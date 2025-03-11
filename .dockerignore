@@ -1,0 +1,42 @@
+# Ignorar dependencias instaladas localmente
+node_modules
+npm-debug.log
+*.log
+
+# Ignorar configuraciones de entornos locales
+.env
+.env.*
+
+# Ignorar archivos y directorios específicos del control de versiones
+.git
+.gitignore
+
+# Ignorar configuraciones del editor/IDE
+.vscode
+.idea
+
+# Ignorar configuraciones específicas de Docker Compose
+docker-compose.override.yml
+
+# Ignorar configuraciones del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Ignorar resultados de pruebas
+coverage/
+*.test.js
+*.spec.js
+test/
+
+# Ignorar archivos temporales o de desarrollo
+*.swp
+*.tmp
+.cache/
+
+# Ignorar archivos de Docker
+Dockerfile
+.dockerignore
+
+# Archivos de dependencias y herramientas locales
+.npm/
+yarn.lock
