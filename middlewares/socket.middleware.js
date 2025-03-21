@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import config from '../config/config.js';
-import Task from '../models/task.model.js';
+import * as taskService from '../services/task.service.js';
 
 const socketMiddleware = (io) => {
   io.use((socket, next) => {
@@ -34,6 +34,20 @@ const socketMiddleware = (io) => {
     const broadcastTaskChange = (eventName, message) => {
       io.emit(eventName, message);
     };
+
+    socket.on('task:fetchAll', async (projectId) => {
+      try {
+        console.log('Fetching tasks...');
+
+        const tasks = await taskService.findAllTasks(projectId);
+        socket.emit('task:fetchedAll', tasks);
+      } catch (e) {
+        socket.emit('task:error', {
+          title: 'Task fetch failed',
+          message: e.message,
+        });
+      }
+    });
 
     socket.on('task:create', async (task) => {
       try {
