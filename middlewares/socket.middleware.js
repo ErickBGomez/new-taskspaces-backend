@@ -4,7 +4,7 @@ import Task from '../models/task.model.js';
 
 const socketMiddleware = (io) => {
   io.use((socket, next) => {
-    const token = socket.handshake.query.token;
+    const token = socket.handshake.auth.token;
 
     if (!token) {
       // console.error('No token provided. Proceeding as unauthenticated.');
