@@ -31,16 +31,17 @@ const socketMiddleware = (io) => {
       console.log('User connected: Unauthenticated');
     }
 
-    const broadcastTaskChange = (eventName, message) => {
-      io.emit(eventName, message);
-    };
+    socket.on('saying:hi', (data) => {
+      console.log(`${socket.user || 'Unauthenticated'} says: ${data}`);
+      socket.emit('responding:hi', 'Hello there!');
+    });
 
     socket.on('task:fetchAll', async (projectId) => {
       try {
-        console.log('Fetching tasks...');
+        console.log(`Fetching tasks... Project Id: ${projectId}`);
 
         const tasks = await taskService.findAllTasks(projectId);
-        socket.emit('task:fetchedAll', tasks);
+        socket.emit('task:fetchedAll', { content: tasks });
       } catch (e) {
         socket.emit('task:error', {
           title: 'Task fetch failed',
@@ -49,11 +50,26 @@ const socketMiddleware = (io) => {
       }
     });
 
-    socket.on('task:create', async (task) => {
+    socket.on('task:fetch', async ({ id, projectId }) => {
       try {
-        console.log('Creating new task...');
+        console.log(`Fetching task... Id: ${id}. Project Id: ${projectId}`);
 
-        broadcastTaskChange('task:created', task);
+        const task = await taskService.findTaskById(id, projectId);
+        socket.emit('task:fetched', { content: task });
+      } catch (e) {
+        socket.emit('task:error', {
+          title: 'Task fetch failed',
+          message: e.message,
+        });
+      }
+    });
+
+    socket.on('task:create', async ({ projectId, task }) => {
+      try {
+        console.log(`Creating new task... Project Id: ${projectId}`);
+
+        const newTask = await taskService.createTask(projectId, task);
+        socket.emit('task:created', { content: newTask });
       } catch (e) {
         socket.emit('task:error', {
           title: 'Task creation failed',
@@ -62,11 +78,12 @@ const socketMiddleware = (io) => {
       }
     });
 
-    socket.on('task:update', async (task) => {
+    socket.on('task:update', async ({ id, projectId, task }) => {
       try {
-        console.log('Updating new task...');
+        console.log(`Updating new task... Id: ${id}. Project Id: ${projectId}`);
 
-        broadcastTaskChange('task:updated', task);
+        const updatedTask = await taskService.updateTask(id, projectId, task);
+        socket.emit('task:updated', { content: updatedTask });
       } catch (e) {
         socket.emit('task:error', {
           title: 'Task update failed',
@@ -75,11 +92,12 @@ const socketMiddleware = (io) => {
       }
     });
 
-    socket.on('task:delete', async (task) => {
+    socket.on('task:delete', async ({ id, projectId }) => {
       try {
-        console.log('Creating new task...');
+        console.log(`Deleting new task... Id: ${id}. Project Id: ${projectId}`);
 
-        broadcastTaskChange('task:deleted', task);
+        await taskService.deleteTask(id, projectId);
+        socket.emit('task:deleted', { content: null });
       } catch (e) {
         socket.emit('task:error', {
           title: 'Task deletion failed',
