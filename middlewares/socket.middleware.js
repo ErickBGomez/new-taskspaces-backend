@@ -69,7 +69,8 @@ const socketMiddleware = (io) => {
         console.log(`[${user}] Creating new task... Project Id: ${projectId}`);
 
         const newTask = await taskService.createTask(projectId, task);
-        socket.emit('task:created', { content: newTask });
+        // Using io instead of socket to emit to all connected clients (see later to emit to a specific room)
+        io.emit('task:created', { content: newTask });
       } catch (e) {
         socket.emit('task:error', {
           title: 'Task creation failed',
@@ -85,7 +86,7 @@ const socketMiddleware = (io) => {
         );
 
         const updatedTask = await taskService.updateTask(id, projectId, task);
-        socket.emit('task:updated', { content: updatedTask });
+        io.emit('task:updated', { content: updatedTask });
       } catch (e) {
         socket.emit('task:error', {
           title: 'Task update failed',
@@ -101,7 +102,7 @@ const socketMiddleware = (io) => {
         );
 
         await taskService.deleteTask(id, projectId);
-        socket.emit('task:deleted', { content: null });
+        io.emit('task:deleted', { content: { _id: id } });
       } catch (e) {
         socket.emit('task:error', {
           title: 'Task deletion failed',
