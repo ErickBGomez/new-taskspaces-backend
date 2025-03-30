@@ -25,22 +25,20 @@ const socketMiddleware = (io) => {
   });
 
   io.on('connection', (socket) => {
-    if (socket.user) {
-      console.log(`User connected: ${socket.user.id}`);
-    } else {
-      console.log('User connected: Unauthenticated');
-    }
+    const user = socket.user?.id || 'Unauthenticated';
+    console.log(`User connected: ${user}`);
 
     socket.on('saying:hi', (data) => {
-      console.log(`${socket.user || 'Unauthenticated'} says: ${data}`);
+      console.log(`${user} says: ${data}`);
       socket.emit('responding:hi', 'Hello there!');
     });
 
     socket.on('task:fetchAll', async (projectId) => {
       try {
-        console.log(`Fetching tasks... Project Id: ${projectId}`);
+        console.log(`[${user}] Fetching tasks... Project Id: ${projectId}`);
 
         const tasks = await taskService.findAllTasks(projectId);
+
         socket.emit('task:fetchedAll', { content: tasks });
       } catch (e) {
         socket.emit('task:error', {
@@ -52,7 +50,9 @@ const socketMiddleware = (io) => {
 
     socket.on('task:fetch', async ({ id, projectId }) => {
       try {
-        console.log(`Fetching task... Id: ${id}. Project Id: ${projectId}`);
+        console.log(
+          `[${user}] Fetching task... Id: ${id}. Project Id: ${projectId}`
+        );
 
         const task = await taskService.findTaskById(id, projectId);
         socket.emit('task:fetched', { content: task });
@@ -66,7 +66,7 @@ const socketMiddleware = (io) => {
 
     socket.on('task:create', async ({ projectId, task }) => {
       try {
-        console.log(`Creating new task... Project Id: ${projectId}`);
+        console.log(`[${user}] Creating new task... Project Id: ${projectId}`);
 
         const newTask = await taskService.createTask(projectId, task);
         socket.emit('task:created', { content: newTask });
@@ -80,7 +80,9 @@ const socketMiddleware = (io) => {
 
     socket.on('task:update', async ({ id, projectId, task }) => {
       try {
-        console.log(`Updating new task... Id: ${id}. Project Id: ${projectId}`);
+        console.log(
+          `[${user}] Updating new task... Id: ${id}. Project Id: ${projectId}`
+        );
 
         const updatedTask = await taskService.updateTask(id, projectId, task);
         socket.emit('task:updated', { content: updatedTask });
@@ -94,7 +96,9 @@ const socketMiddleware = (io) => {
 
     socket.on('task:delete', async ({ id, projectId }) => {
       try {
-        console.log(`Deleting new task... Id: ${id}. Project Id: ${projectId}`);
+        console.log(
+          `[${user}] Deleting new task... Id: ${id}. Project Id: ${projectId}`
+        );
 
         await taskService.deleteTask(id, projectId);
         socket.emit('task:deleted', { content: null });
@@ -107,11 +111,7 @@ const socketMiddleware = (io) => {
     });
 
     socket.on('disconnect', () => {
-      if (socket.user) {
-        console.log(`User disconnected: ${socket.user.id}`);
-      } else {
-        console.log('User disconnected: Unauthenticated');
-      }
+      console.log(`User disconnected: ${user}`);
     });
   });
 };
