@@ -240,8 +240,8 @@ export const createWorkspace = async (req, res) => {
 
 export const inviteMember = async (req, res) => {
   try {
-    const { id, username } = req.params;
-    const { role } = req.body;
+    const { id } = req.params;
+    const { username, role } = req.body;
     const { id: ownerId } = req.user;
 
     const workspace = await workspaceService.inviteMember(
@@ -257,6 +257,63 @@ export const inviteMember = async (req, res) => {
         new SuccessResponseBuilder()
           .setStatus(200)
           .setMessage('Member assigned')
+          .setContent(workspace)
+          .build()
+      );
+  } catch (error) {
+    if (error instanceof WorkspaceNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Workspace not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof UserNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('User not found')
+            .setError(error.message)
+            .build()
+        );
+
+    res
+      .status(500)
+      .json(
+        new ErrorResponseBuilder()
+          .setStatus(500)
+          .setMessage('Internal server error')
+          .setError(error.message)
+          .build()
+      );
+  }
+};
+
+export const updateMember = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { username, role } = req.body;
+    const { id: ownerId } = req.user;
+
+    const workspace = await workspaceService.updateMember(
+      id,
+      ownerId,
+      username,
+      role
+    );
+
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Member updated')
           .setContent(workspace)
           .build()
       );

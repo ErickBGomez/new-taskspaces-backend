@@ -26,21 +26,28 @@ router.post(
   workspaceController.createWorkspace
 );
 router.put(
-  '/:id/member/:username',
-  authMiddleware,
-  inviteValidator,
-  checkValidation,
-  workspaceController.inviteMember
-);
-router.put(
   '/:id',
   authMiddleware,
   workspaceValidator,
   checkValidation,
   workspaceController.updateWorkspace
 );
+router.post(
+  '/:id/members',
+  authMiddleware,
+  inviteValidator,
+  checkValidation,
+  workspaceController.inviteMember
+);
+router.put(
+  '/:id/members',
+  authMiddleware,
+  inviteValidator,
+  checkValidation,
+  workspaceController.updateMember
+);
 router.delete(
-  '/:id/member/:username',
+  '/:id/members/:username',
   authMiddleware,
   workspaceController.removeMember
 );

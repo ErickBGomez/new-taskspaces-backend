@@ -98,6 +98,23 @@ export const inviteMember = async (id, ownerId, username, role) => {
   return await workspaceRepository.inviteMember(id, ownerId, userId, role);
 };
 
+export const updateMember = async (id, ownerId, username, role) => {
+  const workspace = await workspaceRepository.findWorkspaceById(id, ownerId);
+  const userExists = await userRepository.findUserByUsername(username);
+
+  if (!workspace) {
+    throw new WorkspaceNotFoundError();
+  }
+
+  if (!userExists) {
+    throw new UserNotFoundError();
+  }
+
+  const userId = userExists._id;
+
+  return await workspaceRepository.updateMember(id, ownerId, userId, role);
+};
+
 export const removeMember = async (id, ownerId, username) => {
   const workspace = await workspaceRepository.findWorkspaceById(id, ownerId);
   const userExists = await userRepository.findUserByUsername(username);

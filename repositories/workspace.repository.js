@@ -49,6 +49,16 @@ export const inviteMember = async (workspaceId, ownerId, memberId, role) => {
   });
 };
 
+export const updateMember = async (workspaceId, ownerId, memberId, role) => {
+  return await Workspace.findOneAndUpdate(
+    { _id: workspaceId, owner: ownerId, 'members.user': memberId },
+    {
+      $set: { 'members.$.role': role },
+    },
+    { new: true }
+  );
+};
+
 export const removeMember = async (workspaceId, ownerId, memberId) => {
   return await Workspace.findOneAndUpdate(
     { _id: workspaceId, owner: ownerId },

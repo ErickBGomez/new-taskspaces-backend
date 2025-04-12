@@ -11,6 +11,11 @@ export const workspaceValidator = [
 ];
 
 export const inviteValidator = [
+  body('username')
+    .notEmpty()
+    .withMessage('Username is required')
+    .isString()
+    .withMessage('Username must be a string'),
   body('role')
     .notEmpty()
     .withMessage('Role is required')
