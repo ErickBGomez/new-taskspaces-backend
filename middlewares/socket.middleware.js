@@ -28,11 +28,26 @@ const socketMiddleware = (io) => {
     const user = socket.user || 'Unauthenticated';
     console.log(`User connected: ${user.username}`);
 
+    // Test
     socket.on('saying:hi', (data) => {
       console.log(`${user.username} says: ${data}`);
       socket.emit('responding:hi', 'Hello there!');
     });
 
+    // Rooms
+    socket.on('project:join', (projectId) => {
+      socket.join(projectId);
+      console.log(`[${user.username}] Joined project: ${projectId}`);
+      socket.emit('project:joined', { projectId });
+    });
+
+    socket.on('project:leave', (projectId) => {
+      socket.leave(projectId);
+      console.log(`[${user.username}] Left project: ${projectId}`);
+      socket.emit('project:left', { projectId });
+    });
+
+    // Task events
     socket.on('task:fetchAll', async (projectId) => {
       try {
         console.log(
@@ -41,7 +56,7 @@ const socketMiddleware = (io) => {
 
         const tasks = await taskService.findAllTasks(projectId);
 
-        socket.emit('task:fetchedAll', { content: tasks });
+        io.to(projectId).emit('task:fetchedAll', { content: tasks });
       } catch (e) {
         socket.emit('task:error', {
           title: 'Task fetch failed',
@@ -57,7 +72,7 @@ const socketMiddleware = (io) => {
         );
 
         const task = await taskService.findTaskById(id, projectId);
-        socket.emit('task:fetched', { content: task });
+        io.to(projectId).emit('task:fetched', { content: task });
       } catch (e) {
         socket.emit('task:error', {
           title: 'Task fetch failed',
@@ -74,7 +89,7 @@ const socketMiddleware = (io) => {
 
         const newTask = await taskService.createTask(projectId, task);
         // Using io instead of socket to emit to all connected clients (see later to emit to a specific room)
-        io.emit('task:created', { content: newTask });
+        io.to(projectId).emit('task:created', { content: newTask });
       } catch (e) {
         socket.emit('task:error', {
           title: 'Task creation failed',
@@ -90,7 +105,7 @@ const socketMiddleware = (io) => {
         );
 
         const updatedTask = await taskService.updateTask(id, projectId, task);
-        io.emit('task:updated', { content: updatedTask });
+        io.to(projectId).emit('task:updated', { content: updatedTask });
       } catch (e) {
         socket.emit('task:error', {
           title: 'Task update failed',
@@ -106,7 +121,7 @@ const socketMiddleware = (io) => {
         );
 
         await taskService.deleteTask(id, projectId);
-        io.emit('task:deleted', { content: { _id: id } });
+        io.to(projectId).emit('task:deleted', { content: { _id: id } });
       } catch (e) {
         socket.emit('task:error', {
           title: 'Task deletion failed',
