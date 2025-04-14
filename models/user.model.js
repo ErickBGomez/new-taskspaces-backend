@@ -27,6 +27,11 @@ const userSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    role: {
+      type: String,
+      enum: ['SYSADMIN', 'USER'],
+      default: 'USER',
+    },
     token: {
       type: String,
     },

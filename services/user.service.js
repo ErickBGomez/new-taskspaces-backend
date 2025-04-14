@@ -64,7 +64,7 @@ export const loginUser = async ({ email, password }) => {
     throw new IncorrectCredentialsError();
   }
 
-  const { _id, fullname, username, avatar } = user;
+  const { _id, fullname, username, avatar, role } = user;
 
   const comparedPassword = await user.comparePassword(password);
 
@@ -73,13 +73,9 @@ export const loginUser = async ({ email, password }) => {
   }
 
   // Saved user information goes here
-  const token = jwt.sign(
-    { id: user._id, username: user.username },
-    config.JWT_SECRET,
-    {
-      expiresIn: '1h',
-    }
-  );
+  const token = jwt.sign({ id: user._id, username, role }, config.JWT_SECRET, {
+    expiresIn: '1h',
+  });
 
   return { user: { _id, fullname, username, avatar, email }, token };
 };
