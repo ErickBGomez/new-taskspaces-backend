@@ -54,6 +54,7 @@ export const registerUser = async ({
     avatar,
     email,
     password,
+    role: 'USER',
   });
 };
 
