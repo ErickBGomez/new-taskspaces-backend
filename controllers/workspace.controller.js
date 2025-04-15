@@ -2,6 +2,7 @@ import * as workspaceService from '../services/workspace.service.js';
 import {
   WorkspaceNotFoundError,
   WorkspaceAlreadyExistsError,
+  InvalidMemberRoleError,
 } from '../errors/workspace.errors.js';
 import SuccessResponseBuilder from '../helpers/success-response-builder.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
@@ -238,6 +239,155 @@ export const createWorkspace = async (req, res) => {
   }
 };
 
+export const updateWorkspace = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, bookmarks, members } = req.body;
+    const { id: userId } = req.user;
+
+    const workspace = await workspaceService.updateWorkspace(id, userId, {
+      title,
+      bookmarks,
+      members,
+    });
+
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Workspace updated')
+          .setContent(workspace)
+          .build()
+      );
+  } catch (error) {
+    if (error instanceof WorkspaceNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Workspace not found')
+            .setError(error.message)
+            .build()
+        );
+
+    res
+      .status(500)
+      .json(
+        new ErrorResponseBuilder()
+          .setStatus(500)
+          .setMessage('Internal server error')
+          .setError(error.message)
+          .build()
+      );
+  }
+};
+
+export const deleteWorkspace = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { id: userId } = req.user;
+
+    await workspaceService.deleteWorkspace(id, userId);
+
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Workspace deleted')
+          .build()
+      );
+  } catch (error) {
+    if (error instanceof WorkspaceNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Workspace not found')
+            .setError(error.message)
+            .build()
+        );
+
+    res
+      .status(500)
+      .json(
+        new ErrorResponseBuilder()
+          .setStatus(500)
+          .setMessage('Internal server error')
+          .setError(error.message)
+          .build()
+      );
+  }
+};
+
+// Members
+export const getMemberRole = async (req, res) => {
+  try {
+    const { id: workspaceId, memberId } = req.params;
+
+    const memberRole = await workspaceService.findMemberRole(
+      workspaceId,
+      memberId
+    );
+
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Member role found')
+          .setContent({ memberRole })
+          .build()
+      );
+  } catch (error) {
+    if (error instanceof WorkspaceNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Workspace not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof UserNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('User not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof InvalidMemberRoleError)
+      return res
+        .status(400)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(400)
+            .setMessage('Invalid member role')
+            .setError(error.message)
+            .build()
+        );
+
+    res
+      .status(500)
+      .json(
+        new ErrorResponseBuilder()
+          .setStatus(500)
+          .setMessage('Internal server error')
+          .setError(error.message)
+          .build()
+      );
+  }
+};
+
 export const inviteMember = async (req, res) => {
   try {
     const { id } = req.params;
@@ -391,90 +541,6 @@ export const removeMember = async (req, res) => {
           new ErrorResponseBuilder()
             .setStatus(404)
             .setMessage('User not found')
-            .setError(error.message)
-            .build()
-        );
-
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
-  }
-};
-
-export const updateWorkspace = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { title, bookmarks, members } = req.body;
-    const { id: userId } = req.user;
-
-    const workspace = await workspaceService.updateWorkspace(id, userId, {
-      title,
-      bookmarks,
-      members,
-    });
-
-    res
-      .status(200)
-      .json(
-        new SuccessResponseBuilder()
-          .setStatus(200)
-          .setMessage('Workspace updated')
-          .setContent(workspace)
-          .build()
-      );
-  } catch (error) {
-    if (error instanceof WorkspaceNotFoundError)
-      return res
-        .status(404)
-        .json(
-          new ErrorResponseBuilder()
-            .setStatus(404)
-            .setMessage('Workspace not found')
-            .setError(error.message)
-            .build()
-        );
-
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
-  }
-};
-
-export const deleteWorkspace = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { id: userId } = req.user;
-
-    await workspaceService.deleteWorkspace(id, userId);
-
-    res
-      .status(200)
-      .json(
-        new SuccessResponseBuilder()
-          .setStatus(200)
-          .setMessage('Workspace deleted')
-          .build()
-      );
-  } catch (error) {
-    if (error instanceof WorkspaceNotFoundError)
-      return res
-        .status(404)
-        .json(
-          new ErrorResponseBuilder()
-            .setStatus(404)
-            .setMessage('Workspace not found')
             .setError(error.message)
             .build()
         );

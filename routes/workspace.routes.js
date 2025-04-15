@@ -6,6 +6,10 @@ import {
 } from '../validators/workspace.validator.js';
 import checkValidation from '../middlewares/validator.middleware.js';
 import express from 'express';
+import {
+  authorizeRoles,
+  ROLES,
+} from '../middlewares/authorize-roles.middleware.js';
 
 const router = express.Router();
 
@@ -14,7 +18,12 @@ router.get(
   authMiddleware,
   workspaceController.checkWorkspaceAvailability
 );
-router.get('/', authMiddleware, workspaceController.getAllWorkspaces);
+router.get(
+  '/',
+  authMiddleware,
+  authorizeRoles(ROLES.USER),
+  workspaceController.getAllWorkspaces
+);
 router.get('/:id/', authMiddleware, workspaceController.getWorkspaceById);
 router.get('/u/:userId', workspaceController.getWorkspacesByOwnerId);
 router.get('/:id/u/:userId', workspaceController.getWorkspaceByOwnerId);
@@ -31,6 +40,14 @@ router.put(
   workspaceValidator,
   checkValidation,
   workspaceController.updateWorkspace
+);
+router.delete('/:id', authMiddleware, workspaceController.deleteWorkspace);
+
+// Members
+router.get(
+  '/:id/members/:memberId',
+  authMiddleware,
+  workspaceController.getMemberRole
 );
 router.post(
   '/:id/members',
@@ -51,6 +68,5 @@ router.delete(
   authMiddleware,
   workspaceController.removeMember
 );
-router.delete('/:id', authMiddleware, workspaceController.deleteWorkspace);
 
 export default router;

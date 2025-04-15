@@ -6,9 +6,9 @@ const memberSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  role: {
+  memberRole: {
     type: String,
-    enum: ['admin', 'collaborator', 'reader'],
+    enum: ['ADMIN', 'COLLABORATOR', 'READER'],
     required: true,
   },
 });

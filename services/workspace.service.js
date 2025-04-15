@@ -3,8 +3,10 @@ import * as userRepository from '../repositories/user.repository.js';
 import {
   WorkspaceNotFoundError,
   WorkspaceAlreadyExistsError,
+  InvalidMemberRoleError,
 } from '../errors/workspace.errors.js';
 import { UserNotFoundError } from '../errors/user.errors.js';
+import { MEMBER_ROLES } from '../middlewares/check-member-role.middleware.js';
 
 export const findAllWorkspaces = async (userId) => {
   return await workspaceRepository.findAllWorkspaces(userId);
@@ -33,6 +35,16 @@ export const findWorkspaceByOwnerId = async (id, ownerId) => {
   return workspace;
 };
 
+export const findWorkspacesByOwnerId = async (ownerId) => {
+  const userExists = await userRepository.findUserById(ownerId);
+
+  if (!userExists) {
+    throw new UserNotFoundError();
+  }
+
+  return await workspaceRepository.findWorkspacesByOwnerId(ownerId);
+};
+
 export const getUserRole = async (workspaceId, userId) => {
   const workspace = await workspaceRepository.findWorkspaceById(
     workspaceId,
@@ -46,16 +58,6 @@ export const getUserRole = async (workspaceId, userId) => {
   return workspace.members.find(
     (member) => member.user._id.toString() === userId
   ).role;
-};
-
-export const findWorkspacesByOwnerId = async (ownerId) => {
-  const userExists = await userRepository.findUserById(ownerId);
-
-  if (!userExists) {
-    throw new UserNotFoundError();
-  }
-
-  return await workspaceRepository.findWorkspacesByOwnerId(ownerId);
 };
 
 export const checkWorkspaceAvailability = async (title, userId) => {
@@ -79,6 +81,22 @@ export const createWorkspace = async ({ title, bookmarks, owner }) => {
     bookmarks,
     owner,
   });
+};
+
+// Members
+export const findMemberRole = async (workspaceId, memberId) => {
+  const workspace = await workspaceRepository.findWorkspaceById(workspaceId);
+
+  if (!workspace) throw new WorkspaceNotFoundError();
+
+  const member = await workspaceRepository.findMember(workspaceId, memberId);
+
+  if (!member) throw new UserNotFoundError();
+
+  if (!MEMBER_ROLES[member.memberRole.toUpperCase()])
+    throw new InvalidMemberRoleError();
+
+  return member.memberRole;
 };
 
 export const inviteMember = async (id, ownerId, username, role) => {

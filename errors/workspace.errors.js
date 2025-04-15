@@ -11,3 +11,10 @@ export class WorkspaceAlreadyExistsError extends Error {
     this.name = 'WorkspaceAlreadyExists';
   }
 }
+
+export class InvalidMemberRoleError extends Error {
+  constructor(message = 'Invalid member role or member role not provided') {
+    super(message);
+    this.name = 'InvalidMemberRole';
+  }
+}

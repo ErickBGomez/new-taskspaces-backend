@@ -4,10 +4,8 @@ export const findAllWorkspaces = async (userId) => {
   return await Workspace.find({ owner: userId }).populate('members.user');
 };
 
-export const findWorkspaceById = async (id, userId) => {
-  return await Workspace.findOne({ _id: id, owner: userId }).populate(
-    'members.user'
-  );
+export const findWorkspaceById = async (id) => {
+  return await Workspace.findById(id);
 };
 
 export const findWorkspaceByTitle = async (title, userId) => {
@@ -26,6 +24,37 @@ export const findWorkspaceByOwnerId = async (id, ownerId) => {
 
 export const createWorkspace = async (workspace) => {
   return await Workspace.create(workspace);
+};
+
+export const updateWorkspace = async (id, userId, workspace) => {
+  return await Workspace.findOneAndUpdate(
+    { _id: id, owner: userId },
+    workspace,
+    { new: true }
+  );
+};
+
+export const deleteWorkspace = async (id, userId, workspace) => {
+  return await Workspace.findOneAndDelete(
+    { _id: id, owner: userId },
+    workspace
+  );
+};
+
+// Members
+export const findMember = async (workspaceId, memberId) => {
+  const workspace =
+    await Workspace.findById(workspaceId).populate('members.user');
+
+  if (!workspace) return null;
+
+  const member = workspace.members.find(
+    (member) => member.user._id.toString() === memberId
+  );
+
+  if (!member) return null;
+
+  return member;
 };
 
 export const inviteMember = async (workspaceId, ownerId, memberId, role) => {
@@ -66,20 +95,5 @@ export const removeMember = async (workspaceId, ownerId, memberId) => {
       $pull: { members: { user: memberId } },
     },
     { new: true }
-  );
-};
-
-export const updateWorkspace = async (id, userId, workspace) => {
-  return await Workspace.findOneAndUpdate(
-    { _id: id, owner: userId },
-    workspace,
-    { new: true }
-  );
-};
-
-export const deleteWorkspace = async (id, userId, workspace) => {
-  return await Workspace.findOneAndDelete(
-    { _id: id, owner: userId },
-    workspace
   );
 };
