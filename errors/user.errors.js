@@ -33,3 +33,26 @@ export class SameOldPasswordError extends Error {
     this.name = 'SameOldPasswordError';
   }
 }
+
+export class UnauthorizedError extends Error {
+  constructor(message = 'Unauthorized') {
+    super(message);
+    this.name = 'UnauthorizedError';
+  }
+}
+
+export class InvalidRoleError extends Error {
+  constructor(message = 'Role invalid or not provided') {
+    super(message);
+    this.name = 'InvalidRoleError';
+  }
+}
+
+export class InsufficientPrivilegesError extends Error {
+  constructor(
+    message = 'User does not have sufficient privileges to perform this action'
+  ) {
+    super(message);
+    this.name = 'InsufficientPrivilegesError';
+  }
+}

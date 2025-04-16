@@ -2,6 +2,17 @@ import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import * as workspaceService from '../services/workspace.service.js';
 import * as projectService from '../services/project.service.js';
 import * as taskService from '../services/task.service.js';
+import {
+  InsufficientPrivilegesError,
+  UnauthorizedError,
+} from '../errors/user.errors.js';
+import {
+  InvalidMemberRoleError,
+  WorkspaceNotFoundError,
+} from '../errors/workspace.errors.js';
+import { ProjectNotFoundError } from '../errors/project.errors.js';
+import { TaskNotFoundError } from '../errors/task.errors.js';
+import { InvalidDepthError } from '../errors/common.errors.js';
 
 export const MEMBER_ROLES = {
   READER: 'READER',
@@ -23,17 +34,9 @@ export const DEPTH = {
 
 export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
   return async (req, res, next) => {
-    if (!req.user)
-      return res
-        .status(401)
-        .json(
-          new ErrorResponseBuilder.setStatus(401)
-            .setMessage('Unauthorized')
-            .setError('User not authenticated')
-            .build()
-        );
-
     try {
+      if (!req.user) throw new UnauthorizedError();
+
       const { id: userId } = req.user;
       let memberRole;
 
@@ -84,10 +87,56 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
           break;
         }
         default:
-          throw new Error('Invalid depth parameter');
+          throw new InvalidDepthError();
       }
 
-      if (!MEMBER_ROLES[memberRole])
+      if (!MEMBER_ROLES[memberRole]) throw new InvalidMemberRoleError();
+
+      if (
+        MEMBER_ROLES_HIERARCHY[memberRole] <
+        MEMBER_ROLES_HIERARCHY[requiredMemberRole]
+      )
+        throw new InsufficientPrivilegesError();
+
+      // User has the required member role (ADMIN can bypass all member roles)
+      next();
+    } catch (error) {
+      if (error instanceof UnauthorizedError)
+        return res
+          .status(401)
+          .json(
+            new ErrorResponseBuilder.setStatus(401)
+              .setMessage('Unauthorized')
+              .setError('User not authenticated')
+              .build()
+          );
+
+      if (
+        error instanceof WorkspaceNotFoundError ||
+        error instanceof ProjectNotFoundError ||
+        error instanceof TaskNotFoundError
+      )
+        return res
+          .status(404)
+          .json(
+            new ErrorResponseBuilder()
+              .setStatus(404)
+              .setMessage('Not Found')
+              .setError(error.message).build
+          );
+
+      if (error instanceof InvalidDepthError)
+        return res
+          .status(400)
+          .json(
+            new ErrorResponseBuilder()
+              .setStatus(400)
+              .setMessage('Bad Request')
+              .setError('Invalid depth provided')
+              .build()
+          );
+
+      if (error instanceof InvalidMemberRoleError)
         return res
           .status(403)
           .json(
@@ -98,10 +147,7 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
               .build()
           );
 
-      if (
-        MEMBER_ROLES_HIERARCHY[memberRole] <
-        MEMBER_ROLES_HIERARCHY[requiredMemberRole]
-      )
+      if (error instanceof InsufficientPrivilegesError)
         return res
           .status(403)
           .json(
@@ -114,12 +160,7 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
               .build()
           );
 
-      // User has the required member role (ADMIN can bypass all member roles)
-      next();
-    } catch (error) {
-      // TODO: Define all errors
-
-      return res
+      res
         .status(500)
         .json(
           new ErrorResponseBuilder()
