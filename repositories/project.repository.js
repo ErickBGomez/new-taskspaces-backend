@@ -8,7 +8,11 @@ export const findGlobalProjects = async () => {
   return await Project.find();
 };
 
-export const findProjectById = async (id, workspaceId) => {
+export const findProjectById = async (id) => {
+  return await Project.findById(id);
+};
+
+export const findProjectByIdAndWorkspaceId = async (id, workspaceId) => {
   return await Project.findOne({ _id: id, workspace: workspaceId });
 };
 

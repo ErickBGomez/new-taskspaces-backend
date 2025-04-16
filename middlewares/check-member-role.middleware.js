@@ -35,7 +35,6 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
     try {
       const { id: userId } = req.user;
       let memberRole;
-      console.log(req.user);
 
       // TODO: Refactor these lines
       // TODO: Test this: Should be put after authorizeRoles, and then try with different depths

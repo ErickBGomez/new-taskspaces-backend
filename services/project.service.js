@@ -30,7 +30,10 @@ export const getRoleFromProject = async (projectId, userId) => {
 };
 
 export const findProjectById = async (id, workspaceId) => {
-  const project = await projectRepository.findProjectById(id, workspaceId);
+  const project = await projectRepository.findProjectByIdAndWorkspaceId(
+    id,
+    workspaceId
+  );
 
   if (!project) {
     throw new ProjectNotFoundError();
@@ -84,7 +87,7 @@ export const updateProject = async (
 };
 
 export const deleteProject = async (id, workspaceId) => {
-  const projectExists = await projectRepository.findProjectById(
+  const projectExists = await projectRepository.findProjectByIdAndWorkspaceId(
     id,
     workspaceId
   );
