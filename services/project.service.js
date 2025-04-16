@@ -1,5 +1,4 @@
 import * as projectRepository from '../repositories/project.repository.js';
-import * as workspaceService from './workspace.service.js';
 import {
   ProjectNotFoundError,
   ProjectAlreadyExists,
@@ -12,21 +11,6 @@ export const findAllProjects = async (workspaceId) => {
 
 export const findGlobalProjects = async () => {
   return await projectRepository.findGlobalProjects();
-};
-
-export const getRoleFromProject = async (projectId, userId) => {
-  const allProjects = await findGlobalProjects();
-  const currentProject = allProjects.find(
-    (project) => project._id.toString() === projectId
-  );
-
-  if (!currentProject) {
-    throw new ProjectNotFoundError();
-  }
-
-  const workspaceId = currentProject.workspace;
-
-  return await workspaceService.getUserRole(workspaceId, userId);
 };
 
 export const findProjectById = async (id, workspaceId) => {
