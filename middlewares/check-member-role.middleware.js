@@ -38,37 +38,52 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
 
       // TODO: Refactor these lines
       // TODO: Test this: Should be put after authorizeRoles, and then try with different depths
-      if (depth === DEPTH.WORKSPACE) {
-        // Obtain either workspaceId or id from path parameters
-        const { workspaceId, id } = req.params;
-        const resolvedWorkspaceId = workspaceId ?? id;
+      switch (depth) {
+        case DEPTH.WORKSPACE: {
+          // Obtain either workspaceId or id from path parameters
+          const { workspaceId, id } = req.params;
+          const resolvedWorkspaceId = workspaceId ?? id;
 
-        memberRole = await workspaceService.findMemberRole(
-          resolvedWorkspaceId,
-          userId
-        );
-      } else if (depth === DEPTH.PROJECT) {
-        const { projectId, id } = req.params;
-        const resolvedProjectId = projectId ?? id;
+          memberRole = await workspaceService.findMemberRole(
+            resolvedWorkspaceId,
+            userId
+          );
+          break;
+        }
+        case DEPTH.PROJECT: {
+          const { projectId, id } = req.params;
+          const resolvedProjectId = projectId ?? id;
 
-        const workspaceId =
-          await projectService.findWorkspaceIdByProjectId(resolvedProjectId);
+          const workspaceId =
+            await projectService.findWorkspaceIdByProjectId(resolvedProjectId);
 
-        memberRole = await workspaceService.findMemberRole(workspaceId, userId);
-      } else if (depth === DEPTH.TASK) {
-        const { taskId, id } = req.params;
-        const resolvedTaskId = taskId ?? id;
+          memberRole = await workspaceService.findMemberRole(
+            workspaceId,
+            userId
+          );
 
-        // Create this method in Task service
-        const projectId =
-          await projectService.findProjectIdByTaskId(resolvedTaskId);
+          break;
+        }
+        case DEPTH.TASK: {
+          const { taskId, id } = req.params;
+          const resolvedTaskId = taskId ?? id;
 
-        const workspaceId =
-          await projectService.findWorkspaceIdByProjectId(projectId);
+          // Create this method in Task service
+          const projectId =
+            await projectService.findProjectIdByTaskId(resolvedTaskId);
 
-        memberRole = await workspaceService.findMemberRole(workspaceId, userId);
-      } else {
-        throw new Error('Invalid depth parameter');
+          const workspaceId =
+            await projectService.findWorkspaceIdByProjectId(projectId);
+
+          memberRole = await workspaceService.findMemberRole(
+            workspaceId,
+            userId
+          );
+
+          break;
+        }
+        default:
+          throw new Error('Invalid depth parameter');
       }
 
       if (!MEMBER_ROLES[memberRole])
