@@ -37,12 +37,11 @@ export const getAllUsers = async (req, res) => {
 
 export const getUserById = async (req, res) => {
   try {
-    const { user } = req;
+    const { id: userId, role } = req.user;
     const { id } = req.params;
 
     // User role can only retrieve their own data. Sysadmin can retrieve any user
-    if (user.role === ROLES.USER && user.id !== id)
-      throw new UserNotFoundError();
+    if (role !== ROLES.SYSADMIN && userId !== id) throw new UserNotFoundError();
 
     const resultUser = await userService.findUserById(id);
 
@@ -213,13 +212,12 @@ export const forgotPassword = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
-    const { user } = req;
+    const { id: userId, role } = req.user;
     const { id } = req.params;
     const { fullname, username, avatar, email, description } = req.body;
 
     // User role can only retrieve their own data. Sysadmin can retrieve any user
-    if (user.role === ROLES.USER && user.id !== id)
-      throw new UserNotFoundError();
+    if (role !== ROLES.SYSADMIN && userId !== id) throw new UserNotFoundError();
 
     const updatedUser = await userService.updateUser(id, {
       fullname,
@@ -264,13 +262,12 @@ export const updateUser = async (req, res) => {
 
 export const updatePassword = async (req, res) => {
   try {
-    const { user } = req;
+    const { id: userId, role } = req.user;
     const { id } = req.params;
     const { newPassword, confirmPassword } = req.body;
 
     // User role can only retrieve their own data. Sysadmin can retrieve any user
-    if (user.role === ROLES.USER && user.id !== id)
-      throw new UserNotFoundError();
+    if (role !== ROLES.SYSADMIN && userId !== id) throw new UserNotFoundError();
 
     await userService.updatePassword(id, newPassword, confirmPassword);
 
@@ -308,12 +305,11 @@ export const updatePassword = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
-    const { user } = req;
+    const { id: userId, role } = req.user;
     const { id } = req.params;
 
     // User role can only retrieve their own data. Sysadmin can retrieve any user
-    if (user.role === ROLES.USER && user.id !== id)
-      throw new UserNotFoundError();
+    if (role !== ROLES.SYSADMIN && userId !== id) throw new UserNotFoundError();
 
     await userService.deleteUser(id);
 
