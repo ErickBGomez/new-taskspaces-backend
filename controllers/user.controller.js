@@ -7,6 +7,7 @@ import {
 } from '../errors/user.errors.js';
 import SuccessResponseBuilder from '../helpers/success-response-builder.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
+import { ROLES } from '../middlewares/authorize-roles.middleware.js';
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -36,9 +37,14 @@ export const getAllUsers = async (req, res) => {
 
 export const getUserById = async (req, res) => {
   try {
+    const { user } = req;
     const { id } = req.params;
 
-    const user = await userService.findUserById(id);
+    // User role can only retrieve their own data. Sysadmin can retrieve any user
+    if (user.role === ROLES.USER && user.id !== id)
+      throw new UserNotFoundError();
+
+    const resultUser = await userService.findUserById(id);
 
     res
       .status(200)
@@ -46,7 +52,7 @@ export const getUserById = async (req, res) => {
         new SuccessResponseBuilder()
           .setStatus(200)
           .setMessage('User retrieved')
-          .setContent(user)
+          .setContent(resultUser)
           .build()
       );
   } catch (error) {
@@ -134,8 +140,6 @@ export const loginUser = async (req, res) => {
 
     const { user, token } = await userService.loginUser({ email, password });
 
-    // ? Insert token here?
-
     res
       .status(200)
       .json(
@@ -209,8 +213,13 @@ export const forgotPassword = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
+    const { user } = req;
     const { id } = req.params;
     const { fullname, username, avatar, email, description } = req.body;
+
+    // User role can only retrieve their own data. Sysadmin can retrieve any user
+    if (user.role === ROLES.USER && user.id !== id)
+      throw new UserNotFoundError();
 
     const updatedUser = await userService.updateUser(id, {
       fullname,
@@ -255,8 +264,13 @@ export const updateUser = async (req, res) => {
 
 export const updatePassword = async (req, res) => {
   try {
+    const { user } = req;
     const { id } = req.params;
     const { newPassword, confirmPassword } = req.body;
+
+    // User role can only retrieve their own data. Sysadmin can retrieve any user
+    if (user.role === ROLES.USER && user.id !== id)
+      throw new UserNotFoundError();
 
     await userService.updatePassword(id, newPassword, confirmPassword);
 
@@ -294,7 +308,12 @@ export const updatePassword = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
+    const { user } = req;
     const { id } = req.params;
+
+    // User role can only retrieve their own data. Sysadmin can retrieve any user
+    if (user.role === ROLES.USER && user.id !== id)
+      throw new UserNotFoundError();
 
     await userService.deleteUser(id);
 

@@ -20,6 +20,8 @@ export const authorizeRolesMiddleware = (requiredRole) => {
     try {
       const { role } = req.user;
 
+      console.log(role);
+
       if (!req.user) throw new UnauthorizedError();
 
       // ROLES[undefined] returns undefined. This happens when a role is not provided, or is anything besides USER or SYSADMIN
@@ -37,7 +39,8 @@ export const authorizeRolesMiddleware = (requiredRole) => {
         return res
           .status(401)
           .json(
-            new ErrorResponseBuilder.setStatus(401)
+            new ErrorResponseBuilder()
+              .setStatus(401)
               .setMessage('Unauthorized')
               .setError('User not authenticated')
               .build()
@@ -47,7 +50,8 @@ export const authorizeRolesMiddleware = (requiredRole) => {
         return res
           .status(403)
           .json(
-            new ErrorResponseBuilder.setStatus(403)
+            new ErrorResponseBuilder()
+              .setStatus(403)
               .setMessage('Forbidden')
               .setError('Role invalid or not provided')
               .build()
@@ -57,7 +61,8 @@ export const authorizeRolesMiddleware = (requiredRole) => {
         return res
           .status(403)
           .json(
-            new ErrorResponseBuilder.setStatus(403)
+            new ErrorResponseBuilder()
+              .setStatus(403)
               .setMessage('Forbidden')
               .setError(
                 'User does not have sufficient privileges to perform this action'

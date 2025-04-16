@@ -105,7 +105,8 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
         return res
           .status(401)
           .json(
-            new ErrorResponseBuilder.setStatus(401)
+            new ErrorResponseBuilder()
+              .setStatus(401)
               .setMessage('Unauthorized')
               .setError('User not authenticated')
               .build()
