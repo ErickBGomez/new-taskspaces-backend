@@ -242,13 +242,11 @@ export const createWorkspace = async (req, res) => {
 export const updateWorkspace = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, bookmarks, members } = req.body;
+    const { title } = req.body;
     const { id: userId } = req.user;
 
     const workspace = await workspaceService.updateWorkspace(id, userId, {
       title,
-      bookmarks,
-      members,
     });
 
     res

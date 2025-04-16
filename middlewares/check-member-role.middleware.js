@@ -14,6 +14,12 @@ const MEMBER_ROLES_HIERARCHY = {
   ADMIN: 2,
 };
 
+export const DEPTH = {
+  TASK: 'task',
+  PROJECT: 'project',
+  WORKSPACE: 'workspace',
+};
+
 export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
   return async (req, res, next) => {
     if (!req.user)
@@ -33,22 +39,30 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
 
       // TODO: Refactor these lines
       // TODO: Test this: Should be put after authorizeRoles, and then try with different depths
-      if (depth === 'workspace') {
-        const { workspaceId } = req.params;
+      if (depth === DEPTH.WORKSPACE) {
+        // Obtain either workspaceId or id from path parameters
+        const { workspaceId, id } = req.params;
+        const resolvedWorkspaceId = workspaceId ?? id;
 
-        memberRole = await workspaceService.findMemberRole(workspaceId, userId);
-      } else if (depth === 'project') {
-        const { projectId } = req.params;
+        memberRole = await workspaceService.findMemberRole(
+          resolvedWorkspaceId,
+          userId
+        );
+      } else if (depth === DEPTH.PROJECT) {
+        const { projectId, id } = req.params;
+        const resolvedProjectId = projectId ?? id;
 
         const workspaceId =
-          await projectService.findWorkspaceIdByProjectId(projectId);
+          await projectService.findWorkspaceIdByProjectId(resolvedProjectId);
 
         memberRole = await workspaceService.findMemberRole(workspaceId, userId);
-      } else if (depth === 'task') {
-        const { taskId } = req.params;
+      } else if (depth === DEPTH.TASK) {
+        const { taskId, id } = req.params;
+        const resolvedTaskId = taskId ?? id;
 
         // Create this method in Task service
-        const projectId = await projectService.findProjectIdByTaskId(taskId);
+        const projectId =
+          await projectService.findProjectIdByTaskId(resolvedTaskId);
 
         const workspaceId =
           await projectService.findWorkspaceIdByProjectId(projectId);

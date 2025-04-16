@@ -149,7 +149,7 @@ export const removeMember = async (id, ownerId, username) => {
   return await workspaceRepository.removeMember(id, ownerId, userId);
 };
 
-export const updateWorkspace = async (id, userId, { title, bookmarks }) => {
+export const updateWorkspace = async (id, userId, { title }) => {
   const workspaceExists = await workspaceRepository.findWorkspaceById(
     id,
     userId
@@ -159,11 +159,7 @@ export const updateWorkspace = async (id, userId, { title, bookmarks }) => {
     throw new WorkspaceNotFoundError();
   }
 
-  return await workspaceRepository.updateWorkspace(id, {
-    title,
-    bookmarks,
-    owner: userId,
-  });
+  return await workspaceRepository.updateWorkspace(id, userId, { title });
 };
 
 export const deleteWorkspace = async (id, userId) => {
