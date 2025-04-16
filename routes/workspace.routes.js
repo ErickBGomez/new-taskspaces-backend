@@ -7,7 +7,7 @@ import {
 import checkValidation from '../middlewares/validator.middleware.js';
 import express from 'express';
 import {
-  authorizeRoles,
+  authorizeRolesMiddleware,
   ROLES,
 } from '../middlewares/authorize-roles.middleware.js';
 
@@ -21,7 +21,7 @@ router.get(
 router.get(
   '/',
   authMiddleware,
-  authorizeRoles(ROLES.USER),
+  authorizeRolesMiddleware(ROLES.USER),
   workspaceController.getAllWorkspaces
 );
 router.get('/:id/', authMiddleware, workspaceController.getWorkspaceById);
@@ -57,7 +57,7 @@ router.post(
   workspaceController.inviteMember
 );
 router.put(
-  '/:id/members',
+  '/:id/members/:username',
   authMiddleware,
   inviteValidator,
   checkValidation,

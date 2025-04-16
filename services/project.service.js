@@ -4,6 +4,7 @@ import {
   ProjectNotFoundError,
   ProjectAlreadyExists,
 } from '../errors/project.errors.js';
+import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
 
 export const findAllProjects = async (workspaceId) => {
   return await projectRepository.findAllProjects(workspaceId);
@@ -93,4 +94,17 @@ export const deleteProject = async (id, workspaceId) => {
   }
 
   return await projectRepository.deleteProject(id);
+};
+
+// Methods without routes
+export const findWorkspaceIdByProjectId = async (id) => {
+  const project = await projectRepository.findProjectById(id);
+
+  if (!project) throw new ProjectNotFoundError();
+
+  if (!project.workspace) {
+    throw new WorkspaceNotFoundError();
+  }
+
+  return project.workspace;
 };

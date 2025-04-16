@@ -4,6 +4,11 @@ import express from 'express';
 import projectValidator from '../validators/project.validator.js';
 import checkValidation from '../middlewares/validator.middleware.js';
 import projectRolesMiddleware from '../middlewares/project-roles.middleware.js';
+import { authorizeRolesMiddleware } from '../middlewares/authorize-roles.middleware.js';
+import {
+  checkMemberRoleMiddleware,
+  MEMBER_ROLES,
+} from '../middlewares/check-member-role.middleware.js';
 
 const router = express.Router();
 
@@ -16,7 +21,9 @@ router.get(
 router.post(
   '/w/:workspaceId',
   authMiddleware,
-  projectRolesMiddleware,
+  // projectRolesMiddleware,
+  authorizeRolesMiddleware('USER'),
+  checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, 'workspace'),
   projectValidator,
   checkValidation,
   projectController.createProject

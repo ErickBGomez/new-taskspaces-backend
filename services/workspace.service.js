@@ -45,21 +45,6 @@ export const findWorkspacesByOwnerId = async (ownerId) => {
   return await workspaceRepository.findWorkspacesByOwnerId(ownerId);
 };
 
-export const getUserRole = async (workspaceId, userId) => {
-  const workspace = await workspaceRepository.findWorkspaceById(
-    workspaceId,
-    userId
-  );
-
-  if (!workspace) {
-    throw new WorkspaceNotFoundError();
-  }
-
-  return workspace.members.find(
-    (member) => member.user._id.toString() === userId
-  ).role;
-};
-
 export const checkWorkspaceAvailability = async (title, userId) => {
   const workspace = await workspaceRepository.findWorkspaceByTitle(
     title,
@@ -99,8 +84,13 @@ export const findMemberRole = async (workspaceId, memberId) => {
   return member.memberRole;
 };
 
-export const inviteMember = async (id, ownerId, username, role) => {
-  const workspace = await workspaceRepository.findWorkspaceById(id, ownerId);
+export const inviteMember = async (
+  workspaceId,
+  ownerId,
+  username,
+  memberRole
+) => {
+  const workspace = await workspaceRepository.findWorkspaceById(workspaceId);
   const userExists = await userRepository.findUserByUsername(username);
 
   if (!workspace) {
@@ -111,9 +101,18 @@ export const inviteMember = async (id, ownerId, username, role) => {
     throw new UserNotFoundError();
   }
 
+  if (!MEMBER_ROLES[memberRole]) {
+    throw new InvalidMemberRoleError();
+  }
+
   const userId = userExists._id;
 
-  return await workspaceRepository.inviteMember(id, ownerId, userId, role);
+  return await workspaceRepository.inviteMember(
+    workspaceId,
+    ownerId,
+    userId,
+    memberRole
+  );
 };
 
 export const updateMember = async (id, ownerId, username, role) => {

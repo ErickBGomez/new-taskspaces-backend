@@ -203,7 +203,7 @@ export const createWorkspace = async (req, res) => {
       workspace._id,
       userId,
       username,
-      'admin'
+      'ADMIN'
     );
 
     res
@@ -391,14 +391,14 @@ export const getMemberRole = async (req, res) => {
 export const inviteMember = async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, role } = req.body;
+    const { username, memberRole } = req.body;
     const { id: ownerId } = req.user;
 
     const workspace = await workspaceService.inviteMember(
       id,
       ownerId,
       username,
-      role
+      memberRole
     );
 
     res
@@ -429,6 +429,17 @@ export const inviteMember = async (req, res) => {
           new ErrorResponseBuilder()
             .setStatus(404)
             .setMessage('User not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof InvalidMemberRoleError)
+      return res
+        .status(400)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(400)
+            .setMessage('Invalid member role')
             .setError(error.message)
             .build()
         );

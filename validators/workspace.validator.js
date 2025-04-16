@@ -16,11 +16,11 @@ export const inviteValidator = [
     .withMessage('Username is required')
     .isString()
     .withMessage('Username must be a string'),
-  body('role')
+  body('memberRole')
     .notEmpty()
-    .withMessage('Role is required')
+    .withMessage('Member role is required')
     .isString()
-    .withMessage('Role must be a string')
-    .isIn(['admin', 'collaborator', 'reader'])
-    .withMessage('Role must be either admin, collaborator, or reader'),
+    .withMessage('Member role must be a string')
+    .isIn(['ADMIN', 'COLLABORATOR', 'READER'])
+    .withMessage('Member role must be either ADMIN, COLLABORATOR, or READER'),
 ];

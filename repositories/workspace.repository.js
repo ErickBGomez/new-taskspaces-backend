@@ -57,11 +57,16 @@ export const findMember = async (workspaceId, memberId) => {
   return member;
 };
 
-export const inviteMember = async (workspaceId, ownerId, memberId, role) => {
+export const inviteMember = async (
+  workspaceId,
+  ownerId,
+  memberId,
+  memberRole
+) => {
   return await Workspace.findOneAndUpdate(
     { _id: workspaceId, owner: ownerId, 'members.user': memberId },
     {
-      $set: { 'members.$.role': role },
+      $set: { 'members.$.memberRole': memberRole },
     },
     { new: true }
   ).then(async (workspace) => {
@@ -69,7 +74,7 @@ export const inviteMember = async (workspaceId, ownerId, memberId, role) => {
       return await Workspace.findOneAndUpdate(
         { _id: workspaceId, owner: ownerId },
         {
-          $push: { members: { user: memberId, role } },
+          $push: { members: { user: memberId, memberRole } },
         },
         { new: true }
       );
@@ -78,11 +83,16 @@ export const inviteMember = async (workspaceId, ownerId, memberId, role) => {
   });
 };
 
-export const updateMember = async (workspaceId, ownerId, memberId, role) => {
+export const updateMember = async (
+  workspaceId,
+  ownerId,
+  memberId,
+  memberRole
+) => {
   return await Workspace.findOneAndUpdate(
     { _id: workspaceId, owner: ownerId, 'members.user': memberId },
     {
-      $set: { 'members.$.role': role },
+      $set: { 'members.$.memberRole': memberRole },
     },
     { new: true }
   );

@@ -1,0 +1,104 @@
+import ErrorResponseBuilder from '../helpers/error-response-builder.js';
+import * as workspaceService from '../services/workspace.service.js';
+import * as projectService from '../services/project.service.js';
+
+export const MEMBER_ROLES = {
+  READER: 'READER',
+  COLLABORATOR: 'COLLABORATOR',
+  ADMIN: 'ADMIN',
+};
+
+const MEMBER_ROLES_HIERARCHY = {
+  READER: 0,
+  COLLABORATOR: 1,
+  ADMIN: 2,
+};
+
+export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
+  return async (req, res, next) => {
+    if (!req.user)
+      return res
+        .status(401)
+        .json(
+          new ErrorResponseBuilder.setStatus(401)
+            .setMessage('Unauthorized')
+            .setError('User not authenticated')
+            .build()
+        );
+
+    try {
+      const { id: userId } = req.user;
+      let memberRole;
+      console.log(req.user);
+
+      // TODO: Refactor these lines
+      // TODO: Test this: Should be put after authorizeRoles, and then try with different depths
+      if (depth === 'workspace') {
+        const { workspaceId } = req.params;
+
+        memberRole = await workspaceService.findMemberRole(workspaceId, userId);
+      } else if (depth === 'project') {
+        const { projectId } = req.params;
+
+        const workspaceId =
+          await projectService.findWorkspaceIdByProjectId(projectId);
+
+        memberRole = await workspaceService.findMemberRole(workspaceId, userId);
+      } else if (depth === 'task') {
+        const { taskId } = req.params;
+
+        // Create this method in Task service
+        const projectId = await projectService.findProjectIdByTaskId(taskId);
+
+        const workspaceId =
+          await projectService.findWorkspaceIdByProjectId(projectId);
+
+        memberRole = await workspaceService.findMemberRole(workspaceId, userId);
+      } else {
+        throw new Error('Invalid depth parameter');
+      }
+
+      if (!MEMBER_ROLES[memberRole])
+        return res
+          .status(403)
+          .json(
+            new ErrorResponseBuilder()
+              .setStatus(403)
+              .setMessage('Forbidden')
+              .setError('Role invalid or not provided')
+              .build()
+          );
+
+      if (
+        MEMBER_ROLES_HIERARCHY[memberRole] <
+        MEMBER_ROLES_HIERARCHY[requiredMemberRole]
+      )
+        return res
+          .status(403)
+          .json(
+            new ErrorResponseBuilder()
+              .setStatus(403)
+              .setMessage('Forbidden')
+              .setError(
+                'User does not have sufficient privileges to perform this action'
+              )
+              .build()
+          );
+
+      // User has the required member role (ADMIN can bypass all member roles)
+      next();
+    } catch (error) {
+      // TODO: Define all errors
+
+      return res
+        .status(500)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(500)
+            .setMessage('Internal Server Error')
+            .setError(error.message)
+            .build()
+        );
+    }
+  };
+};
