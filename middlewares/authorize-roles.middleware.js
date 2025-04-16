@@ -20,8 +20,6 @@ export const authorizeRolesMiddleware = (requiredRole) => {
     try {
       const { role } = req.user;
 
-      console.log(role);
-
       if (!req.user) throw new UnauthorizedError();
 
       // ROLES[undefined] returns undefined. This happens when a role is not provided, or is anything besides USER or SYSADMIN

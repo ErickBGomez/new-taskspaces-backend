@@ -24,3 +24,13 @@ export const inviteValidator = [
     .isIn(['ADMIN', 'COLLABORATOR', 'READER'])
     .withMessage('Member role must be either ADMIN, COLLABORATOR, or READER'),
 ];
+
+export const updateMemberValidator = [
+  body('memberRole')
+    .notEmpty()
+    .withMessage('Member role is required')
+    .isString()
+    .withMessage('Member role must be a string')
+    .isIn(['ADMIN', 'COLLABORATOR', 'READER'])
+    .withMessage('Member role must be either ADMIN, COLLABORATOR, or READER'),
+];

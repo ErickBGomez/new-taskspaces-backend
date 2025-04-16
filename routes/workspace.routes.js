@@ -2,6 +2,7 @@ import * as workspaceController from '../controllers/workspace.controller.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
 import {
   inviteValidator,
+  updateMemberValidator,
   workspaceValidator,
 } from '../validators/workspace.validator.js';
 import checkValidation from '../middlewares/validator.middleware.js';
@@ -24,7 +25,6 @@ router.get(
   authorizeRolesMiddleware(ROLES.USER),
   workspaceController.checkWorkspaceAvailability
 );
-// TODO: Define get all workspaces (admin)
 router.get(
   '/',
   authMiddleware,
@@ -38,21 +38,15 @@ router.get(
   checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.WORKSPACE),
   workspaceController.getWorkspaceById
 );
+// This route cannot be checked by the middleware checkMemberRoleMiddleware,
+// because there is no way to obtain the id of a specific workspace
 router.get(
   '/u/:userId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.WORKSPACE),
   workspaceController.getWorkspacesByOwnerId
 );
-router.get(
-  '/:id/u/:userId',
-  authMiddleware,
-  authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.WORKSPACE),
-  workspaceController.getWorkspaceByOwnerId
-);
-// TODO: Define create workspace (admin)
+// TODO: Define create workspace to another user (admin)
 router.post(
   '/',
   authMiddleware,
@@ -80,6 +74,14 @@ router.delete(
 
 // Members
 router.get(
+  '/:id/members',
+  authMiddleware,
+  authorizeRolesMiddleware(ROLES.USER),
+  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.WORKSPACE),
+  workspaceController.getMembers
+);
+// Gets just member role, not the whole user information
+router.get(
   '/:id/members/:memberId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
@@ -96,16 +98,16 @@ router.post(
   workspaceController.inviteMember
 );
 router.put(
-  '/:id/members/:username',
+  '/:id/members/:memberId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, DEPTH.WORKSPACE),
-  inviteValidator,
+  updateMemberValidator,
   checkValidation,
   workspaceController.updateMember
 );
 router.delete(
-  '/:id/members/:username',
+  '/:id/members/:memberId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, DEPTH.WORKSPACE),

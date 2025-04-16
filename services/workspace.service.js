@@ -4,33 +4,21 @@ import {
   WorkspaceNotFoundError,
   WorkspaceAlreadyExistsError,
   InvalidMemberRoleError,
+  UserAlreadyInvitedError,
+  MemberRoleSelfModifiedError,
+  MemberSelfRemovedError,
 } from '../errors/workspace.errors.js';
 import { UserNotFoundError } from '../errors/user.errors.js';
 import { MEMBER_ROLES } from '../middlewares/check-member-role.middleware.js';
 
-export const findAllWorkspaces = async (userId) => {
-  return await workspaceRepository.findAllWorkspaces(userId);
+export const findWorkspaces = async () => {
+  return await workspaceRepository.findAllWorkspaces();
 };
 
-export const findWorkspaceById = async (id, userId) => {
-  const workspace = await workspaceRepository.findWorkspaceById(id, userId);
+export const findWorkspaceById = async (id) => {
+  const workspace = await workspaceRepository.findWorkspaceById(id);
 
-  if (!workspace) {
-    throw new WorkspaceNotFoundError();
-  }
-
-  return workspace;
-};
-
-export const findWorkspaceByOwnerId = async (id, ownerId) => {
-  const workspace = await workspaceRepository.findWorkspaceByOwnerId(
-    id,
-    ownerId
-  );
-
-  if (!workspace) {
-    throw new WorkspaceNotFoundError();
-  }
+  if (!workspace) throw new WorkspaceNotFoundError();
 
   return workspace;
 };
@@ -38,9 +26,7 @@ export const findWorkspaceByOwnerId = async (id, ownerId) => {
 export const findWorkspacesByOwnerId = async (ownerId) => {
   const userExists = await userRepository.findUserById(ownerId);
 
-  if (!userExists) {
-    throw new UserNotFoundError();
-  }
+  if (!userExists) throw new UserNotFoundError();
 
   return await workspaceRepository.findWorkspacesByOwnerId(ownerId);
 };
@@ -57,9 +43,7 @@ export const checkWorkspaceAvailability = async (title, userId) => {
 export const createWorkspace = async ({ title, bookmarks, owner }) => {
   const workspaceExists = await workspaceRepository.findWorkspaceByTitle(title);
 
-  if (workspaceExists) {
-    throw new WorkspaceAlreadyExistsError();
-  }
+  if (workspaceExists) throw new WorkspaceAlreadyExistsError();
 
   return await workspaceRepository.createWorkspace({
     title,
@@ -68,7 +52,35 @@ export const createWorkspace = async ({ title, bookmarks, owner }) => {
   });
 };
 
+export const updateWorkspace = async (id, { title }) => {
+  const workspaceExists = await workspaceRepository.findWorkspaceById(id);
+
+  if (!workspaceExists) throw new WorkspaceNotFoundError();
+
+  return await workspaceRepository.updateWorkspace(id, { title });
+};
+
+export const deleteWorkspace = async (id) => {
+  const workspaceExists = await workspaceRepository.findWorkspaceById(id);
+
+  if (!workspaceExists) throw new WorkspaceNotFoundError();
+
+  return await workspaceRepository.deleteWorkspace(id);
+};
+
 // Members
+export const findMembers = async (workspaceId) => {
+  const workspace = await workspaceRepository.findWorkspaceById(workspaceId);
+
+  if (!workspace) throw new WorkspaceNotFoundError();
+
+  const members = await workspaceRepository.findMembers(workspaceId);
+
+  if (!members) throw new UserNotFoundError();
+
+  return members;
+};
+
 export const findMemberRole = async (workspaceId, memberId) => {
   const workspace = await workspaceRepository.findWorkspaceById(workspaceId);
 
@@ -78,99 +90,88 @@ export const findMemberRole = async (workspaceId, memberId) => {
 
   if (!member) throw new UserNotFoundError();
 
-  if (!MEMBER_ROLES[member.memberRole.toUpperCase()])
+  if (!MEMBER_ROLES[member.memberRole?.toUpperCase()])
     throw new InvalidMemberRoleError();
 
   return member.memberRole;
 };
 
-export const inviteMember = async (
-  workspaceId,
-  ownerId,
-  username,
-  memberRole
-) => {
+export const inviteMember = async (workspaceId, username, memberRole) => {
   const workspace = await workspaceRepository.findWorkspaceById(workspaceId);
+
+  if (!workspace) throw new WorkspaceNotFoundError();
+
   const userExists = await userRepository.findUserByUsername(username);
 
-  if (!workspace) {
-    throw new WorkspaceNotFoundError();
-  }
+  if (!userExists) throw new UserNotFoundError();
 
-  if (!userExists) {
-    throw new UserNotFoundError();
-  }
+  // Check if memberRole is a valid role
+  if (!MEMBER_ROLES[memberRole]) throw new InvalidMemberRoleError();
 
-  if (!MEMBER_ROLES[memberRole]) {
-    throw new InvalidMemberRoleError();
-  }
+  // Check if the user is already a member of the workspace
+  const existingMembers = await workspaceRepository.findMembers(workspaceId);
+  if (existingMembers?.some((member) => member.user.username === username))
+    throw new UserAlreadyInvitedError();
 
-  const userId = userExists._id;
+  // Else, invite the user
+  const memberId = userExists._id;
 
   return await workspaceRepository.inviteMember(
     workspaceId,
-    ownerId,
-    userId,
+    memberId,
     memberRole
   );
 };
 
-export const updateMember = async (id, ownerId, username, role) => {
-  const workspace = await workspaceRepository.findWorkspaceById(id, ownerId);
-  const userExists = await userRepository.findUserByUsername(username);
+export const updateMember = async (id, actionUserId, memberId, memberRole) => {
+  const workspace = await workspaceRepository.findWorkspaceById(id);
+
+  if (!workspace) throw new WorkspaceNotFoundError();
+
+  const userExists = await userRepository.findUserById(memberId);
+
+  if (!userExists) throw new UserNotFoundError();
+
+  // Avoid the user to update their own member role
+  if (actionUserId === userExists._id.toString())
+    throw new MemberRoleSelfModifiedError();
+
+  if (!MEMBER_ROLES[memberRole]) throw new InvalidMemberRoleError();
+
+  // Check if the user is NOT a member of the workspace
+  const existingMembers = await workspaceRepository.findMembers(id);
+  if (
+    !existingMembers?.some((member) => member.user._id.toString() === memberId)
+  )
+    throw new UserNotFoundError();
+
+  return await workspaceRepository.updateMember(id, memberId, memberRole);
+};
+
+// TODO: Define a way to assign a new owner to the workspace when the current owner is removed
+export const removeMember = async (id, actionUserId, memberId) => {
+  const workspace = await workspaceRepository.findWorkspaceById(id);
 
   if (!workspace) {
     throw new WorkspaceNotFoundError();
   }
 
-  if (!userExists) {
-    throw new UserNotFoundError();
-  }
-
-  const userId = userExists._id;
-
-  return await workspaceRepository.updateMember(id, ownerId, userId, role);
-};
-
-export const removeMember = async (id, ownerId, username) => {
-  const workspace = await workspaceRepository.findWorkspaceById(id, ownerId);
-  const userExists = await userRepository.findUserByUsername(username);
-
-  if (!workspace) {
-    throw new WorkspaceNotFoundError();
-  }
+  const userExists = await userRepository.findUserById(memberId);
 
   if (!userExists) {
     throw new UserNotFoundError();
   }
 
-  const userId = userExists._id;
+  // Avoid the user to update their own member role
+  if (actionUserId === userExists._id.toString())
+    throw new MemberSelfRemovedError();
 
-  return await workspaceRepository.removeMember(id, ownerId, userId);
-};
+  // Check if the user is NOT a member of the workspace
+  const existingMembers = await workspaceRepository.findMembers(id);
+  if (
+    !existingMembers?.some((member) => member.user._id.toString() === memberId)
+  )
+    throw new UserNotFoundError();
 
-export const updateWorkspace = async (id, userId, { title }) => {
-  const workspaceExists = await workspaceRepository.findWorkspaceById(
-    id,
-    userId
-  );
-
-  if (!workspaceExists) {
-    throw new WorkspaceNotFoundError();
-  }
-
-  return await workspaceRepository.updateWorkspace(id, userId, { title });
-};
-
-export const deleteWorkspace = async (id, userId) => {
-  const workspaceExists = await workspaceRepository.findWorkspaceById(
-    id,
-    userId
-  );
-
-  if (!workspaceExists) {
-    throw new WorkspaceNotFoundError();
-  }
-
-  return await workspaceRepository.deleteWorkspace(id, userId);
+  return await workspaceRepository.removeMember(id, memberId);
 };

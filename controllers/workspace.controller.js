@@ -3,15 +3,23 @@ import {
   WorkspaceNotFoundError,
   WorkspaceAlreadyExistsError,
   InvalidMemberRoleError,
+  UserAlreadyInvitedError,
+  MemberRoleSelfModifiedError,
+  MemberSelfRemovedError,
 } from '../errors/workspace.errors.js';
 import SuccessResponseBuilder from '../helpers/success-response-builder.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import { UserNotFoundError } from '../errors/user.errors.js';
+import { ROLES } from '../middlewares/authorize-roles.middleware.js';
 
 export const getAllWorkspaces = async (req, res) => {
   try {
-    const { id: userId } = req.user;
-    const workspaces = await workspaceService.findAllWorkspaces(userId);
+    const { id: userId, role } = req.user;
+
+    const workspaces =
+      role === ROLES.SYSADMIN
+        ? await workspaceService.findWorkspaces()
+        : await workspaceService.findWorkspacesByOwnerId(userId);
 
     res
       .status(200)
@@ -38,9 +46,11 @@ export const getAllWorkspaces = async (req, res) => {
 export const getWorkspaceById = async (req, res) => {
   try {
     const { id } = req.params;
-    const { id: userId } = req.user;
 
-    const workspace = await workspaceService.findWorkspaceById(id, userId);
+    // In this case is not necessary check the server role,
+    // Because the access will be granted or revoked based on workspace member role
+    // (see the middleware checkMemberRoleMiddleware before this controller method)
+    const workspace = await workspaceService.findWorkspaceById(id);
 
     res
       .status(200)
@@ -77,7 +87,15 @@ export const getWorkspaceById = async (req, res) => {
 
 export const getWorkspacesByOwnerId = async (req, res) => {
   try {
+    const { role, id: userId } = req.user;
     const { ownerId } = req.params;
+
+    // This controller cannot be checked by the middleware checkMemberRoleMiddleware,
+    // because there is no way to obtain the id of a specific workspace
+
+    // Avoid obtaining workspaces from other users, only sysadmin can do that
+    if (role !== ROLES.SYSADMIN && userId !== ownerId)
+      throw new UserNotFoundError();
 
     const workspaces = await workspaceService.findWorkspacesByOwnerId(ownerId);
 
@@ -146,48 +164,6 @@ export const checkWorkspaceAvailability = async (req, res) => {
   }
 };
 
-export const getWorkspaceByOwnerId = async (req, res) => {
-  try {
-    const { id: workspaceId, userId } = req.params;
-
-    const workspace = await workspaceService.findWorkspaceByOwnerId(
-      workspaceId,
-      userId
-    );
-
-    res
-      .status(200)
-      .json(
-        new SuccessResponseBuilder()
-          .setStatus(200)
-          .setMessage('Workspace found')
-          .setContent(workspace)
-          .build()
-      );
-  } catch (e) {
-    if (e instanceof WorkspaceNotFoundError)
-      return res
-        .status(404)
-        .json(
-          new ErrorResponseBuilder()
-            .setStatus(404)
-            .setMessage('Workspace not found')
-            .setError(e.message)
-            .build()
-        );
-
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(e.message)
-          .build()
-      );
-  }
-};
-
 export const createWorkspace = async (req, res) => {
   try {
     const { title, bookmarks } = req.body;
@@ -243,11 +219,8 @@ export const updateWorkspace = async (req, res) => {
   try {
     const { id } = req.params;
     const { title } = req.body;
-    const { id: userId } = req.user;
 
-    const workspace = await workspaceService.updateWorkspace(id, userId, {
-      title,
-    });
+    const workspace = await workspaceService.updateWorkspace(id, { title });
 
     res
       .status(200)
@@ -285,9 +258,8 @@ export const updateWorkspace = async (req, res) => {
 export const deleteWorkspace = async (req, res) => {
   try {
     const { id } = req.params;
-    const { id: userId } = req.user;
 
-    await workspaceService.deleteWorkspace(id, userId);
+    await workspaceService.deleteWorkspace(id);
 
     res
       .status(200)
@@ -322,6 +294,45 @@ export const deleteWorkspace = async (req, res) => {
 };
 
 // Members
+export const getMembers = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const members = await workspaceService.findMembers(id);
+
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Members found')
+          .setContent(members)
+          .build()
+      );
+  } catch (error) {
+    if (error instanceof WorkspaceNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Workspace not found')
+            .setError(error.message)
+            .build()
+        );
+
+    res
+      .status(500)
+      .json(
+        new ErrorResponseBuilder()
+          .setStatus(500)
+          .setMessage('Internal server error')
+          .setError(error.message)
+          .build()
+      );
+  }
+};
+
 export const getMemberRole = async (req, res) => {
   try {
     const { id: workspaceId, memberId } = req.params;
@@ -390,11 +401,10 @@ export const inviteMember = async (req, res) => {
   try {
     const { id } = req.params;
     const { username, memberRole } = req.body;
-    const { id: ownerId } = req.user;
 
+    // TODO: Invite by email
     const workspace = await workspaceService.inviteMember(
       id,
-      ownerId,
       username,
       memberRole
     );
@@ -442,6 +452,17 @@ export const inviteMember = async (req, res) => {
             .build()
         );
 
+    if (error instanceof UserAlreadyInvitedError)
+      return res
+        .status(409)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(409)
+            .setMessage('User already invited')
+            .setError(error.message)
+            .build()
+        );
+
     res
       .status(500)
       .json(
@@ -456,15 +477,15 @@ export const inviteMember = async (req, res) => {
 
 export const updateMember = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { username, role } = req.body;
-    const { id: ownerId } = req.user;
+    const { id, memberId } = req.params;
+    const { id: actionUserId } = req.user;
+    const { memberRole } = req.body;
 
     const workspace = await workspaceService.updateMember(
       id,
-      ownerId,
-      username,
-      role
+      actionUserId,
+      memberId,
+      memberRole
     );
 
     res
@@ -499,6 +520,28 @@ export const updateMember = async (req, res) => {
             .build()
         );
 
+    if (error instanceof MemberRoleSelfModifiedError)
+      return res
+        .status(400)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(400)
+            .setMessage('Member role cannot be modified by self')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof InvalidMemberRoleError)
+      return res
+        .status(400)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(400)
+            .setMessage('Invalid member role')
+            .setError(error.message)
+            .build()
+        );
+
     res
       .status(500)
       .json(
@@ -513,13 +556,13 @@ export const updateMember = async (req, res) => {
 
 export const removeMember = async (req, res) => {
   try {
-    const { id, username } = req.params;
-    const { id: ownerId } = req.user;
+    const { id, memberId } = req.params;
+    const { id: actionUserId } = req.user;
 
     const workspace = await workspaceService.removeMember(
       id,
-      ownerId,
-      username
+      actionUserId,
+      memberId
     );
 
     res
@@ -550,6 +593,17 @@ export const removeMember = async (req, res) => {
           new ErrorResponseBuilder()
             .setStatus(404)
             .setMessage('User not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof MemberSelfRemovedError)
+      return res
+        .status(400)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(400)
+            .setMessage('Member cannot be removed by self')
             .setError(error.message)
             .build()
         );
