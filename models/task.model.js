@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+// TODO: Check assignedMembers functionality
 const taskSchema = new mongoose.Schema(
   {
     title: {
@@ -24,7 +25,7 @@ const taskSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    members: [
+    assignedMembers: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

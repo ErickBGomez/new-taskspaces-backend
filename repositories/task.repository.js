@@ -2,18 +2,22 @@ import Task from '../models/task.model.js';
 
 // TODO: Document these lines
 export const findAllTasks = async (projectId) => {
-  return await Task.find({ project: projectId }).populate('members');
+  return await Task.find({ project: projectId }).populate('assignedMembers');
 };
 
-export const findTaskById = async (id, projectId) => {
+export const findTaskById = async (id) => {
+  return await Task.findById(id).populate('assignedMembers');
+};
+
+export const findTaskByIdAndProjectId = async (id, projectId) => {
   return await Task.findOne({ _id: id, project: projectId }).populate(
-    'members'
+    'assignedMembers'
   );
 };
 
 export const createTask = async (task) => {
   const newTask = await Task.create(task);
-  await newTask.populate('members');
+  await newTask.populate('assignedMembers');
   return newTask;
 };
 
@@ -26,7 +30,7 @@ export const updateTask = async (id, projectId, task) => {
     }
   );
 
-  await updatedTask.populate('members');
+  await updatedTask.populate('assignedMembers');
 
   return updatedTask;
 };

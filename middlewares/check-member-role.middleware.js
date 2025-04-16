@@ -1,6 +1,7 @@
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import * as workspaceService from '../services/workspace.service.js';
 import * as projectService from '../services/project.service.js';
+import * as taskService from '../services/task.service.js';
 
 export const MEMBER_ROLES = {
   READER: 'READER',
@@ -70,7 +71,7 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
 
           // Create this method in Task service
           const projectId =
-            await projectService.findProjectIdByTaskId(resolvedTaskId);
+            await taskService.findProjectIdByTaskId(resolvedTaskId);
 
           const workspaceId =
             await projectService.findWorkspaceIdByProjectId(projectId);

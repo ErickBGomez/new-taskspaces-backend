@@ -100,14 +100,12 @@ export const deleteProject = async (id, workspaceId) => {
 };
 
 // Methods without routes
-export const findWorkspaceIdByProjectId = async (id) => {
-  const project = await projectRepository.findProjectById(id);
+export const findWorkspaceIdByProjectId = async (projectId) => {
+  const project = await projectRepository.findProjectById(projectId);
 
   if (!project) throw new ProjectNotFoundError();
 
-  if (!project.workspace) {
-    throw new WorkspaceNotFoundError();
-  }
+  if (!project.workspace) throw new WorkspaceNotFoundError();
 
   return project.workspace;
 };
