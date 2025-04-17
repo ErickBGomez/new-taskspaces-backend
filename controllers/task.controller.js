@@ -187,15 +187,17 @@ export const updateTask = async (req, res) => {
     // In the case of update task, it's not necessary to retrieve the projectId
     // because projectId cannot be updated, and the member role has been checked before
     // in checkMemberRoleMiddleware
+
+    // Tags should NOT be included in the update task request
+    // This action is being handled from another route (assignTagToTask and unassignTagToTask from Tag module)
     const { id } = req.params;
-    const { title, description, status, tags, date, timer, assignedMembers } =
+    const { title, description, status, date, timer, assignedMembers } =
       req.body;
 
     const task = await taskService.updateTask(id, {
       title,
       description,
       status,
-      tags,
       date,
       timer,
       assignedMembers,

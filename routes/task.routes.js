@@ -9,7 +9,10 @@ import {
   DEPTH,
   MEMBER_ROLES,
 } from '../middlewares/check-member-role.middleware.js';
-import taskValidator from '../validators/task.validator.js';
+import {
+  createTaskValidator,
+  updateTaskValidator,
+} from '../validators/task.validator.js';
 import checkValidation from '../middlewares/validator.middleware.js';
 import * as taskController from '../controllers/task.controller.js';
 
@@ -40,7 +43,7 @@ router.post(
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.PROJECT),
-  taskValidator,
+  createTaskValidator,
   checkValidation,
   taskController.createTask
 );
@@ -49,7 +52,7 @@ router.put(
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
-  taskValidator,
+  updateTaskValidator,
   checkValidation,
   taskController.updateTask
 );

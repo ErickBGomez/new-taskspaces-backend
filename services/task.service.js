@@ -44,7 +44,7 @@ export const createTask = async (
 
 export const updateTask = async (
   id,
-  { title, description, status, tags, date, timer, assignedMembers }
+  { title, description, status, date, timer, assignedMembers }
 ) => {
   const taskExists = await taskRepository.findTaskById(id);
 
@@ -54,7 +54,6 @@ export const updateTask = async (
     title,
     description,
     status,
-    tags,
     date,
     timer,
     assignedMembers,
