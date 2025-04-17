@@ -1,7 +1,7 @@
 import Workspace from '../models/workspace.model.js';
 
 export const findAllWorkspaces = async () => {
-  return await Workspace.find().populate('members.user');
+  return await Workspace.find();
 };
 
 export const findWorkspaceById = async (id) => {
@@ -14,12 +14,6 @@ export const findWorkspaceByTitle = async (title, userId) => {
 
 export const findWorkspacesByOwnerId = async (ownerId) => {
   return await Workspace.find({ owner: ownerId });
-};
-
-export const findWorkspaceByIdAndOwnerId = async (id, ownerId) => {
-  return await Workspace.findOne({ _id: id, owner: ownerId }).populate(
-    'members.user'
-  );
 };
 
 export const createWorkspace = async (workspace) => {
@@ -36,8 +30,10 @@ export const deleteWorkspace = async (id) => {
 
 // Members
 export const findMembers = async (workspaceId) => {
-  const workspace =
-    await Workspace.findById(workspaceId).populate('members.user');
+  const workspace = await Workspace.findById(workspaceId).populate(
+    'members.user',
+    '-password -role'
+  );
 
   if (!workspace) return null;
 
@@ -45,8 +41,10 @@ export const findMembers = async (workspaceId) => {
 };
 
 export const findMember = async (workspaceId, memberId) => {
-  const workspace =
-    await Workspace.findById(workspaceId).populate('members.user');
+  const workspace = await Workspace.findById(workspaceId).populate(
+    'members.user',
+    '-password -role'
+  );
 
   if (!workspace) return null;
 

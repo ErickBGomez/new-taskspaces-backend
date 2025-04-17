@@ -42,9 +42,6 @@ export const getWorkspaceById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // In this case is not necessary check the server role,
-    // Because the access will be granted or revoked based on workspace member role
-    // (see the middleware checkMemberRoleMiddleware before this controller method)
     const workspace = await workspaceService.findWorkspaceById(id);
 
     res
