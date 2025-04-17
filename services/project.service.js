@@ -46,7 +46,7 @@ export const createProject = async (workspaceId, { title, icon }) => {
   });
 };
 
-export const updateProject = async (id, { title, statuses, tags, icon }) => {
+export const updateProject = async (id, { title, statuses, icon }) => {
   const projectExists = await projectRepository.findProjectById(id);
 
   if (!projectExists) throw new ProjectNotFoundError();
@@ -54,7 +54,6 @@ export const updateProject = async (id, { title, statuses, tags, icon }) => {
   return await projectRepository.updateProject(id, {
     title,
     statuses,
-    tags,
     icon,
   });
 };

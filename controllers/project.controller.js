@@ -117,7 +117,6 @@ export const createProject = async (req, res) => {
     // In the case of create project, it's necessary to retrieve the workspaceId
     // because its part of the project schema to have the reference to the workspace
     const { workspaceId } = req.params;
-
     const { title, icon } = req.body;
 
     const project = await projectService.createProject(workspaceId, {
@@ -175,12 +174,11 @@ export const updateProject = async (req, res) => {
     // because workspaceId cannot be updated, and the member role has been checked before
     // in checkMemberRoleMiddleware
     const { id } = req.params;
-    const { title, statuses, tags, icon } = req.body;
+    const { title, statuses, icon } = req.body;
 
     const updatedProject = await projectService.updateProject(id, {
       title,
       statuses,
-      tags,
       icon,
     });
 
