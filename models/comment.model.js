@@ -11,6 +11,7 @@ const commentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // TODO: Implement mentions
     mentions: [
       {
         type: mongoose.Schema.Types.ObjectId,

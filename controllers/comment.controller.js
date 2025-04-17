@@ -5,8 +5,33 @@ import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 
 export const getAllComments = async (req, res) => {
   try {
+    const comments = await commentService.findAllComments();
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Comments found')
+          .setContent(comments)
+          .build()
+      );
+  } catch (error) {
+    res
+      .status(500)
+      .json(
+        new ErrorResponseBuilder()
+          .setStatus(500)
+          .setMessage('Internal server error')
+          .setError(error.message)
+          .build()
+      );
+  }
+};
+
+export const getCommentsByTaskId = async (req, res) => {
+  try {
     const { taskId } = req.params;
-    const comments = await commentService.findAllComments(taskId);
+    const comments = await commentService.findCommentsByTaskId(taskId);
     res
       .status(200)
       .json(
@@ -31,9 +56,9 @@ export const getAllComments = async (req, res) => {
 
 export const getCommentById = async (req, res) => {
   try {
-    const { id, taskId } = req.params;
+    const { id } = req.params;
 
-    const comment = await commentService.findCommentById(id, taskId);
+    const comment = await commentService.findCommentById(id);
 
     res
       .status(200)
@@ -104,11 +129,11 @@ export const createComment = async (req, res) => {
 
 export const updateComment = async (req, res) => {
   try {
-    const { id, taskId } = req.params;
+    const { id } = req.params;
     const { content, mentions } = req.body;
     const author = req.user.id;
 
-    const comment = await commentService.updateComment(id, taskId, {
+    const comment = await commentService.updateComment(id, {
       author,
       content,
       mentions,
@@ -149,9 +174,9 @@ export const updateComment = async (req, res) => {
 
 export const deleteComment = async (req, res) => {
   try {
-    const { id, taskId } = req.params;
+    const { id } = req.params;
 
-    await commentService.deleteComment(id, taskId);
+    await commentService.deleteComment(id);
 
     res
       .status(200)

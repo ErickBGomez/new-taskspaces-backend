@@ -1,12 +1,16 @@
 import * as commentRepository from '../repositories/comment.repository.js';
 import { CommentNotFoundError } from '../errors/comment.errors.js';
 
-export const findAllComments = async (taskId) => {
-  return await commentRepository.findAllComments(taskId);
+export const findAllComments = async () => {
+  return await commentRepository.findAllComments();
 };
 
-export const findCommentById = async (id, taskId) => {
-  const comment = await commentRepository.findCommentById(id, taskId);
+export const findCommentsByTaskId = async (taskId) => {
+  return await commentRepository.findCommentsByTaskId(taskId);
+};
+
+export const findCommentById = async (id) => {
+  const comment = await commentRepository.findCommentById(id);
 
   if (!comment) {
     throw new CommentNotFoundError();
@@ -24,30 +28,26 @@ export const createComment = async (taskId, { author, content, mentions }) => {
   });
 };
 
-export const updateComment = async (
-  id,
-  taskId,
-  { author, content, mentions }
-) => {
-  const commentExists = await commentRepository.findCommentById(id, taskId);
+export const updateComment = async (id, { author, content, mentions }) => {
+  const commentExists = await commentRepository.findCommentById(id);
 
   if (!commentExists) {
     throw new CommentNotFoundError();
   }
 
-  return await commentRepository.updateComment(id, taskId, {
+  return await commentRepository.updateComment(id, {
     author,
     content,
     mentions,
   });
 };
 
-export const deleteComment = async (id, taskId) => {
-  const commentExists = await commentRepository.findCommentById(id, taskId);
+export const deleteComment = async (id) => {
+  const commentExists = await commentRepository.findCommentById(id);
 
   if (!commentExists) {
     throw new CommentNotFoundError();
   }
 
-  return await commentRepository.deleteComment(id, taskId);
+  return await commentRepository.deleteComment(id);
 };

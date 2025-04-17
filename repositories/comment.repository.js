@@ -1,14 +1,18 @@
 import Comment from '../models/comment.model.js';
 
-export const findAllComments = async (taskId) => {
+export const findAllComments = async () => {
+  return await Comment.find().populate('author', 'username avatar');
+};
+
+export const findCommentsByTaskId = async (taskId) => {
   return await Comment.find({ task: taskId }).populate(
     'author',
     'username avatar'
   );
 };
 
-export const findCommentById = async (id, taskId) => {
-  return await Comment.findOne({ _id: id, task: taskId });
+export const findCommentById = async (id) => {
+  return await Comment.findById(id);
 };
 
 export const createComment = async (comment) => {
@@ -17,12 +21,12 @@ export const createComment = async (comment) => {
   );
 };
 
-export const updateComment = async (id, taskId, comment) => {
-  return await Comment.findOneAndUpdate({ _id: id, task: taskId }, comment, {
+export const updateComment = async (id, comment) => {
+  return await Comment.findByIdAndUpdate(id, comment, {
     new: true,
   });
 };
 
-export const deleteComment = async (id, taskId) => {
-  return await Comment.findOneAndDelete({ _id: id, task: taskId });
+export const deleteComment = async (id) => {
+  return await Comment.findByIdAndDelete(id);
 };
