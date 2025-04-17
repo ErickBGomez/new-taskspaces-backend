@@ -7,6 +7,7 @@ const taskSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // TODO: Get first status from project instead of hardcoding it
     status: {
       type: String,
       default: 'pending',
@@ -14,9 +15,12 @@ const taskSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    tag: {
-      type: String,
-    },
+    // TODO: Use tag model instead of strings
+    tags: [
+      {
+        type: String,
+      },
+    ],
     date: {
       type: String,
       nullable: true,

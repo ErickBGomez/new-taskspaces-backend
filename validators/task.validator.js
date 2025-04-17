@@ -7,28 +7,25 @@ const taskValidator = [
     .withMessage('Title is required')
     .isString()
     .withMessage('Title must be a string'),
+  body('description')
+    .optional()
+    .isString()
+    .withMessage('Description must be a string'),
   body('status')
     .optional()
     .isString()
     .withMessage('Status must be a string')
     .isIn(['pending', 'doing', 'done'])
     .withMessage('Status must be one of the following: pending, doing, done'),
-  body('description')
-    .optional()
-    .isString()
-    .withMessage('Description must be a string'),
-  body('media')
-    .optional()
-    .isArray()
-    .withMessage('Media must be an array of strings')
-    .custom((media) => media.every((item) => typeof item === 'string'))
-    .withMessage('Each media item must be a string'),
-  body('date').optional(),
+  // TODO: Implement tags model correctly
+  body('tags').optional().isArray().withMessage('Tags must be an array'),
+  // TODO: Check data type
+  body('date').optional().isString().withMessage('Date must be a string'),
   body('timer')
     .optional()
     .isInt({ min: 0 })
     .withMessage('Timer must be a non-negative integer'),
-  body('members')
+  body('assignedMembers')
     .optional()
     .isArray()
     .withMessage('Members must be an array of ObjectIds')

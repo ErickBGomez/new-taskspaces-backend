@@ -16,11 +16,17 @@ import {
 const router = express.Router();
 
 router.get(
+  '/',
+  authMiddleware,
+  authorizeRolesMiddleware(ROLES.SYSADMIN),
+  taskController.getAllTasks
+);
+router.get(
   '/p/:projectId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.PROJECT),
-  taskController.getAllTasks
+  taskController.getTasksByProjectId
 );
 router.get(
   '/:id/p/:projectId',

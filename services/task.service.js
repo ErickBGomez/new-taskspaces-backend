@@ -2,12 +2,16 @@ import * as taskRepository from '../repositories/task.repository.js';
 import { TaskNotFoundError } from '../errors/task.errors.js';
 import { ProjectNotFoundError } from '../errors/project.errors.js';
 
-export const findAllTasks = async (projectId) => {
-  return await taskRepository.findAllTasks(projectId);
+export const findAllTasks = async () => {
+  return await taskRepository.findAllTasks();
 };
 
-export const findTaskById = async (id, projectId) => {
-  const task = await taskRepository.findTaskByIdAndProjectId(id, projectId);
+export const findTasksByProjectId = async (projectId) => {
+  return await taskRepository.findTasksByProjectId(projectId);
+};
+
+export const findTaskById = async (id) => {
+  const task = await taskRepository.findTaskById(id);
 
   if (!task) {
     throw new TaskNotFoundError();
@@ -18,58 +22,49 @@ export const findTaskById = async (id, projectId) => {
 
 export const createTask = async (
   projectId,
-  { title, description, status, tag, media, date, timer, members }
+  { title, description, status, tags, date, timer, assignedMembers }
 ) => {
   return await taskRepository.createTask({
     title,
     description,
     status,
-    tag,
-    media,
+    tags,
     date,
     timer,
-    members,
+    assignedMembers,
     project: projectId,
   });
 };
 
 export const updateTask = async (
   id,
-  projectId,
-  { title, description, status, tag, media, date, timer, members }
+  { title, description, status, tags, date, timer, assignedMembers }
 ) => {
-  const taskExists = await taskRepository.findTaskByIdAndProjectId(
-    id,
-    projectId
-  );
+  const taskExists = await taskRepository.findTaskById(id);
 
   if (!taskExists) {
     throw new TaskNotFoundError();
   }
 
-  return await taskRepository.updateTask(id, projectId, {
+  return await taskRepository.updateTask(id, {
     title,
     description,
     status,
-    tag,
-    media,
+    tags,
     date,
     timer,
-    members,
+    assignedMembers,
   });
 };
 
-export const deleteTask = async (id, projectId) => {
-  const taskExists = await taskRepository.findTaskByIdAndProjectId(
-    id,
-    projectId
-  );
+export const deleteTask = async (id) => {
+  const taskExists = await taskRepository.findTaskById(id);
 
   if (!taskExists) {
     throw new TaskNotFoundError();
   }
 
-  return await taskRepository.deleteTask(id, projectId);
+  return await taskRepository.deleteTask(id);
 };
 
 // Methods without routes
