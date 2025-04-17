@@ -46,6 +46,17 @@ export const getTagsByProjectId = async (req, res) => {
           .build()
       );
   } catch (error) {
+    if (error instanceof ProjectNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Project not found')
+            .setError(error.message)
+            .build()
+        );
+
     res
       .status(500)
       .json(

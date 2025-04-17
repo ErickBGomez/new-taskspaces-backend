@@ -2,6 +2,7 @@ import * as commentService from '../services/comment.service.js';
 import { CommentNotFoundError } from '../errors/comment.errors.js';
 import SuccessResponseBuilder from '../helpers/success-response-builder.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
+import { TaskNotFoundError } from '../errors/task.errors.js';
 
 export const getAllComments = async (req, res) => {
   try {
@@ -42,6 +43,17 @@ export const getCommentsByTaskId = async (req, res) => {
           .build()
       );
   } catch (error) {
+    if (error instanceof TaskNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Task not found')
+            .setError(error.message)
+            .build()
+        );
+
     res
       .status(500)
       .json(
@@ -115,6 +127,17 @@ export const createComment = async (req, res) => {
           .build()
       );
   } catch (error) {
+    if (error instanceof TaskNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Task not found')
+            .setError(error.message)
+            .build()
+        );
+
     res
       .status(500)
       .json(

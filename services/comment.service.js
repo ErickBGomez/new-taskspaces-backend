@@ -1,11 +1,17 @@
 import * as commentRepository from '../repositories/comment.repository.js';
+import * as taskRepository from '../repositories/task.repository.js';
 import { CommentNotFoundError } from '../errors/comment.errors.js';
+import { TaskNotFoundError } from '../errors/task.errors.js';
 
 export const findAllComments = async () => {
   return await commentRepository.findAllComments();
 };
 
 export const findCommentsByTaskId = async (taskId) => {
+  const taskExists = await taskRepository.findTaskById(taskId);
+
+  if (!taskExists) throw new TaskNotFoundError();
+
   return await commentRepository.findCommentsByTaskId(taskId);
 };
 
@@ -18,6 +24,10 @@ export const findCommentById = async (id) => {
 };
 
 export const createComment = async (taskId, { author, content, mentions }) => {
+  const taskExists = await taskRepository.findTaskById(taskId);
+
+  if (!taskExists) throw new TaskNotFoundError();
+
   return await commentRepository.createComment({
     author,
     content,

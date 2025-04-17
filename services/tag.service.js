@@ -1,13 +1,19 @@
 import * as tagRepository from '../repositories/tag.repository.js';
+import * as projectRepository from '../repositories/project.repository.js';
 import * as taskRepository from '../repositories/task.repository.js';
 import { TagAlreadyAssigned, TagNotFoundError } from '../errors/tag.errors.js';
 import { TaskNotFoundError } from '../errors/task.errors.js';
+import { ProjectNotFoundError } from '../errors/project.errors.js';
 
 export const findAllTags = async () => {
   return await tagRepository.findAllTags();
 };
 
 export const findTagsByProjectId = async (projectId) => {
+  const projectExists = await projectRepository.findProjectById(projectId);
+
+  if (!projectExists) throw new ProjectNotFoundError();
+
   return await tagRepository.findTagsByProjectId(projectId);
 };
 
@@ -28,7 +34,9 @@ export const findTagsByTaskId = async (taskId) => {
 };
 
 export const createTag = async (projectId, { title, color }) => {
-  // TODO: Check if the project exists
+  const projectExists = await projectRepository.findProjectById(projectId);
+
+  if (!projectExists) throw new ProjectNotFoundError();
 
   return await tagRepository.createTag({
     title,

@@ -2,6 +2,7 @@ import * as taskService from '../services/task.service.js';
 import { TaskNotFoundError } from '../errors/task.errors.js';
 import SuccessResponseBuilder from '../helpers/success-response-builder.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
+import { ProjectNotFoundError } from '../errors/project.errors.js';
 
 export const getAllTasks = async (req, res) => {
   try {
@@ -43,6 +44,17 @@ export const getTasksByProjectId = async (req, res) => {
           .build()
       );
   } catch (error) {
+    if (error instanceof ProjectNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Project not found')
+            .setError(error.message)
+            .build()
+        );
+
     res
       .status(500)
       .json(
@@ -122,6 +134,17 @@ export const createTask = async (req, res) => {
           .build()
       );
   } catch (error) {
+    if (error instanceof ProjectNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Project not found')
+            .setError(error.message)
+            .build()
+        );
+
     res
       .status(500)
       .json(
