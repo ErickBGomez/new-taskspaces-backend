@@ -23,8 +23,10 @@ export const createTaskValidator = [
     .withMessage('Tags must be an array of strings')
     .custom((tags) => tags.every((tag) => typeof tag === 'string'))
     .withMessage('Each tag must be valid'),
-  // TODO: Check data type
-  body('date').optional().isString().withMessage('Date must be a string'),
+  body('date')
+    .optional()
+    .isISO8601()
+    .withMessage('Date must be a valid ISO 8601 date format'),
   body('timer')
     .optional()
     .isInt({ min: 0 })
@@ -55,8 +57,10 @@ export const updateTaskValidator = [
     .withMessage('Status must be a string')
     .isIn(['pending', 'doing', 'done'])
     .withMessage('Status must be one of the following: pending, doing, done'),
-  // TODO: Check data type
-  body('date').optional().isString().withMessage('Date must be a string'),
+  body('date')
+    .optional()
+    .isISO8601()
+    .withMessage('Date must be a valid ISO 8601 date format'),
   body('timer')
     .optional()
     .isInt({ min: 0 })

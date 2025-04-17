@@ -46,9 +46,7 @@ export const findMember = async (workspaceId, memberId) => {
     '-password -role'
   );
 
-  if (!workspace) return null;
-
-  const member = workspace.members.find(
+  const member = workspace?.members?.find(
     (member) => member.user?._id.toString() === memberId
   );
 

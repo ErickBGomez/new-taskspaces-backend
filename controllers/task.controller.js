@@ -5,6 +5,8 @@ import SuccessResponseBuilder from '../helpers/success-response-builder.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import { ProjectNotFoundError } from '../errors/project.errors.js';
 import { TagNotFoundError } from '../errors/tag.errors.js';
+import { UserNotFoundError } from '../errors/user.errors.js';
+import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
 
 export const getAllTasks = async (req, res) => {
   try {
@@ -258,6 +260,136 @@ export const deleteTask = async (req, res) => {
           new ErrorResponseBuilder()
             .setStatus(404)
             .setMessage('Task not found')
+            .setError(error.message)
+            .build()
+        );
+
+    res
+      .status(500)
+      .json(
+        new ErrorResponseBuilder()
+          .setStatus(500)
+          .setMessage('Internal server error')
+          .setError(error.message)
+          .build()
+      );
+  }
+};
+
+export const assignMemberToTask = async (req, res) => {
+  try {
+    const { id, workspaceId, memberId } = req.params;
+
+    const task = await taskService.assignMemberToTask(
+      id,
+      workspaceId,
+      memberId
+    );
+
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Member assigned to task')
+          .setContent(task)
+          .build()
+      );
+  } catch (error) {
+    if (error instanceof TaskNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Task not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof WorkspaceNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Workspace not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof UserNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('User not found')
+            .setError(error.message)
+            .build()
+        );
+
+    res
+      .status(500)
+      .json(
+        new ErrorResponseBuilder()
+          .setStatus(500)
+          .setMessage('Internal server error')
+          .setError(error.message)
+          .build()
+      );
+  }
+};
+
+export const unassignMemberToTask = async (req, res) => {
+  try {
+    const { id, workspaceId, memberId } = req.params;
+
+    const task = await taskService.unassignMemberToTask(
+      id,
+      workspaceId,
+      memberId
+    );
+
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Member unassigned from task')
+          .setContent(task)
+          .build()
+      );
+  } catch (error) {
+    if (error instanceof TaskNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Task not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof WorkspaceNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Workspace not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof UserNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('User not found')
             .setError(error.message)
             .build()
         );

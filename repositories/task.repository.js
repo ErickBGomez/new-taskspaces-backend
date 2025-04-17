@@ -38,3 +38,19 @@ export const updateTask = async (id, task) => {
 export const deleteTask = async (id) => {
   return await Task.findByIdAndDelete(id);
 };
+
+export const assignMemberToTask = async (taskId, memberId) => {
+  return await Task.findByIdAndUpdate(
+    taskId,
+    { $push: { assignedMembers: memberId } },
+    { new: true }
+  );
+};
+
+export const unassignMemberToTask = async (taskId, memberId) => {
+  return await Task.findByIdAndUpdate(
+    taskId,
+    { $pull: { assignedMembers: memberId } },
+    { new: true }
+  );
+};
