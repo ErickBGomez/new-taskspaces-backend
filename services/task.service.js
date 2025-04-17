@@ -1,5 +1,6 @@
 import * as taskRepository from '../repositories/task.repository.js';
 import * as projectRepository from '../repositories/project.repository.js';
+import * as projectHelper from '../helpers/project.helper.js';
 import * as workspaceRepository from '../repositories/workspace.repository.js';
 import { TaskNotFoundError } from '../errors/task.errors.js';
 import { ProjectNotFoundError } from '../errors/project.errors.js';
@@ -47,7 +48,7 @@ export const createTask = async (
 
 export const updateTask = async (
   id,
-  { title, description, status, date, timer, assignedMembers }
+  { title, description, status, date, timer }
 ) => {
   const taskExists = await taskRepository.findTaskById(id);
 
@@ -59,7 +60,6 @@ export const updateTask = async (
     status,
     date,
     timer,
-    assignedMembers,
   });
 };
 
@@ -71,12 +71,17 @@ export const deleteTask = async (id) => {
   return await taskRepository.deleteTask(id);
 };
 
-export const assignMemberToTask = async (id, workspaceId, memberId) => {
+export const assignMemberToTask = async (id, projectId, memberId) => {
   const taskExists = await taskRepository.findTaskById(id);
   if (!taskExists) throw new TaskNotFoundError();
 
-  const workspace = workspaceRepository.findWorkspaceById(workspaceId);
-  if (!workspace) throw new WorkspaceNotFoundError();
+  const projectExists = await projectRepository.findProjectById(projectId);
+  if (!projectExists) throw new ProjectNotFoundError();
+
+  const workspaceId = (
+    await projectHelper.findWorkspaceIdByProjectId(projectId)
+  ).toString();
+  if (!workspaceId) throw new WorkspaceNotFoundError();
 
   const memberExists = await workspaceRepository.findMember(
     workspaceId,
@@ -87,12 +92,17 @@ export const assignMemberToTask = async (id, workspaceId, memberId) => {
   return await taskRepository.assignMemberToTask(id, memberId);
 };
 
-export const unassignMemberToTask = async (id, workspaceId, memberId) => {
+export const unassignMemberToTask = async (id, projectId, memberId) => {
   const taskExists = await taskRepository.findTaskById(id);
   if (!taskExists) throw new TaskNotFoundError();
 
-  const workspace = workspaceRepository.findWorkspaceById(workspaceId);
-  if (!workspace) throw new WorkspaceNotFoundError();
+  const projectExists = await projectRepository.findProjectById(projectId);
+  if (!projectExists) throw new ProjectNotFoundError();
+
+  const workspaceId = (
+    await projectHelper.findWorkspaceIdByProjectId(projectId)
+  ).toString();
+  if (!workspaceId) throw new WorkspaceNotFoundError();
 
   const memberExists = await workspaceRepository.findMember(
     workspaceId,

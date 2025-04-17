@@ -119,12 +119,15 @@ export const createTask = async (req, res) => {
     // I was considering of creating the tags here and then assigned them to the task
     // but that action does not belong to this controller and may complicate the logic
     // So, for the client, it should create the tag before somewhere else and then assign it to the task
+
+    // assignedMembers: The same case as tags, an array with user Ids
     const { projectId } = req.params;
     const { title, description, status, tags, date, timer, assignedMembers } =
       req.body;
 
     // TODO: When a task with tags is created, the new tags are not showing in the created task
     // But it appears after fetching this task from another request
+    // The same with assignedMembers
     const task = await taskService.createTask(projectId, {
       title,
       description,
@@ -132,12 +135,21 @@ export const createTask = async (req, res) => {
       // tags,
       date,
       timer,
-      assignedMembers,
+      // assignedMembers,
     });
 
     if (tags)
       tags.forEach(async (tag) => {
         await tagService.assignTagToTask(tag, task._id.toString());
+      });
+
+    if (assignedMembers)
+      assignedMembers.forEach(async (member) => {
+        await taskService.assignMemberToTask(
+          task._id.toString(),
+          projectId,
+          member
+        );
       });
 
     res
@@ -193,8 +205,7 @@ export const updateTask = async (req, res) => {
     // Tags should NOT be included in the update task request
     // This action is being handled from another route (assignTagToTask and unassignTagToTask from Tag module)
     const { id } = req.params;
-    const { title, description, status, date, timer, assignedMembers } =
-      req.body;
+    const { title, description, status, date, timer } = req.body;
 
     const task = await taskService.updateTask(id, {
       title,
@@ -202,7 +213,6 @@ export const updateTask = async (req, res) => {
       status,
       date,
       timer,
-      assignedMembers,
     });
 
     res
@@ -278,13 +288,9 @@ export const deleteTask = async (req, res) => {
 
 export const assignMemberToTask = async (req, res) => {
   try {
-    const { id, workspaceId, memberId } = req.params;
+    const { id, projectId, memberId } = req.params;
 
-    const task = await taskService.assignMemberToTask(
-      id,
-      workspaceId,
-      memberId
-    );
+    const task = await taskService.assignMemberToTask(id, projectId, memberId);
 
     res
       .status(200)
@@ -303,6 +309,17 @@ export const assignMemberToTask = async (req, res) => {
           new ErrorResponseBuilder()
             .setStatus(404)
             .setMessage('Task not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof ProjectNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Project not found')
             .setError(error.message)
             .build()
         );
@@ -343,11 +360,11 @@ export const assignMemberToTask = async (req, res) => {
 
 export const unassignMemberToTask = async (req, res) => {
   try {
-    const { id, workspaceId, memberId } = req.params;
+    const { id, projectId, memberId } = req.params;
 
     const task = await taskService.unassignMemberToTask(
       id,
-      workspaceId,
+      projectId,
       memberId
     );
 
@@ -368,6 +385,17 @@ export const unassignMemberToTask = async (req, res) => {
           new ErrorResponseBuilder()
             .setStatus(404)
             .setMessage('Task not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof ProjectNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Project not found')
             .setError(error.message)
             .build()
         );

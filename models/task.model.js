@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-// TODO: Check assignedMembers functionality
 const taskSchema = new mongoose.Schema(
   {
     title: {
