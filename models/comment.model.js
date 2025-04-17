@@ -23,7 +23,7 @@ const commentSchema = new mongoose.Schema(
       ref: 'Task',
       required: true,
     },
-    // ?: Attachments ?
+    // TODO: Implement attachments
   },
   { timestamps: true }
 );

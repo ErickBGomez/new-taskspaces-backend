@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+// TODO: Implement attachments or media
 const taskSchema = new mongoose.Schema(
   {
     title: {

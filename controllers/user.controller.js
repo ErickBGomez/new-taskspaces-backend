@@ -23,6 +23,7 @@ export const getAllUsers = async (req, res) => {
           .build()
       );
   } catch (error) {
+    // TODO: Create handle internal server error middleware, instead of repeating this code
     res
       .status(500)
       .json(
@@ -131,6 +132,7 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   try {
+    // TODO: Login with email OR username
     const { email, password } = req.body;
 
     const { user, token } = await userService.loginUser({ email, password });

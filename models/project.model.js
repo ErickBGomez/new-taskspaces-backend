@@ -7,13 +7,10 @@ const projectSchema = new mongoose.Schema(
       unique: true,
       required: true,
     },
+    // TODO: Create status model to create custom status columns
     statuses: {
       type: [String],
       default: ['pending', 'doing', 'done'],
-    },
-    tags: {
-      type: [String],
-      default: ['Low', 'Medium', 'High'],
     },
     icon: {
       type: String, // TODO: Change to a proper icon type
