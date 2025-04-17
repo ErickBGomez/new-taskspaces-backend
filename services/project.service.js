@@ -16,9 +16,7 @@ export const findProjectsByWorkspaceId = async (workspaceId) => {
 export const findProjectById = async (id) => {
   const project = await projectRepository.findProjectById(id);
 
-  if (!project) {
-    throw new ProjectNotFoundError();
-  }
+  if (!project) throw new ProjectNotFoundError();
 
   return project;
 };
@@ -29,9 +27,7 @@ export const createProject = async (workspaceId, { title, icon }) => {
     workspaceId
   );
 
-  if (projectExists) {
-    throw new ProjectAlreadyExists();
-  }
+  if (projectExists) throw new ProjectAlreadyExists();
 
   return await projectRepository.createProject({
     title,
@@ -43,9 +39,7 @@ export const createProject = async (workspaceId, { title, icon }) => {
 export const updateProject = async (id, { title, statuses, tags, icon }) => {
   const projectExists = await projectRepository.findProjectById(id);
 
-  if (!projectExists) {
-    throw new ProjectNotFoundError();
-  }
+  if (!projectExists) throw new ProjectNotFoundError();
 
   return await projectRepository.updateProject(id, {
     title,
@@ -58,9 +52,7 @@ export const updateProject = async (id, { title, statuses, tags, icon }) => {
 export const deleteProject = async (id) => {
   const projectExists = await projectRepository.findProjectById(id);
 
-  if (!projectExists) {
-    throw new ProjectNotFoundError();
-  }
+  if (!projectExists) throw new ProjectNotFoundError();
 
   return await projectRepository.deleteProject(id);
 };
