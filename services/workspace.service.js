@@ -74,11 +74,7 @@ export const findMembers = async (workspaceId) => {
 
   if (!workspace) throw new WorkspaceNotFoundError();
 
-  const members = await workspaceRepository.findMembers(workspaceId);
-
-  if (!members) throw new UserNotFoundError();
-
-  return members;
+  return await workspaceRepository.findMembers(workspaceId);
 };
 
 export const findMemberRole = async (workspaceId, memberId) => {
@@ -128,13 +124,15 @@ export const updateMember = async (id, actionUserId, memberId, memberRole) => {
 
   if (!workspace) throw new WorkspaceNotFoundError();
 
-  const userExists = await userRepository.findUserById(memberId);
+  // Check if actions user and member exists
+  const actionUserExists = await userRepository.findUserById(actionUserId);
+  if (!actionUserExists) throw new UserNotFoundError();
 
-  if (!userExists) throw new UserNotFoundError();
+  const memberExists = await userRepository.findUserById(memberId);
+  if (!memberExists) throw new UserNotFoundError();
 
   // Avoid the user to update their own member role
-  if (actionUserId === userExists._id.toString())
-    throw new MemberRoleSelfModifiedError();
+  if (actionUserId === memberId) throw new MemberRoleSelfModifiedError();
 
   if (!MEMBER_ROLES[memberRole]) throw new InvalidMemberRoleError();
 
@@ -152,19 +150,16 @@ export const updateMember = async (id, actionUserId, memberId, memberRole) => {
 export const removeMember = async (id, actionUserId, memberId) => {
   const workspace = await workspaceRepository.findWorkspaceById(id);
 
-  if (!workspace) {
-    throw new WorkspaceNotFoundError();
-  }
+  if (!workspace) throw new WorkspaceNotFoundError();
 
-  const userExists = await userRepository.findUserById(memberId);
+  const actionUserExists = await userRepository.findUserById(actionUserId);
+  if (!actionUserExists) throw new UserNotFoundError();
 
-  if (!userExists) {
-    throw new UserNotFoundError();
-  }
+  const memberExists = await userRepository.findUserById(memberId);
+  if (!memberExists) throw new UserNotFoundError();
 
   // Avoid the user to update their own member role
-  if (actionUserId === userExists._id.toString())
-    throw new MemberSelfRemovedError();
+  if (actionUserId === memberId) throw new MemberSelfRemovedError();
 
   // Check if the user is NOT a member of the workspace
   const existingMembers = await workspaceRepository.findMembers(id);

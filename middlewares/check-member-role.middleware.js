@@ -1,6 +1,6 @@
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import * as workspaceService from '../services/workspace.service.js';
-import * as projectService from '../services/project.service.js';
+import * as projectHelper from '../helpers/project.helper.js';
 import * as taskService from '../services/task.service.js';
 import {
   InsufficientPrivilegesError,
@@ -66,7 +66,7 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
           const resolvedProjectId = projectId ?? id;
 
           const workspaceId =
-            await projectService.findWorkspaceIdByProjectId(resolvedProjectId);
+            await projectHelper.findWorkspaceIdByProjectId(resolvedProjectId);
 
           memberRole = await workspaceService.findMemberRole(
             workspaceId,
@@ -83,7 +83,7 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
             await taskService.findProjectIdByTaskId(resolvedTaskId);
 
           const workspaceId =
-            await projectService.findWorkspaceIdByProjectId(projectId);
+            await projectHelper.findWorkspaceIdByProjectId(projectId);
 
           memberRole = await workspaceService.findMemberRole(
             workspaceId,

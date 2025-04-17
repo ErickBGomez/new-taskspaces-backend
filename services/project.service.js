@@ -1,4 +1,5 @@
 import * as projectRepository from '../repositories/project.repository.js';
+import * as workspaceRepository from '../repositories/workspace.repository.js';
 import {
   ProjectNotFoundError,
   ProjectAlreadyExists,
@@ -10,6 +11,11 @@ export const findAllProjects = async () => {
 };
 
 export const findProjectsByWorkspaceId = async (workspaceId) => {
+  const workspaceExists =
+    await workspaceRepository.findWorkspaceById(workspaceId);
+
+  if (!workspaceExists) throw new WorkspaceNotFoundError();
+
   return await projectRepository.findProjectsByWorkspaceId(workspaceId);
 };
 
@@ -22,6 +28,10 @@ export const findProjectById = async (id) => {
 };
 
 export const createProject = async (workspaceId, { title, icon }) => {
+  const workspaceExists = workspaceRepository.findWorkspaceById(workspaceId);
+
+  if (!workspaceExists) throw new WorkspaceNotFoundError();
+
   const projectExists = await projectRepository.findProjectByTitle(
     title,
     workspaceId
@@ -55,15 +65,4 @@ export const deleteProject = async (id) => {
   if (!projectExists) throw new ProjectNotFoundError();
 
   return await projectRepository.deleteProject(id);
-};
-
-// Methods without routes
-export const findWorkspaceIdByProjectId = async (projectId) => {
-  const project = await projectRepository.findProjectById(projectId);
-
-  if (!project) throw new ProjectNotFoundError();
-
-  if (!project.workspace) throw new WorkspaceNotFoundError();
-
-  return project.workspace;
 };

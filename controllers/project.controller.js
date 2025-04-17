@@ -5,6 +5,7 @@ import {
 } from '../errors/project.errors.js';
 import SuccessResponseBuilder from '../helpers/success-response-builder.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
+import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
 
 export const getAllProjects = async (req, res) => {
   try {
@@ -49,6 +50,17 @@ export const getProjectsByWorkspaceId = async (req, res) => {
           .build()
       );
   } catch (error) {
+    if (error instanceof WorkspaceNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Workspace not found')
+            .setError(error.message)
+            .build()
+        );
+
     res
       .status(500)
       .json(
@@ -123,6 +135,17 @@ export const createProject = async (req, res) => {
           .build()
       );
   } catch (error) {
+    if (error instanceof WorkspaceNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Workspace not found')
+            .setError(error.message)
+            .build()
+        );
+
     if (error instanceof ProjectAlreadyExists)
       return res
         .status(409)
