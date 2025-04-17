@@ -1,11 +1,5 @@
-import * as projectController from '../controllers/project.controller.js';
+import { Router } from 'express';
 import authMiddleware from '../middlewares/auth.middleware.js';
-import express from 'express';
-import {
-  createProjectValidator,
-  updateProjectValidator,
-} from '../validators/project.validator.js';
-import checkValidation from '../middlewares/validator.middleware.js';
 import {
   authorizeRolesMiddleware,
   ROLES,
@@ -15,8 +9,14 @@ import {
   MEMBER_ROLES,
   DEPTH,
 } from '../middlewares/check-member-role.middleware.js';
+import {
+  createProjectValidator,
+  updateProjectValidator,
+} from '../validators/project.validator.js';
+import checkValidation from '../middlewares/validator.middleware.js';
+import * as projectController from '../controllers/project.controller.js';
 
-const router = express.Router();
+const router = Router();
 
 router.get(
   '/',

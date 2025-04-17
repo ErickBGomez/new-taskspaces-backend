@@ -1,12 +1,5 @@
-import * as workspaceController from '../controllers/workspace.controller.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
-import {
-  inviteValidator,
-  updateMemberValidator,
-  workspaceValidator,
-} from '../validators/workspace.validator.js';
-import checkValidation from '../middlewares/validator.middleware.js';
-import express from 'express';
+import { Router } from 'express';
 import {
   authorizeRolesMiddleware,
   ROLES,
@@ -16,8 +9,15 @@ import {
   DEPTH,
   MEMBER_ROLES,
 } from '../middlewares/check-member-role.middleware.js';
+import {
+  inviteValidator,
+  updateMemberValidator,
+  workspaceValidator,
+} from '../validators/workspace.validator.js';
+import checkValidation from '../middlewares/validator.middleware.js';
+import * as workspaceController from '../controllers/workspace.controller.js';
 
-const router = express.Router();
+const router = Router();
 
 router.get(
   '/check',

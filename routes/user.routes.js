@@ -1,12 +1,12 @@
-import express from 'express';
-import * as userController from '../controllers/user.controller.js';
-import { registerUserValidator } from '../validators/user.validator.js';
-import checkValidation from '../middlewares/validator.middleware.js';
+import { Router } from 'express';
 import authMiddleware from '../middlewares/auth.middleware.js';
 import {
   authorizeRolesMiddleware,
   ROLES,
 } from '../middlewares/authorize-roles.middleware.js';
+import { registerUserValidator } from '../validators/user.validator.js';
+import checkValidation from '../middlewares/validator.middleware.js';
+import * as userController from '../controllers/user.controller.js';
 
 /*
   I've considered separating the actions into an admin-only method and a user-only method
@@ -15,7 +15,7 @@ import {
   rather than just / (since they can conflict with the admin-only GET / route).
 */
 
-const router = express.Router();
+const router = Router();
 
 router.get(
   '/',

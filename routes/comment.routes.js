@@ -1,10 +1,10 @@
-import * as commentController from '../controllers/comment.controller.js';
+import { Router } from 'express';
 import authMiddleware from '../middlewares/auth.middleware.js';
 import commentValidator from '../validators/comment.validator.js';
 import checkValidation from '../middlewares/validator.middleware.js';
-import express from 'express';
+import * as commentController from '../controllers/comment.controller.js';
 
-const router = express.Router();
+const router = Router();
 
 router.get('/t/:taskId', authMiddleware, commentController.getAllComments);
 router.get('/:id/t/:taskId', authMiddleware, commentController.getCommentById);

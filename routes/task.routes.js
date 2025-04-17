@@ -1,8 +1,5 @@
-import * as taskController from '../controllers/task.controller.js';
+import { Router } from 'express';
 import authMiddleware from '../middlewares/auth.middleware.js';
-import taskValidator from '../validators/task.validator.js';
-import checkValidation from '../middlewares/validator.middleware.js';
-import express from 'express';
 import {
   authorizeRolesMiddleware,
   ROLES,
@@ -12,8 +9,11 @@ import {
   DEPTH,
   MEMBER_ROLES,
 } from '../middlewares/check-member-role.middleware.js';
+import taskValidator from '../validators/task.validator.js';
+import checkValidation from '../middlewares/validator.middleware.js';
+import * as taskController from '../controllers/task.controller.js';
 
-const router = express.Router();
+const router = Router();
 
 router.get(
   '/',

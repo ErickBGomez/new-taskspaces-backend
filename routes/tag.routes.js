@@ -1,10 +1,10 @@
-import * as tagController from '../controllers/tag.controller.js';
+import { Router } from 'express';
 import authMiddleware from '../middlewares/auth.middleware.js';
 import tagValidator from '../validators/tag.validator.js';
 import checkValidation from '../middlewares/validator.middleware.js';
-import express from 'express';
+import * as tagController from '../controllers/tag.controller.js';
 
-const router = express.Router();
+const router = Router();
 
 router.get('/p/:projectId', authMiddleware, tagController.getAllTags);
 router.get('/:id/p/:projectId', authMiddleware, tagController.getTagById);
