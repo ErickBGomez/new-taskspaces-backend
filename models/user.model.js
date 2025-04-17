@@ -45,8 +45,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// use pre to trim all strings
-
 // Hash password when creating new user
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
