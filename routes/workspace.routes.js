@@ -28,7 +28,7 @@ router.get(
 router.get(
   '/',
   authMiddleware,
-  authorizeRolesMiddleware(ROLES.USER),
+  authorizeRolesMiddleware(ROLES.SYSADMIN),
   workspaceController.getAllWorkspaces
 );
 router.get(

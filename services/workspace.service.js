@@ -11,7 +11,7 @@ import {
 import { UserNotFoundError } from '../errors/user.errors.js';
 import { MEMBER_ROLES } from '../middlewares/check-member-role.middleware.js';
 
-export const findWorkspaces = async () => {
+export const findAllWorkspaces = async () => {
   return await workspaceRepository.findAllWorkspaces();
 };
 

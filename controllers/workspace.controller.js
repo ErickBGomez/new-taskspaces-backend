@@ -14,12 +14,7 @@ import { ROLES } from '../middlewares/authorize-roles.middleware.js';
 
 export const getAllWorkspaces = async (req, res) => {
   try {
-    const { id: userId, role } = req.user;
-
-    const workspaces =
-      role === ROLES.SYSADMIN
-        ? await workspaceService.findWorkspaces()
-        : await workspaceService.findWorkspacesByOwnerId(userId);
+    const workspaces = await workspaceService.findAllWorkspaces();
 
     res
       .status(200)
