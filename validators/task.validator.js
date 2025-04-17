@@ -18,7 +18,12 @@ const taskValidator = [
     .isIn(['pending', 'doing', 'done'])
     .withMessage('Status must be one of the following: pending, doing, done'),
   // TODO: Implement tags model correctly
-  body('tags').optional().isArray().withMessage('Tags must be an array'),
+  body('tags')
+    .optional()
+    .isArray()
+    .withMessage('Tags must be an array of strings')
+    .custom((tags) => tags.every((tag) => typeof tag === 'string'))
+    .withMessage('Each tag must be valid'),
   // TODO: Check data type
   body('date').optional().isString().withMessage('Date must be a string'),
   body('timer')

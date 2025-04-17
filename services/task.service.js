@@ -25,7 +25,7 @@ export const findTaskById = async (id) => {
 
 export const createTask = async (
   projectId,
-  { title, description, status, tags, date, timer, assignedMembers }
+  { title, description, status, date, timer, assignedMembers }
 ) => {
   const projectExists = await projectRepository.findProjectById(projectId);
 
@@ -35,7 +35,6 @@ export const createTask = async (
     title,
     description,
     status,
-    tags,
     date,
     timer,
     assignedMembers,

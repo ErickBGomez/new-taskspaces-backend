@@ -190,66 +190,6 @@ export const createTag = async (req, res) => {
   }
 };
 
-export const assignTagToTask = async (req, res) => {
-  try {
-    const { id, taskId } = req.params;
-
-    await tagService.assignTagToTask(id, taskId);
-
-    res
-      .status(200)
-      .json(
-        new SuccessResponseBuilder()
-          .setStatus(200)
-          .setMessage('Tag assigned to task')
-          .build()
-      );
-  } catch (error) {
-    if (error instanceof TagNotFoundError)
-      return res
-        .status(404)
-        .json(
-          new ErrorResponseBuilder()
-            .setStatus(404)
-            .setMessage('Tag not found')
-            .setError(error.message)
-            .build()
-        );
-
-    if (error instanceof TaskNotFoundError)
-      return res
-        .status(404)
-        .json(
-          new ErrorResponseBuilder()
-            .setStatus(404)
-            .setMessage('Task not found')
-            .setError(error.message)
-            .build()
-        );
-
-    if (error instanceof TagAlreadyAssigned)
-      return res
-        .status(400)
-        .json(
-          new ErrorResponseBuilder()
-            .setStatus(400)
-            .setMessage('Tag already assigned to task')
-            .setError(error.message)
-            .build()
-        );
-
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
-  }
-};
-
 export const updateTag = async (req, res) => {
   try {
     const { id } = req.params;
@@ -312,6 +252,115 @@ export const deleteTag = async (req, res) => {
           new ErrorResponseBuilder()
             .setStatus(404)
             .setMessage('Tag not found')
+            .setError(error.message)
+            .build()
+        );
+
+    res
+      .status(500)
+      .json(
+        new ErrorResponseBuilder()
+          .setStatus(500)
+          .setMessage('Internal server error')
+          .setError(error.message)
+          .build()
+      );
+  }
+};
+
+export const assignTagToTask = async (req, res) => {
+  try {
+    const { id, taskId } = req.params;
+
+    await tagService.assignTagToTask(id, taskId);
+
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Tag assigned to task')
+          .build()
+      );
+  } catch (error) {
+    if (error instanceof TagNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Tag not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof TaskNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Task not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof TagAlreadyAssigned)
+      return res
+        .status(400)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(400)
+            .setMessage('Tag already assigned to task')
+            .setError(error.message)
+            .build()
+        );
+
+    res
+      .status(500)
+      .json(
+        new ErrorResponseBuilder()
+          .setStatus(500)
+          .setMessage('Internal server error')
+          .setError(error.message)
+          .build()
+      );
+  }
+};
+
+export const unassignTagFromTask = async (req, res) => {
+  try {
+    const { id, taskId } = req.params;
+
+    await tagService.unassignTagFromTask(id, taskId);
+
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Tag unassigned from task')
+          .build()
+      );
+  } catch (error) {
+    if (error instanceof TagNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Tag not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof TaskNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Task not found')
             .setError(error.message)
             .build()
         );

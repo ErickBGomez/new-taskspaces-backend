@@ -22,14 +22,6 @@ export const createTag = async (tag) => {
   return await Tag.create(tag);
 };
 
-export const assignTagToTask = async (id, taskId) => {
-  return await Task.findByIdAndUpdate(
-    taskId,
-    { $push: { tags: id } },
-    { new: true }
-  );
-};
-
 export const updateTag = async (id, tag) => {
   return await Tag.findByIdAndUpdate(id, tag, {
     new: true,
@@ -40,4 +32,20 @@ export const deleteTag = async (id) => {
   // Also delete the tag from all tasks
   await Task.updateMany({ tags: id }, { $pull: { tags: id } });
   return await Tag.findByIdAndDelete(id);
+};
+
+export const assignTagToTask = async (id, taskId) => {
+  return await Task.findByIdAndUpdate(
+    taskId,
+    { $push: { tags: id } },
+    { new: true }
+  );
+};
+
+export const unassignTagFromTask = async (id, taskId) => {
+  return await Task.findByIdAndUpdate(
+    taskId,
+    { $pull: { tags: id } },
+    { new: true }
+  );
 };

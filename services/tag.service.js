@@ -45,6 +45,25 @@ export const createTag = async (projectId, { title, color }) => {
   });
 };
 
+export const updateTag = async (id, { title, color }) => {
+  const tagExists = await tagRepository.findTagById(id);
+
+  if (!tagExists) throw new TagNotFoundError();
+
+  return await tagRepository.updateTag(id, {
+    title,
+    color,
+  });
+};
+
+export const deleteTag = async (id) => {
+  const tagExists = await tagRepository.findTagById(id);
+
+  if (!tagExists) throw new TagNotFoundError();
+
+  return await tagRepository.deleteTag(id);
+};
+
 export const assignTagToTask = async (id, taskId) => {
   const tagExists = await tagRepository.findTagById(id);
 
@@ -64,21 +83,14 @@ export const assignTagToTask = async (id, taskId) => {
   return await tagRepository.assignTagToTask(id, taskId);
 };
 
-export const updateTag = async (id, { title, color }) => {
+export const unassignTagFromTask = async (id, taskId) => {
   const tagExists = await tagRepository.findTagById(id);
 
   if (!tagExists) throw new TagNotFoundError();
 
-  return await tagRepository.updateTag(id, {
-    title,
-    color,
-  });
-};
+  const taskExists = await taskRepository.findTaskById(taskId);
 
-export const deleteTag = async (id) => {
-  const tagExists = await tagRepository.findTagById(id);
+  if (!taskExists) throw new TaskNotFoundError();
 
-  if (!tagExists) throw new TagNotFoundError();
-
-  return await tagRepository.deleteTag(id);
+  return await tagRepository.unassignTagFromTask(id, taskId);
 };
