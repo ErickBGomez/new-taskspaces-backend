@@ -18,9 +18,7 @@ export const findAllUsers = async () => {
 export const findUserById = async (id) => {
   const user = await userRepository.findUserById(id);
 
-  if (!user) {
-    throw new UserNotFoundError();
-  }
+  if (!user) throw new UserNotFoundError();
 
   return user;
 };
@@ -35,18 +33,15 @@ export const registerUser = async ({
 }) => {
   const userCheck = await checkUserExists(username, email);
 
-  if (userCheck.exists) {
+  if (userCheck.exists)
     throw new UserAlreadyExistsError([
       {
         field: userCheck.field,
         errors: [`A user with this ${userCheck.field} already exists`],
       },
     ]);
-  }
 
-  if (password !== confirmPassword) {
-    throw new PasswordDoNotMatchError();
-  }
+  if (password !== confirmPassword) throw new PasswordDoNotMatchError();
 
   return await userRepository.createUser({
     fullname,
@@ -59,19 +54,15 @@ export const registerUser = async ({
 };
 
 export const loginUser = async ({ email, password }) => {
-  const user = await userRepository.findUserByEmail(email);
+  const user = await userRepository.findUserByEmail(email, true);
 
-  if (!user) {
-    throw new IncorrectCredentialsError();
-  }
-
-  const { _id, fullname, username, avatar, role } = user;
+  if (!user) throw new IncorrectCredentialsError();
 
   const comparedPassword = await user.comparePassword(password);
 
-  if (!comparedPassword) {
-    throw new IncorrectCredentialsError();
-  }
+  if (!comparedPassword) throw new IncorrectCredentialsError();
+
+  const { _id, fullname, username, avatar, role } = user;
 
   // Saved user information goes here
   const token = jwt.sign({ id: user._id, username, role }, config.JWT_SECRET, {
@@ -87,9 +78,7 @@ export const updateUser = async (
 ) => {
   const userExists = await userRepository.findUserById(id);
 
-  if (!userExists) {
-    throw new UserNotFoundError();
-  }
+  if (!userExists) throw new UserNotFoundError();
 
   return await userRepository.updateUser(id, {
     fullname,
@@ -103,9 +92,7 @@ export const updateUser = async (
 export const requestUpdatePassword = async (email) => {
   const user = await userRepository.findUserByEmail(email);
 
-  if (!user) {
-    throw new UserNotFoundError();
-  }
+  if (!user) throw new UserNotFoundError();
 
   const token = jwt.sign({ id: user._id }, config.JWT_SECRET, {
     expiresIn: '1h',
@@ -118,17 +105,11 @@ export const updatePassword = async (id, newPassword, confirmPassword) => {
   const userExists = await userRepository.findUserById(id);
   const comparedPassword = await userExists.comparePassword(newPassword);
 
-  if (!userExists) {
-    throw new UserNotFoundError();
-  }
+  if (!userExists) throw new UserNotFoundError();
 
-  if (newPassword !== confirmPassword) {
-    throw new PasswordDoNotMatchError();
-  }
+  if (newPassword !== confirmPassword) throw new PasswordDoNotMatchError();
 
-  if (comparedPassword) {
-    throw new SameOldPasswordError();
-  }
+  if (comparedPassword) throw new SameOldPasswordError();
 
   return await userRepository.updateUser(id, { password: newPassword });
 };
@@ -136,9 +117,7 @@ export const updatePassword = async (id, newPassword, confirmPassword) => {
 export const deleteUser = async (id) => {
   const userExists = await userRepository.findUserById(id);
 
-  if (!userExists) {
-    throw new UserNotFoundError();
-  }
+  if (!userExists) throw new UserNotFoundError();
 
   return await userRepository.deleteUser(id);
 };

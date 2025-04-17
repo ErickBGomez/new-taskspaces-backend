@@ -37,11 +37,7 @@ export const getAllUsers = async (req, res) => {
 
 export const getUserById = async (req, res) => {
   try {
-    const { id: userId, role } = req.user;
     const { id } = req.params;
-
-    // User role can only retrieve their own data. Sysadmin can retrieve any user
-    if (role !== ROLES.SYSADMIN && userId !== id) throw new UserNotFoundError();
 
     const resultUser = await userService.findUserById(id);
 
@@ -216,7 +212,7 @@ export const updateUser = async (req, res) => {
     const { id } = req.params;
     const { fullname, username, avatar, email, description } = req.body;
 
-    // User role can only retrieve their own data. Sysadmin can retrieve any user
+    // User role can update only their own data. Sysadmin can update any user
     if (role !== ROLES.SYSADMIN && userId !== id) throw new UserNotFoundError();
 
     const updatedUser = await userService.updateUser(id, {
@@ -266,7 +262,7 @@ export const updatePassword = async (req, res) => {
     const { id } = req.params;
     const { newPassword, confirmPassword } = req.body;
 
-    // User role can only retrieve their own data. Sysadmin can retrieve any user
+    // User role can update only their own password. Sysadmin can update any user's password
     if (role !== ROLES.SYSADMIN && userId !== id) throw new UserNotFoundError();
 
     await userService.updatePassword(id, newPassword, confirmPassword);
@@ -308,7 +304,7 @@ export const deleteUser = async (req, res) => {
     const { id: userId, role } = req.user;
     const { id } = req.params;
 
-    // User role can only retrieve their own data. Sysadmin can retrieve any user
+    // User role can delete only their own data. Sysadmin can delete any user
     if (role !== ROLES.SYSADMIN && userId !== id) throw new UserNotFoundError();
 
     await userService.deleteUser(id);
