@@ -1,7 +1,7 @@
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import * as workspaceService from '../services/workspace.service.js';
 import * as projectHelper from '../helpers/project.helper.js';
-import * as taskService from '../services/task.service.js';
+import * as taskHelper from '../helpers/task.helper.js';
 import {
   InsufficientPrivilegesError,
   UnauthorizedError,
@@ -80,7 +80,7 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
           const resolvedTaskId = taskId ?? id;
 
           const projectId =
-            await taskService.findProjectIdByTaskId(resolvedTaskId);
+            await taskHelper.findProjectIdByTaskId(resolvedTaskId);
 
           const workspaceId =
             await projectHelper.findWorkspaceIdByProjectId(projectId);

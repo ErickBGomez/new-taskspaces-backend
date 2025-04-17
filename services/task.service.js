@@ -1,4 +1,5 @@
 import * as taskRepository from '../repositories/task.repository.js';
+import * as projectRepository from '../repositories/project.repository.js';
 import { TaskNotFoundError } from '../errors/task.errors.js';
 import { ProjectNotFoundError } from '../errors/project.errors.js';
 
@@ -7,15 +8,17 @@ export const findAllTasks = async () => {
 };
 
 export const findTasksByProjectId = async (projectId) => {
+  const projectExists = await projectRepository.findProjectById(projectId);
+
+  if (!projectExists) throw new ProjectNotFoundError();
+
   return await taskRepository.findTasksByProjectId(projectId);
 };
 
 export const findTaskById = async (id) => {
   const task = await taskRepository.findTaskById(id);
 
-  if (!task) {
-    throw new TaskNotFoundError();
-  }
+  if (!task) throw new TaskNotFoundError();
 
   return task;
 };
@@ -24,6 +27,10 @@ export const createTask = async (
   projectId,
   { title, description, status, tags, date, timer, assignedMembers }
 ) => {
+  const projectExists = await projectRepository.findProjectById(projectId);
+
+  if (!projectExists) throw new ProjectNotFoundError();
+
   return await taskRepository.createTask({
     title,
     description,
@@ -42,9 +49,7 @@ export const updateTask = async (
 ) => {
   const taskExists = await taskRepository.findTaskById(id);
 
-  if (!taskExists) {
-    throw new TaskNotFoundError();
-  }
+  if (!taskExists) throw new TaskNotFoundError();
 
   return await taskRepository.updateTask(id, {
     title,
@@ -60,20 +65,7 @@ export const updateTask = async (
 export const deleteTask = async (id) => {
   const taskExists = await taskRepository.findTaskById(id);
 
-  if (!taskExists) {
-    throw new TaskNotFoundError();
-  }
+  if (!taskExists) throw new TaskNotFoundError();
 
   return await taskRepository.deleteTask(id);
-};
-
-// Methods without routes
-export const findProjectIdByTaskId = async (taskId) => {
-  const task = await taskRepository.findTaskById(taskId);
-
-  if (!task) throw new TaskNotFoundError();
-
-  if (!task.project) throw new ProjectNotFoundError();
-
-  return task.project;
 };
