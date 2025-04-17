@@ -15,10 +15,10 @@ const taskSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    // TODO: Use tag model instead of strings
     tags: [
       {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Tag',
       },
     ],
     date: {

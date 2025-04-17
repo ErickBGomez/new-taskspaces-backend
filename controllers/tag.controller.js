@@ -1,5 +1,5 @@
 import * as tagService from '../services/tag.service.js';
-import { TagNotFoundError } from '../errors/tag.errors.js';
+import { TagAlreadyAssigned, TagNotFoundError } from '../errors/tag.errors.js';
 import SuccessResponseBuilder from '../helpers/success-response-builder.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import { ProjectNotFoundError } from '../errors/project.errors.js';
@@ -223,6 +223,17 @@ export const assignTagToTask = async (req, res) => {
           new ErrorResponseBuilder()
             .setStatus(404)
             .setMessage('Task not found')
+            .setError(error.message)
+            .build()
+        );
+
+    if (error instanceof TagAlreadyAssigned)
+      return res
+        .status(400)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(400)
+            .setMessage('Tag already assigned to task')
             .setError(error.message)
             .build()
         );

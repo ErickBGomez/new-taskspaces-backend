@@ -28,6 +28,4 @@ app.use(`${apiPrefix}/comments`, commentRoutes);
 app.use(`${apiPrefix}/tags`, tagRoutes);
 app.use(`${apiPrefix}/auth`, authRoutes);
 
-//TODO: Error handling goes here
-
 export default app;

@@ -48,7 +48,6 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
       let memberRole;
 
       // TODO: Refactor these lines
-      // TODO: Test this: Should be put after authorizeRoles, and then try with different depths
       switch (depth) {
         case DEPTH.WORKSPACE: {
           // Obtain either workspaceId or id from path parameters

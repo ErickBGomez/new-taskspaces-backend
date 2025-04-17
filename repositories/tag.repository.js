@@ -37,5 +37,7 @@ export const updateTag = async (id, tag) => {
 };
 
 export const deleteTag = async (id) => {
+  // Also delete the tag from all tasks
+  await Task.updateMany({ tags: id }, { $pull: { tags: id } });
   return await Tag.findByIdAndDelete(id);
 };
