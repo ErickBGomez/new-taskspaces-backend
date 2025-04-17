@@ -5,19 +5,16 @@ import {
 } from '../errors/project.errors.js';
 import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
 
-export const findAllProjects = async (workspaceId) => {
-  return await projectRepository.findAllProjects(workspaceId);
+export const findAllProjects = async () => {
+  return await projectRepository.findAllProjects();
 };
 
-export const findGlobalProjects = async () => {
-  return await projectRepository.findGlobalProjects();
+export const findProjectsByWorkspaceId = async (workspaceId) => {
+  return await projectRepository.findProjectsByWorkspaceId(workspaceId);
 };
 
-export const findProjectById = async (id, workspaceId) => {
-  const project = await projectRepository.findProjectByIdAndWorkspaceId(
-    id,
-    workspaceId
-  );
+export const findProjectById = async (id) => {
+  const project = await projectRepository.findProjectById(id);
 
   if (!project) {
     throw new ProjectNotFoundError();
@@ -26,10 +23,7 @@ export const findProjectById = async (id, workspaceId) => {
   return project;
 };
 
-export const createProject = async (
-  workspaceId,
-  { title, statuses, tags, icon }
-) => {
+export const createProject = async (workspaceId, { title, icon }) => {
   const projectExists = await projectRepository.findProjectByTitle(
     title,
     workspaceId
@@ -41,28 +35,19 @@ export const createProject = async (
 
   return await projectRepository.createProject({
     title,
-    statuses,
-    tags,
     icon,
     workspace: workspaceId,
   });
 };
 
-export const updateProject = async (
-  id,
-  workspaceId,
-  { title, statuses, tags, icon }
-) => {
-  const projectExists = await projectRepository.findProjectById(
-    id,
-    workspaceId
-  );
+export const updateProject = async (id, { title, statuses, tags, icon }) => {
+  const projectExists = await projectRepository.findProjectById(id);
 
   if (!projectExists) {
     throw new ProjectNotFoundError();
   }
 
-  return await projectRepository.updateProject(id, workspaceId, {
+  return await projectRepository.updateProject(id, {
     title,
     statuses,
     tags,
@@ -70,11 +55,8 @@ export const updateProject = async (
   });
 };
 
-export const deleteProject = async (id, workspaceId) => {
-  const projectExists = await projectRepository.findProjectByIdAndWorkspaceId(
-    id,
-    workspaceId
-  );
+export const deleteProject = async (id) => {
+  const projectExists = await projectRepository.findProjectById(id);
 
   if (!projectExists) {
     throw new ProjectNotFoundError();

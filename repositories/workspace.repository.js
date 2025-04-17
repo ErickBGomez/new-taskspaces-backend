@@ -51,7 +51,7 @@ export const findMember = async (workspaceId, memberId) => {
   if (!workspace) return null;
 
   const member = workspace.members.find(
-    (member) => member.user._id.toString() === memberId
+    (member) => member.user?._id.toString() === memberId
   );
 
   if (!member) return null;

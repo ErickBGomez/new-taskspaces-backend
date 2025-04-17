@@ -1,7 +1,10 @@
 import * as projectController from '../controllers/project.controller.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
 import express from 'express';
-import projectValidator from '../validators/project.validator.js';
+import {
+  createProjectValidator,
+  updateProjectValidator,
+} from '../validators/project.validator.js';
 import checkValidation from '../middlewares/validator.middleware.js';
 import {
   authorizeRolesMiddleware,
@@ -16,16 +19,23 @@ import {
 const router = express.Router();
 
 router.get(
+  '/',
+  authMiddleware,
+  authorizeRolesMiddleware(ROLES.SYSADMIN),
+  projectController.getAllProjects
+);
+router.get(
   '/w/:workspaceId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  projectController.getAllProjects
+  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.WORKSPACE),
+  projectController.getProjectsByWorkspaceId
 );
 router.get(
   '/:id/w/:workspaceId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.PROJECT),
+  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.WORKSPACE),
   projectController.getProjectById
 );
 router.post(
@@ -33,7 +43,7 @@ router.post(
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, DEPTH.WORKSPACE),
-  projectValidator,
+  createProjectValidator,
   checkValidation,
   projectController.createProject
 );
@@ -41,8 +51,8 @@ router.put(
   '/:id/w/:workspaceId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.PROJECT),
-  projectValidator,
+  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.WORKSPACE),
+  updateProjectValidator,
   checkValidation,
   projectController.updateProject
 );
@@ -50,7 +60,7 @@ router.delete(
   '/:id/w/:workspaceId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, DEPTH.PROJECT),
+  checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, DEPTH.WORKSPACE),
   projectController.deleteProject
 );
 

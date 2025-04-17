@@ -9,7 +9,7 @@ const projectSchema = new mongoose.Schema(
     },
     statuses: {
       type: [String],
-      default: ['pending', 'doing', 'done'],
+      default: ['PENDING', 'DOING', 'DONE'],
     },
     tags: {
       type: [String],

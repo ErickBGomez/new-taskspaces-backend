@@ -8,9 +8,36 @@ import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 
 export const getAllProjects = async (req, res) => {
   try {
+    const projects = await projectService.findAllProjects();
+
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Projects found')
+          .setContent(projects)
+          .build()
+      );
+  } catch (error) {
+    res
+      .status(500)
+      .json(
+        new ErrorResponseBuilder()
+          .setStatus(500)
+          .setMessage('Internal server error')
+          .setError(error.message)
+          .build()
+      );
+  }
+};
+
+export const getProjectsByWorkspaceId = async (req, res) => {
+  try {
     const { workspaceId } = req.params;
 
-    const projects = await projectService.findAllProjects(workspaceId);
+    const projects =
+      await projectService.findProjectsByWorkspaceId(workspaceId);
 
     res
       .status(200)
@@ -36,9 +63,9 @@ export const getAllProjects = async (req, res) => {
 
 export const getProjectById = async (req, res) => {
   try {
-    const { id, workspaceId } = req.params;
+    const { id } = req.params;
 
-    const project = await projectService.findProjectById(id, workspaceId);
+    const project = await projectService.findProjectById(id);
 
     res
       .status(200)
@@ -75,14 +102,14 @@ export const getProjectById = async (req, res) => {
 
 export const createProject = async (req, res) => {
   try {
+    // In the case of create project, it's necessary to retrieve the workspaceId
+    // because its part of the project schema to have the reference to the workspace
     const { workspaceId } = req.params;
 
-    const { title, statuses, tags, icon } = req.body;
+    const { title, icon } = req.body;
 
     const project = await projectService.createProject(workspaceId, {
       title,
-      statuses,
-      tags,
       icon,
     });
 
@@ -121,10 +148,13 @@ export const createProject = async (req, res) => {
 
 export const updateProject = async (req, res) => {
   try {
-    const { id, workspaceId } = req.params;
+    // In the case of update project, it's not necessary to retrieve the workspaceId
+    // because workspaceId cannot be updated, and the member role has been checked before
+    // in checkMemberRoleMiddleware
+    const { id } = req.params;
     const { title, statuses, tags, icon } = req.body;
 
-    const updatedProject = await projectService.updateProject(id, workspaceId, {
+    const updatedProject = await projectService.updateProject(id, {
       title,
       statuses,
       tags,
@@ -166,9 +196,11 @@ export const updateProject = async (req, res) => {
 
 export const deleteProject = async (req, res) => {
   try {
-    const { id, workspaceId } = req.params;
+    // In the case of delete project, it's the same case as update project
+    // the workspaceId is not necessary to retrieve
+    const { id } = req.params;
 
-    await projectService.deleteProject(id, workspaceId);
+    await projectService.deleteProject(id);
 
     res
       .status(200)

@@ -5,6 +5,7 @@ import * as taskService from '../services/task.service.js';
 import {
   InsufficientPrivilegesError,
   UnauthorizedError,
+  UserNotFoundError,
 } from '../errors/user.errors.js';
 import {
   InvalidMemberRoleError,
@@ -13,6 +14,7 @@ import {
 import { ProjectNotFoundError } from '../errors/project.errors.js';
 import { TaskNotFoundError } from '../errors/task.errors.js';
 import { InvalidDepthError } from '../errors/common.errors.js';
+import { ROLES } from './authorize-roles.middleware.js';
 
 export const MEMBER_ROLES = {
   READER: 'READER',
@@ -37,7 +39,12 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
     try {
       if (!req.user) throw new UnauthorizedError();
 
-      const { id: userId } = req.user;
+      const { id: userId, role } = req.user;
+
+      // Check if user is SYSADMIN (SYSADMIN does not have to be
+      // checked by their member roles)
+      if (ROLES[role] === ROLES.SYSADMIN) return next();
+
       let memberRole;
 
       // TODO: Refactor these lines
@@ -72,7 +79,6 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
           const { taskId, id } = req.params;
           const resolvedTaskId = taskId ?? id;
 
-          // Create this method in Task service
           const projectId =
             await taskService.findProjectIdByTaskId(resolvedTaskId);
 
@@ -115,7 +121,8 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
       if (
         error instanceof WorkspaceNotFoundError ||
         error instanceof ProjectNotFoundError ||
-        error instanceof TaskNotFoundError
+        error instanceof TaskNotFoundError ||
+        error instanceof UserNotFoundError
       )
         return res
           .status(404)
@@ -123,7 +130,8 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
             new ErrorResponseBuilder()
               .setStatus(404)
               .setMessage('Not Found')
-              .setError(error.message).build
+              .setError(error.message)
+              .build()
           );
 
       if (error instanceof InvalidDepthError)
