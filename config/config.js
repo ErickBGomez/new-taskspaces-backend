@@ -7,7 +7,7 @@ dotenv.config();
 // Validate variables
 const envSchema = Joi.object({
   PORT: Joi.number().required(),
-  MONGODB_URI: Joi.string().uri().required(),
+  DATABASE_URL: Joi.string().uri().required(),
   JWT_SECRET: Joi.string().required(),
   MAIL_HOST: Joi.string().required(),
   MAIL_PORT: Joi.number().required(),
@@ -29,7 +29,7 @@ if (error) {
 
 const config = {
   PORT: envVars.PORT,
-  MONGODB_URI: envVars.MONGODB_URI,
+  DATABASE_URL: envVars.DATABASE_URL,
   JWT_SECRET: envVars.JWT_SECRET,
   MAIL_HOST: envVars.MAIL_HOST,
   MAIL_PORT: envVars.MAIL_PORT,
