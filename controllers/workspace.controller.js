@@ -158,12 +158,11 @@ export const checkWorkspaceAvailability = async (req, res) => {
 
 export const createWorkspace = async (req, res) => {
   try {
-    const { title, bookmarks } = req.body;
+    const { title } = req.body;
     const { id: userId, username } = req.user;
 
     const workspace = await workspaceService.createWorkspace({
       title,
-      bookmarks,
       owner: userId,
     });
 

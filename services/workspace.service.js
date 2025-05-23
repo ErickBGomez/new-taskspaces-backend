@@ -40,14 +40,13 @@ export const checkWorkspaceAvailability = async (title, userId) => {
   return { available: Boolean(!workspace) };
 };
 
-export const createWorkspace = async ({ title, bookmarks, owner }) => {
+export const createWorkspace = async ({ title, owner }) => {
   const workspaceExists = await workspaceRepository.findWorkspaceByTitle(title);
 
   if (workspaceExists) throw new WorkspaceAlreadyExistsError();
 
   return await workspaceRepository.createWorkspace({
     title,
-    bookmarks,
     owner,
   });
 };
@@ -110,7 +109,7 @@ export const inviteMember = async (workspaceId, username, memberRole) => {
     throw new UserAlreadyInvitedError();
 
   // Else, invite the user
-  const memberId = userExists._id;
+  const memberId = userExists.id;
 
   return await workspaceRepository.inviteMember(
     workspaceId,
@@ -139,7 +138,7 @@ export const updateMember = async (id, actionUserId, memberId, memberRole) => {
   // Check if the user is NOT a member of the workspace
   const existingMembers = await workspaceRepository.findMembers(id);
   if (
-    !existingMembers?.some((member) => member.user._id.toString() === memberId)
+    !existingMembers?.some((member) => member.user.id.toString() === memberId)
   )
     throw new UserNotFoundError();
 
@@ -164,7 +163,7 @@ export const removeMember = async (id, actionUserId, memberId) => {
   // Check if the user is NOT a member of the workspace
   const existingMembers = await workspaceRepository.findMembers(id);
   if (
-    !existingMembers?.some((member) => member.user._id.toString() === memberId)
+    !existingMembers?.some((member) => member.user.id.toString() === memberId)
   )
     throw new UserNotFoundError();
 

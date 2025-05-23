@@ -1,0 +1,5 @@
+export const MEMBER_ROLE_STRING_TO_INT = {
+  READER: 1,
+  COLLABORATOR: 2,
+  ADMIN: 3,
+};
