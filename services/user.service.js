@@ -1,7 +1,6 @@
 // services/user.service.js
 import * as userRepository from '../repositories/user.repository.js';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt'; // You'll need to handle password hashing manually now
 import config from '../config/config.js';
 import {
   UserNotFoundError,
@@ -10,40 +9,17 @@ import {
   PasswordDoNotMatchError,
   SameOldPasswordError,
 } from '../errors/user.errors.js';
-import { checkUserExists } from '../helpers/user.helper.js';
+import {
+  checkUserExists,
+  comparePassword,
+  hashPassword,
+  parseUserData,
+} from '../helpers/user.helper.js';
 import { sendPasswordResetEmail } from './mail.service.js';
-
-// Helper function to hash password
-const hashPassword = async (password) => {
-  const saltRounds = 10;
-  return await bcrypt.hash(password, saltRounds);
-};
-
-// Helper function to compare password
-const comparePassword = async (plainPassword, hashedPassword) => {
-  return await bcrypt.compare(plainPassword, hashedPassword);
-};
-
-// Transform user data to maintain API compatibility
-const transformUserData = (user) => {
-  if (!user) return null;
-
-  return {
-    id: user.id,
-    fullname: user.fullname,
-    username: user.username,
-    email: user.email,
-    avatar: user.avatar,
-    description: user.description,
-    role: user.role?.value || 'USER', // Convert back to string
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-  };
-};
 
 export const findAllUsers = async () => {
   const users = await userRepository.findAllUsers();
-  return users.map(transformUserData);
+  return users.map(parseUserData);
 };
 
 export const findUserById = async (id) => {
@@ -51,7 +27,7 @@ export const findUserById = async (id) => {
 
   if (!user) throw new UserNotFoundError();
 
-  return transformUserData(user);
+  return parseUserData(user);
 };
 
 export const registerUser = async ({
@@ -86,7 +62,7 @@ export const registerUser = async ({
     role: 'USER',
   });
 
-  return transformUserData(createdUser);
+  return parseUserData(createdUser);
 };
 
 export const loginUser = async ({ email, password }) => {
@@ -142,7 +118,7 @@ export const updateUser = async (
     description,
   });
 
-  return transformUserData(updatedUser);
+  return parseUserData(updatedUser);
 };
 
 export const requestUpdatePassword = async (email) => {
@@ -179,7 +155,7 @@ export const updatePassword = async (id, newPassword, confirmPassword) => {
     password: hashedPassword,
   });
 
-  return transformUserData(updatedUser);
+  return parseUserData(updatedUser);
 };
 
 export const deleteUser = async (id) => {
@@ -188,5 +164,5 @@ export const deleteUser = async (id) => {
   if (!userExists) throw new UserNotFoundError();
 
   const deletedUser = await userRepository.deleteUser(id);
-  return transformUserData(deletedUser);
+  return parseUserData(deletedUser);
 };

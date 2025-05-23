@@ -1,11 +1,6 @@
 import prisma from '../utils/prisma.js';
+import { ROLE_STRING_TO_INT } from '../utils/user.utils.js';
 
-const ROLE_STRING_TO_INT = {
-  USER: 1,
-  SYSADMIN: 2,
-};
-
-// Find all users (excluding password and role for security)
 export const findAllUsers = async () => {
   return await prisma.user_app.findMany({
     select: {
@@ -20,7 +15,6 @@ export const findAllUsers = async () => {
   });
 };
 
-// Find user by ID (excluding password and role by default)
 export const findUserById = async (id) => {
   return await prisma.user_app.findUnique({
     where: {
@@ -38,7 +32,6 @@ export const findUserById = async (id) => {
   });
 };
 
-// Find user by email with option to expose sensitive data
 export const findUserByEmail = async (email, exposeSensitive = false) => {
   if (exposeSensitive) {
     return await prisma.user_app.findFirst({
@@ -72,7 +65,6 @@ export const findUserByEmail = async (email, exposeSensitive = false) => {
   });
 };
 
-// Find user by username (excluding password and role)
 export const findUserByUsername = async (username) => {
   return await prisma.user_app.findFirst({
     where: { username },
@@ -88,7 +80,6 @@ export const findUserByUsername = async (username) => {
   });
 };
 
-// Create user
 export const createUser = async (userData) => {
   const { role, ...userFields } = userData;
 
@@ -113,7 +104,6 @@ export const createUser = async (userData) => {
   return createdUser;
 };
 
-// Update user
 export const updateUser = async (id, userData) => {
   const { role, ...userFields } = userData;
 
@@ -140,7 +130,6 @@ export const updateUser = async (id, userData) => {
   });
 };
 
-// Delete user
 export const deleteUser = async (id) => {
   return await prisma.user_app.delete({
     where: {

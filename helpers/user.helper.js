@@ -1,7 +1,9 @@
+import bcrypt from 'bcrypt';
 import {
   findUserByEmail,
   findUserByUsername,
 } from '../repositories/user.repository.js';
+import { ROLE_INT_TO_STRING } from '../utils/user.utils.js';
 
 export const checkUserExists = async (username, email) => {
   const userByUsername = await findUserByUsername(username);
@@ -17,4 +19,29 @@ export const checkUserExists = async (username, email) => {
   }
 
   return { exists: false };
+};
+
+// Helper function to hash password
+export const hashPassword = async (password) => {
+  const saltRounds = 10;
+  return await bcrypt.hash(password, saltRounds);
+};
+
+// Helper function to compare password
+export const comparePassword = async (plainPassword, hashedPassword) => {
+  return await bcrypt.compare(plainPassword, hashedPassword);
+};
+
+// Transform user data to maintain API compatibility
+export const parseUserData = (user) => {
+  if (!user) return null;
+
+  const { role, ...userData } = user;
+
+  const parsedRole = ROLE_INT_TO_STRING[role.value] || 'USER'; // Convert back to string
+
+  return {
+    ...userData,
+    role: parsedRole,
+  };
 };
