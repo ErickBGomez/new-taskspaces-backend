@@ -9,72 +9,72 @@ datasource db {
 }
 
 model bookmark {
-  userid    Int
-  taskid    Int
-  createdat DateTime? @default(now()) @db.Timestamp(6)
-  task      task      @relation(fields: [taskid], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  user_app  user_app  @relation(fields: [userid], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user_id    Int
+  task_id    Int
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  task       task      @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user_app   user_app  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@id([userid, taskid])
-  @@index([taskid], map: "idx_bookmark_task")
-  @@index([userid], map: "idx_bookmark_user")
+  @@id([user_id, task_id])
+  @@index([task_id], map: "idx_bookmark_task")
+  @@index([user_id], map: "idx_bookmark_user")
 }
 
 model comment {
-  id        Int       @id @default(autoincrement())
-  content   String
-  authorid  Int
-  taskid    Int
-  createdat DateTime? @default(now()) @db.Timestamp(6)
-  updatedat DateTime? @default(now()) @db.Timestamp(6)
-  user_app  user_app  @relation(fields: [authorid], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  task      task      @relation(fields: [taskid], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id         Int       @id @default(autoincrement())
+  content    String
+  author_id  Int
+  task_id    Int
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  user_app   user_app  @relation(fields: [author_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  task       task      @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@index([authorid], map: "idx_comment_author")
-  @@index([taskid], map: "idx_comment_task")
+  @@index([author_id], map: "idx_comment_author")
+  @@index([task_id], map: "idx_comment_task")
 }
 
 model member_role {
   id               Int                @id @default(autoincrement())
   value            String?            @db.VarChar(32)
-  createdat        DateTime?          @default(now()) @db.Timestamp(6)
-  updatedat        DateTime?          @default(now()) @db.Timestamp(6)
+  created_at       DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?          @default(now()) @db.Timestamp(6)
   workspace_member workspace_member[]
 }
 
 model project {
-  id          Int       @id @default(autoincrement())
-  title       String    @db.VarChar(100)
-  icon        String    @db.VarChar(32)
-  workspaceid Int
-  createdat   DateTime? @default(now()) @db.Timestamp(6)
-  updatedat   DateTime? @default(now()) @db.Timestamp(6)
-  workspace   workspace @relation(fields: [workspaceid], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  tag         tag[]
-  task        task[]
+  id           Int       @id @default(autoincrement())
+  title        String    @db.VarChar(100)
+  icon         String    @db.VarChar(32)
+  workspace_id Int
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  updated_at   DateTime? @default(now()) @db.Timestamp(6)
+  workspace    workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tag          tag[]
+  task         task[]
 
-  @@index([workspaceid], map: "idx_project_workspace")
+  @@index([workspace_id], map: "idx_project_workspace")
 }
 
 model role {
-  id        Int        @id @default(autoincrement())
-  value     String     @db.VarChar(25)
-  createdat DateTime?  @default(now()) @db.Timestamp(6)
-  updatedat DateTime?  @default(now()) @db.Timestamp(6)
-  user_app  user_app[]
+  id         Int        @id @default(autoincrement())
+  value      String     @db.VarChar(25)
+  created_at DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at DateTime?  @default(now()) @db.Timestamp(6)
+  user_app   user_app[]
 }
 
 model tag {
-  id        Int        @id @default(autoincrement())
-  title     String     @db.VarChar(25)
-  color     String     @default("#FFFFFF") @db.VarChar(7)
-  projectid Int
-  createdat DateTime?  @default(now()) @db.Timestamp(6)
-  updatedat DateTime?  @default(now()) @db.Timestamp(6)
-  project   project    @relation(fields: [projectid], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  task_tag  task_tag[]
+  id         Int        @id @default(autoincrement())
+  title      String     @db.VarChar(25)
+  color      String     @default("#FFFFFF") @db.VarChar(7)
+  project_id Int
+  created_at DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at DateTime?  @default(now()) @db.Timestamp(6)
+  project    project    @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  task_tag   task_tag[]
 
-  @@index([projectid], map: "idx_tag_project")
+  @@index([project_id], map: "idx_tag_project")
 }
 
 model task {
@@ -83,72 +83,73 @@ model task {
   description   String?
   date          DateTime?       @db.Date
   timer         Decimal?        @default(0) @db.Decimal
-  statusid      Int             @default(1)
-  projectid     Int
-  createdat     DateTime?       @default(now()) @db.Timestamp(6)
-  updatedat     DateTime?       @default(now()) @db.Timestamp(6)
+  status_id     Int             @default(1)
+  project_id    Int
+  created_at    DateTime?       @default(now()) @db.Timestamp(6)
+  updated_at    DateTime?       @default(now()) @db.Timestamp(6)
   bookmark      bookmark[]
   comment       comment[]
-  project       project         @relation(fields: [projectid], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  task_status   task_status     @relation(fields: [statusid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  project       project         @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  task_status   task_status     @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   task_assigned task_assigned[]
   task_tag      task_tag[]
 
   @@index([date], map: "idx_task_date")
-  @@index([projectid], map: "idx_task_project")
-  @@index([statusid], map: "idx_task_status")
+  @@index([project_id], map: "idx_task_project")
+  @@index([status_id], map: "idx_task_status")
 }
 
 model task_assigned {
-  userid    Int
-  taskid    Int
-  createdat DateTime? @default(now()) @db.Timestamp(6)
-  task      task      @relation(fields: [taskid], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  user_app  user_app  @relation(fields: [userid], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user_id    Int
+  task_id    Int
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  task       task      @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user_app   user_app  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@id([userid, taskid])
-  @@index([taskid], map: "idx_task_assigned_task")
-  @@index([userid], map: "idx_task_assigned_user")
+  @@id([user_id, task_id])
+  @@index([task_id], map: "idx_task_assigned_task")
+  @@index([user_id], map: "idx_task_assigned_user")
 }
 
 model task_status {
-  id        Int       @id @default(autoincrement())
-  value     String    @db.VarChar(100)
-  createdat DateTime? @default(now()) @db.Timestamp(6)
-  updatedat DateTime? @default(now()) @db.Timestamp(6)
-  task      task[]
+  id         Int       @id @default(autoincrement())
+  value      String    @db.VarChar(100)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  task       task[]
 }
 
 model task_tag {
-  taskid    Int
-  tagid     Int
-  createdat DateTime? @default(now()) @db.Timestamp(6)
-  tag       tag       @relation(fields: [tagid], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  task      task      @relation(fields: [taskid], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  task_id    Int
+  tag_id     Int
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  tag        tag       @relation(fields: [tag_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  task       task      @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@id([taskid, tagid])
-  @@index([tagid], map: "idx_task_tag_tag")
-  @@index([taskid], map: "idx_task_tag_task")
+  @@id([task_id, tag_id])
+  @@index([tag_id], map: "idx_task_tag_tag")
+  @@index([task_id], map: "idx_task_tag_task")
 }
 
 model user_app {
   id               Int                @id @default(autoincrement())
   fullname         String             @db.VarChar(100)
   username         String             @db.VarChar(75)
+  avatar           String?            @db.VarChar(255)
   email            String             @db.VarChar(100)
   password         String             @db.VarChar(255)
-  roleid           Int                @default(1)
-  createdat        DateTime?          @default(now()) @db.Timestamp(6)
-  updatedat        DateTime?          @default(now()) @db.Timestamp(6)
+  role_id          Int                @default(1)
+  created_at       DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?          @default(now()) @db.Timestamp(6)
   bookmark         bookmark[]
   comment          comment[]
   task_assigned    task_assigned[]
-  role             role               @relation(fields: [roleid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  role             role               @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   workspace        workspace[]
   workspace_member workspace_member[]
 
   @@index([email], map: "idx_user_app_email")
-  @@index([roleid], map: "idx_user_app_role")
+  @@index([role_id], map: "idx_user_app_role")
   @@index([username], map: "idx_user_app_username")
 }
 
@@ -156,8 +157,8 @@ model workspace {
   id               Int                @id @default(autoincrement())
   title            String?            @db.VarChar(100)
   ownerid          Int
-  createdat        DateTime?          @default(now()) @db.Timestamp(6)
-  updatedat        DateTime?          @default(now()) @db.Timestamp(6)
+  created_at       DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?          @default(now()) @db.Timestamp(6)
   project          project[]
   user_app         user_app           @relation(fields: [ownerid], references: [id], onDelete: Cascade, onUpdate: NoAction)
   workspace_member workspace_member[]
@@ -166,17 +167,17 @@ model workspace {
 }
 
 model workspace_member {
-  workspaceid   Int
-  userid        Int
-  member_roleid Int         @default(1)
-  createdat     DateTime?   @default(now()) @db.Timestamp(6)
-  updatedat     DateTime?   @default(now()) @db.Timestamp(6)
-  member_role   member_role @relation(fields: [member_roleid], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user_app      user_app    @relation(fields: [userid], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  workspace     workspace   @relation(fields: [workspaceid], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  workspace_id   Int
+  user_id        Int
+  member_role_id Int         @default(1)
+  created_at     DateTime?   @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?   @default(now()) @db.Timestamp(6)
+  member_role    member_role @relation(fields: [member_role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_app       user_app    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  workspace      workspace   @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@id([workspaceid, userid])
-  @@index([member_roleid], map: "idx_workspace_member_role")
-  @@index([userid], map: "idx_workspace_member_user")
-  @@index([workspaceid], map: "idx_workspace_member_workspace")
+  @@id([workspace_id, user_id])
+  @@index([member_role_id], map: "idx_workspace_member_role")
+  @@index([user_id], map: "idx_workspace_member_user")
+  @@index([workspace_id], map: "idx_workspace_member_workspace")
 }
