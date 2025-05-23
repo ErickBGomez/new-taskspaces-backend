@@ -13,13 +13,11 @@ import {
   checkUserExists,
   comparePassword,
   hashPassword,
-  parseUserData,
 } from '../helpers/user.helper.js';
 import { sendPasswordResetEmail } from './mail.service.js';
 
 export const findAllUsers = async () => {
-  const users = await userRepository.findAllUsers();
-  return users.map(parseUserData);
+  return await userRepository.findAllUsers();
 };
 
 export const findUserById = async (id) => {
@@ -27,7 +25,7 @@ export const findUserById = async (id) => {
 
   if (!user) throw new UserNotFoundError();
 
-  return parseUserData(user);
+  return user;
 };
 
 export const registerUser = async ({
@@ -53,7 +51,7 @@ export const registerUser = async ({
   // Hash password before storing
   const hashedPassword = await hashPassword(password);
 
-  const createdUser = await userRepository.createUser({
+  return await userRepository.createUser({
     fullname,
     username,
     avatar,
@@ -61,8 +59,6 @@ export const registerUser = async ({
     password: hashedPassword,
     role: 'USER',
   });
-
-  return parseUserData(createdUser);
 };
 
 export const loginUser = async ({ email, password }) => {
@@ -77,17 +73,9 @@ export const loginUser = async ({ email, password }) => {
   const { id, fullname, username, avatar, role } = user;
 
   // Create JWT token
-  const token = jwt.sign(
-    {
-      id: user.id,
-      username,
-      role: role.value,
-    },
-    config.JWT_SECRET,
-    {
-      expiresIn: '1h',
-    }
-  );
+  const token = jwt.sign({ id, username, role }, config.JWT_SECRET, {
+    expiresIn: '1h',
+  });
 
   return {
     user: {
@@ -95,7 +83,7 @@ export const loginUser = async ({ email, password }) => {
       fullname,
       username,
       avatar,
-      email: user.email,
+      email,
     },
     token,
   };
@@ -109,15 +97,13 @@ export const updateUser = async (
 
   if (!userExists) throw new UserNotFoundError();
 
-  const updatedUser = await userRepository.updateUser(id, {
+  return await userRepository.updateUser(id, {
     fullname,
     username,
     avatar,
     email,
     description,
   });
-
-  return parseUserData(updatedUser);
 };
 
 export const requestUpdatePassword = async (email) => {
@@ -129,7 +115,7 @@ export const requestUpdatePassword = async (email) => {
     expiresIn: '1h',
   });
 
-  await sendPasswordResetEmail(user.email, token);
+  await sendPasswordResetEmail(email, token);
 };
 
 export const updatePassword = async (id, newPassword, confirmPassword) => {
@@ -150,11 +136,9 @@ export const updatePassword = async (id, newPassword, confirmPassword) => {
   // Hash new password
   const hashedPassword = await hashPassword(newPassword);
 
-  const updatedUser = await userRepository.updateUser(id, {
+  return await userRepository.updateUser(id, {
     password: hashedPassword,
   });
-
-  return parseUserData(updatedUser);
 };
 
 export const deleteUser = async (id) => {
@@ -162,6 +146,5 @@ export const deleteUser = async (id) => {
 
   if (!userExists) throw new UserNotFoundError();
 
-  const deletedUser = await userRepository.deleteUser(id);
-  return parseUserData(deletedUser);
+  return await userRepository.deleteUser(id);
 };
