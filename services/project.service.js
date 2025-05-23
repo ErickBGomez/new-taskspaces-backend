@@ -28,7 +28,8 @@ export const findProjectById = async (id) => {
 };
 
 export const createProject = async (workspaceId, { title, icon }) => {
-  const workspaceExists = workspaceRepository.findWorkspaceById(workspaceId);
+  const workspaceExists =
+    await workspaceRepository.findWorkspaceById(workspaceId);
 
   if (!workspaceExists) throw new WorkspaceNotFoundError();
 
@@ -42,18 +43,17 @@ export const createProject = async (workspaceId, { title, icon }) => {
   return await projectRepository.createProject({
     title,
     icon,
-    workspace: workspaceId,
+    workspaceId,
   });
 };
 
-export const updateProject = async (id, { title, statuses, icon }) => {
+export const updateProject = async (id, { title, icon }) => {
   const projectExists = await projectRepository.findProjectById(id);
 
   if (!projectExists) throw new ProjectNotFoundError();
 
   return await projectRepository.updateProject(id, {
     title,
-    statuses,
     icon,
   });
 };
