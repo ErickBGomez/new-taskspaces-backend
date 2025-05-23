@@ -70,7 +70,6 @@ export const loginUser = async ({ email, password }) => {
 
   if (!user) throw new IncorrectCredentialsError();
 
-  // Compare password manually since we don't have Mongoose methods
   const comparedPassword = await comparePassword(password, user.password);
 
   if (!comparedPassword) throw new IncorrectCredentialsError();

@@ -42,11 +42,10 @@ export const findUserByEmail = async (email, exposeSensitive = false) => {
         username: true,
         avatar: true,
         email: true,
+        password: true,
         created_at: true,
         updated_at: true,
-        role: {
-          value: true,
-        },
+        role: { select: { value: true } },
       },
     });
   }
@@ -153,8 +152,15 @@ export const findUserWithPasswordById = async (id) => {
     where: {
       id: parseInt(id),
     },
-    include: {
-      role: true,
+    select: {
+      id: true,
+      fullname: true,
+      username: true,
+      avatar: true,
+      email: true,
+      created_at: true,
+      updated_at: true,
+      role: { select: { value: true } },
     },
   });
 };
