@@ -156,14 +156,14 @@ model user_app {
 model workspace {
   id               Int                @id @default(autoincrement())
   title            String?            @db.VarChar(100)
-  ownerid          Int
   created_at       DateTime?          @default(now()) @db.Timestamp(6)
   updated_at       DateTime?          @default(now()) @db.Timestamp(6)
+  owner_id         Int                @map("owner_id")
   project          project[]
-  user_app         user_app           @relation(fields: [ownerid], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user_app         user_app           @relation(fields: [owner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   workspace_member workspace_member[]
 
-  @@index([ownerid], map: "idx_workspace_owner")
+  @@index([owner_id], map: "idx_workspace_owner")
 }
 
 model workspace_member {
