@@ -1,5 +1,7 @@
+// services/user.service.js
 import * as userRepository from '../repositories/user.repository.js';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt'; // You'll need to handle password hashing manually now
 import config from '../config/config.js';
 import {
   UserNotFoundError,
@@ -11,8 +13,37 @@ import {
 import { checkUserExists } from '../helpers/user.helper.js';
 import { sendPasswordResetEmail } from './mail.service.js';
 
+// Helper function to hash password
+const hashPassword = async (password) => {
+  const saltRounds = 10;
+  return await bcrypt.hash(password, saltRounds);
+};
+
+// Helper function to compare password
+const comparePassword = async (plainPassword, hashedPassword) => {
+  return await bcrypt.compare(plainPassword, hashedPassword);
+};
+
+// Transform user data to maintain API compatibility
+const transformUserData = (user) => {
+  if (!user) return null;
+
+  return {
+    id: user.id,
+    fullname: user.fullname,
+    username: user.username,
+    email: user.email,
+    avatar: user.avatar,
+    description: user.description,
+    role: user.role?.value || 'USER', // Convert back to string
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
+};
+
 export const findAllUsers = async () => {
-  return await userRepository.findAllUsers();
+  const users = await userRepository.findAllUsers();
+  return users.map(transformUserData);
 };
 
 export const findUserById = async (id) => {
@@ -20,7 +51,7 @@ export const findUserById = async (id) => {
 
   if (!user) throw new UserNotFoundError();
 
-  return user;
+  return transformUserData(user);
 };
 
 export const registerUser = async ({
@@ -43,14 +74,19 @@ export const registerUser = async ({
 
   if (password !== confirmPassword) throw new PasswordDoNotMatchError();
 
-  return await userRepository.createUser({
+  // Hash password before storing
+  const hashedPassword = await hashPassword(password);
+
+  const createdUser = await userRepository.createUser({
     fullname,
     username,
     avatar,
     email,
-    password,
+    password: hashedPassword,
     role: 'USER',
   });
+
+  return transformUserData(createdUser);
 };
 
 export const loginUser = async ({ email, password }) => {
@@ -58,18 +94,36 @@ export const loginUser = async ({ email, password }) => {
 
   if (!user) throw new IncorrectCredentialsError();
 
-  const comparedPassword = await user.comparePassword(password);
+  // Compare password manually since we don't have Mongoose methods
+  const comparedPassword = await comparePassword(password, user.password);
 
   if (!comparedPassword) throw new IncorrectCredentialsError();
 
-  const { _id, fullname, username, avatar, role } = user;
+  const { id, fullname, username, avatar, role } = user;
 
-  // Saved user information goes here
-  const token = jwt.sign({ id: user._id, username, role }, config.JWT_SECRET, {
-    expiresIn: '1h',
-  });
+  // Create JWT token
+  const token = jwt.sign(
+    {
+      id: user.id,
+      username,
+      role: role.value,
+    },
+    config.JWT_SECRET,
+    {
+      expiresIn: '1h',
+    }
+  );
 
-  return { user: { _id, fullname, username, avatar, email }, token };
+  return {
+    user: {
+      id,
+      fullname,
+      username,
+      avatar,
+      email: user.email,
+    },
+    token,
+  };
 };
 
 export const updateUser = async (
@@ -80,13 +134,15 @@ export const updateUser = async (
 
   if (!userExists) throw new UserNotFoundError();
 
-  return await userRepository.updateUser(id, {
+  const updatedUser = await userRepository.updateUser(id, {
     fullname,
     username,
     avatar,
     email,
     description,
   });
+
+  return transformUserData(updatedUser);
 };
 
 export const requestUpdatePassword = async (email) => {
@@ -94,7 +150,7 @@ export const requestUpdatePassword = async (email) => {
 
   if (!user) throw new UserNotFoundError();
 
-  const token = jwt.sign({ id: user._id }, config.JWT_SECRET, {
+  const token = jwt.sign({ id: user.id }, config.JWT_SECRET, {
     expiresIn: '1h',
   });
 
@@ -102,16 +158,28 @@ export const requestUpdatePassword = async (email) => {
 };
 
 export const updatePassword = async (id, newPassword, confirmPassword) => {
-  const userExists = await userRepository.findUserById(id);
-  const comparedPassword = await userExists.comparePassword(newPassword);
+  // Get user with password for comparison
+  const userExists = await userRepository.findUserWithPasswordById(id);
 
   if (!userExists) throw new UserNotFoundError();
 
   if (newPassword !== confirmPassword) throw new PasswordDoNotMatchError();
 
+  // Check if new password is same as old password
+  const comparedPassword = await comparePassword(
+    newPassword,
+    userExists.password
+  );
   if (comparedPassword) throw new SameOldPasswordError();
 
-  return await userRepository.updateUser(id, { password: newPassword });
+  // Hash new password
+  const hashedPassword = await hashPassword(newPassword);
+
+  const updatedUser = await userRepository.updateUser(id, {
+    password: hashedPassword,
+  });
+
+  return transformUserData(updatedUser);
 };
 
 export const deleteUser = async (id) => {
@@ -119,5 +187,6 @@ export const deleteUser = async (id) => {
 
   if (!userExists) throw new UserNotFoundError();
 
-  return await userRepository.deleteUser(id);
+  const deletedUser = await userRepository.deleteUser(id);
+  return transformUserData(deletedUser);
 };

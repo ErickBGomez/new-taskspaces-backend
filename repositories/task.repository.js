@@ -1,6 +1,4 @@
-import { PrismaClient } from '../generated/prisma/client.js';
-
-const prisma = new PrismaClient();
+import prisma from '../utils/prisma.js';
 
 // Find all tasks
 export const findAllTasks = async () => {
