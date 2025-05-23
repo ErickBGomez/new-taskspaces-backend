@@ -149,10 +149,8 @@ export const findMembers = async (workspaceId) => {
 export const findMember = async (workspaceId, memberId) => {
   const member = await prisma.workspace_member.findFirst({
     where: {
-      workspace_id_user_id: {
-        workspace_id: parseInt(workspaceId),
-        user_id: parseInt(memberId),
-      },
+      workspace_id: parseInt(workspaceId),
+      user_id: parseInt(memberId),
     },
     select: {
       user_app: {
