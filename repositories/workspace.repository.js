@@ -1,8 +1,12 @@
+import {
+  parseWorkspaceData,
+  parseWorkspaceMember,
+} from '../helpers/workspace.helper.js';
 import prisma from '../utils/prisma.js';
 import { MEMBER_ROLE_STRING_TO_INT } from '../utils/workspace.utils.js';
 
 export const findAllWorkspaces = async () => {
-  return await prisma.workspace.findMany({
+  const workspaces = await prisma.workspace.findMany({
     select: {
       id: true,
       title: true,
@@ -10,10 +14,12 @@ export const findAllWorkspaces = async () => {
       updated_at: true,
     },
   });
+
+  return workspaces.map((workspace) => parseWorkspaceData(workspace));
 };
 
 export const findWorkspaceById = async (id) => {
-  return await prisma.workspace.findUnique({
+  const workspace = await prisma.workspace.findUnique({
     where: {
       id: parseInt(id),
     },
@@ -24,10 +30,12 @@ export const findWorkspaceById = async (id) => {
       updated_at: true,
     },
   });
+
+  return parseWorkspaceData(workspace);
 };
 
 export const findWorkspaceByTitleAndOwnerId = async (title, userId) => {
-  return await prisma.workspace.findFirst({
+  const workspace = await prisma.workspace.findFirst({
     where: {
       title,
       owner_id: parseInt(userId),
@@ -39,10 +47,12 @@ export const findWorkspaceByTitleAndOwnerId = async (title, userId) => {
       updated_at: true,
     },
   });
+
+  return parseWorkspaceData(workspace);
 };
 
 export const findWorkspacesByOwnerId = async (ownerId) => {
-  return await prisma.workspace.findMany({
+  const workspaces = await prisma.workspace.findMany({
     where: {
       owner_id: parseInt(ownerId),
     },
@@ -53,10 +63,12 @@ export const findWorkspacesByOwnerId = async (ownerId) => {
       updated_at: true,
     },
   });
+
+  return workspaces.map((workspace) => parseWorkspaceData(workspace));
 };
 
 export const createWorkspace = async (workspace) => {
-  return await prisma.workspace.create({
+  const createdWorkspace = await prisma.workspace.create({
     data: {
       title: workspace.title,
       owner_id: parseInt(workspace.ownerId),
@@ -68,10 +80,12 @@ export const createWorkspace = async (workspace) => {
       updated_at: true,
     },
   });
+
+  return parseWorkspaceData(createdWorkspace);
 };
 
 export const updateWorkspace = async (id, workspace) => {
-  return await prisma.workspace.update({
+  const updatedWorkspace = await prisma.workspace.update({
     where: {
       id: parseInt(id),
     },
@@ -85,10 +99,12 @@ export const updateWorkspace = async (id, workspace) => {
       updated_at: true,
     },
   });
+
+  return parseWorkspaceData(updatedWorkspace);
 };
 
 export const deleteWorkspace = async (id) => {
-  return await prisma.workspace.delete({
+  const deletedWorkspace = await prisma.workspace.delete({
     where: {
       id: parseInt(id),
     },
@@ -99,6 +115,8 @@ export const deleteWorkspace = async (id) => {
       updated_at: true,
     },
   });
+
+  return parseWorkspaceData(deletedWorkspace);
 };
 
 // Members
@@ -125,12 +143,7 @@ export const findMembers = async (workspaceId) => {
     },
   });
 
-  if (!members) return null;
-
-  return members.map((member) => ({
-    user: member.user_app,
-    member_role: member.member_role.value,
-  }));
+  return members.map((member) => parseWorkspaceMember(member));
 };
 
 export const findMember = async (workspaceId, memberId) => {
@@ -159,12 +172,7 @@ export const findMember = async (workspaceId, memberId) => {
     },
   });
 
-  if (!member) return null;
-
-  return {
-    user: member.user_app,
-    member_role: member.member_role.value,
-  };
+  return parseWorkspaceMember(member);
 };
 
 export const inviteMember = async (workspaceId, memberId, memberRole) => {
@@ -192,12 +200,7 @@ export const inviteMember = async (workspaceId, memberId, memberRole) => {
     },
   });
 
-  if (!invitedMember) return null;
-
-  return {
-    user: invitedMember.user_app,
-    member_role: invitedMember.member_role.value,
-  };
+  return parseWorkspaceMember(invitedMember);
 };
 
 export const updateMember = async (workspaceId, memberId, memberRole) => {
@@ -229,23 +232,10 @@ export const updateMember = async (workspaceId, memberId, memberRole) => {
     },
   });
 
-  if (!updatedMember) return null;
-
-  return {
-    user: updatedMember.user_app,
-    member_role: updatedMember.member_role.value,
-  };
+  return parseWorkspaceMember(updatedMember);
 };
 
 export const removeMember = async (workspaceId, memberId) => {
-  // return await Workspace.findByIdAndUpdate(
-  //   workspaceId,
-  //   {
-  //     $pull: { members: { user: memberId } },
-  //   },
-  //   { new: true }
-  // );
-
   const removedMember = await prisma.workspace_member.delete({
     where: {
       workspace_id_user_id: {
@@ -271,10 +261,5 @@ export const removeMember = async (workspaceId, memberId) => {
     },
   });
 
-  if (!removedMember) return null;
-
-  return {
-    user: removedMember.user_app,
-    member_role: removedMember.member_role.value,
-  };
+  return parseWorkspaceMember(removedMember);
 };
