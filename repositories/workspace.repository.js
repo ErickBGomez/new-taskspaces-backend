@@ -26,7 +26,7 @@ export const findWorkspaceById = async (id) => {
   });
 };
 
-export const findWorkspaceByTitle = async (title, userId) => {
+export const findWorkspaceByTitleAndOwnerId = async (title, userId) => {
   return await prisma.workspace.findFirst({
     where: {
       title,
@@ -59,7 +59,7 @@ export const createWorkspace = async (workspace) => {
   return await prisma.workspace.create({
     data: {
       title: workspace.title,
-      owner_id: parseInt(workspace.owner),
+      owner_id: parseInt(workspace.ownerId),
     },
     select: {
       id: true,

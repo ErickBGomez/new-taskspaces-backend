@@ -163,12 +163,11 @@ export const createWorkspace = async (req, res) => {
 
     const workspace = await workspaceService.createWorkspace({
       title,
-      owner: userId,
+      ownerId: userId,
     });
 
     const updatedWorkspace = await workspaceService.inviteMember(
-      workspace._id,
-      userId,
+      workspace.id,
       username,
       'ADMIN'
     );
