@@ -131,3 +131,6 @@ dist
 
 # Prisma ORM
 generated/prisma
+
+# Others (remove lated)
+test.js
