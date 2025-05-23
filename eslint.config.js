@@ -15,9 +15,13 @@ export default [
   {
     plugins: {
       prettier: pluginPrettier,
+      jest: pluginJest, // ✅ Register Jest plugin
     },
     rules: {
       'prettier/prettier': 'error',
+      // optional: add recommended Jest rules
+      ...pluginJest.configs.recommended.rules,
     },
   },
+  pluginJs.configs.recommended,
 ];
