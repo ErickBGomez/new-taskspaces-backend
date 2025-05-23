@@ -1,5 +1,10 @@
 import prisma from '../utils/prisma.js';
 
+const ROLE_STRING_TO_INT = {
+  USER: 1,
+  SYSADMIN: 2,
+};
+
 // Find all users (excluding password and role for security)
 export const findAllUsers = async () => {
   return await prisma.user_app.findMany({
@@ -87,17 +92,13 @@ export const findUserByUsername = async (username) => {
 export const createUser = async (userData) => {
   const { role, ...userFields } = userData;
 
-  // Convert role string to roleId
-  let role_id = 1; // Default to USER
-  if (role === 'SYSADMIN') {
-    role_id = 2;
-  }
+  const data = {
+    ...userFields,
+    role_id: ROLE_STRING_TO_INT[role] || 1, // Default to USER if role is not recognized,
+  };
 
   const createdUser = await prisma.user_app.create({
-    data: {
-      ...userFields,
-      role_id,
-    },
+    data,
     select: {
       id: true,
       fullname: true,
@@ -116,18 +117,18 @@ export const createUser = async (userData) => {
 export const updateUser = async (id, userData) => {
   const { role, ...userFields } = userData;
 
-  let to_update = { ...userFields };
+  let data = { ...userFields };
 
   // Convert role string to roleId if provided
   if (role) {
-    to_update.role_id = role === 'SYSADMIN' ? 2 : 1;
+    data.role_id = ROLE_STRING_TO_INT[role] || 1; // Default to USER if role is not recognized
   }
 
   return await prisma.user_app.update({
     where: {
       id: parseInt(id),
     },
-    data: to_update,
+    data,
     select: {
       id: true,
       fullname: true,
