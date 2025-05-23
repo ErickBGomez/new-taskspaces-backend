@@ -165,11 +165,8 @@ export const createWorkspace = async (req, res) => {
       ownerId: userId,
     });
 
-    const updatedWorkspace = await workspaceService.inviteMember(
-      workspace.id,
-      username,
-      'ADMIN'
-    );
+    // Self invite the owner as admin
+    await workspaceService.inviteMember(workspace.id, username, 'ADMIN');
 
     res
       .status(201)
@@ -177,7 +174,7 @@ export const createWorkspace = async (req, res) => {
         new SuccessResponseBuilder()
           .setStatus(201)
           .setMessage('Workspace created')
-          .setContent(updatedWorkspace)
+          .setContent(workspace)
           .build()
       );
   } catch (error) {
