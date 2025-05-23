@@ -79,17 +79,16 @@ export const getWorkspaceById = async (req, res) => {
 
 export const getWorkspacesByOwnerId = async (req, res) => {
   try {
-    const { role, id: userId } = req.user;
-    const { ownerId } = req.params;
+    const { role, id } = req.user;
+    const { userId } = req.params;
 
     // This controller cannot be checked by the middleware checkMemberRoleMiddleware,
     // because there is no way to obtain the id of a specific workspace
 
     // Avoid obtaining workspaces from other users, only sysadmin can do that
-    if (role !== ROLES.SYSADMIN && userId !== ownerId)
-      throw new UserNotFoundError();
+    if (role !== ROLES.SYSADMIN && id !== userId) throw new UserNotFoundError();
 
-    const workspaces = await workspaceService.findWorkspacesByOwnerId(ownerId);
+    const workspaces = await workspaceService.findWorkspacesByOwnerId(userId);
 
     res
       .status(200)
