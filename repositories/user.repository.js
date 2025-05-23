@@ -7,6 +7,7 @@ export const findAllUsers = async () => {
       id: true,
       fullname: true,
       username: true,
+      avatar: true,
       email: true,
       created_at: true,
       updated_at: true,
@@ -24,6 +25,7 @@ export const findUserById = async (id) => {
       id: true,
       fullname: true,
       username: true,
+      avatar: true,
       email: true,
       created_at: true,
       updated_at: true,
@@ -36,8 +38,17 @@ export const findUserByEmail = async (email, exposeSensitive = false) => {
   if (exposeSensitive) {
     return await prisma.user_app.findFirst({
       where: { email },
-      include: {
-        role: true,
+      select: {
+        id: true,
+        fullname: true,
+        username: true,
+        avatar: true,
+        email: true,
+        created_at: true,
+        updated_at: true,
+        role: {
+          value: true,
+        },
       },
     });
   }
@@ -48,6 +59,7 @@ export const findUserByEmail = async (email, exposeSensitive = false) => {
       id: true,
       fullname: true,
       username: true,
+      avatar: true,
       email: true,
       created_at: true,
       updated_at: true,
@@ -63,6 +75,7 @@ export const findUserByUsername = async (username) => {
       id: true,
       fullname: true,
       username: true,
+      avatar: true,
       email: true,
       created_at: true,
       updated_at: true,
@@ -89,6 +102,7 @@ export const createUser = async (userData) => {
       id: true,
       fullname: true,
       username: true,
+      avatar: true,
       email: true,
       created_at: true,
       updated_at: true,
@@ -102,18 +116,18 @@ export const createUser = async (userData) => {
 export const updateUser = async (id, userData) => {
   const { role, ...userFields } = userData;
 
-  let updated_ata = { ...userFields };
+  let to_update = { ...userFields };
 
   // Convert role string to roleId if provided
   if (role) {
-    updated_ata.roleId = role === 'SYSADMIN' ? 2 : 1;
+    to_update.role_id = role === 'SYSADMIN' ? 2 : 1;
   }
 
   return await prisma.user_app.update({
     where: {
       id: parseInt(id),
     },
-    data: updated_ata,
+    data: to_update,
     select: {
       id: true,
       fullname: true,
@@ -135,6 +149,7 @@ export const deleteUser = async (id) => {
       id: true,
       fullname: true,
       username: true,
+      avatar: true,
       email: true,
       created_at: true,
       updated_at: true,
