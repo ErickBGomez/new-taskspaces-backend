@@ -174,11 +174,10 @@ export const updateProject = async (req, res) => {
     // because workspaceId cannot be updated, and the member role has been checked before
     // in checkMemberRoleMiddleware
     const { id } = req.params;
-    const { title, statuses, icon } = req.body;
+    const { title, icon } = req.body;
 
     const updatedProject = await projectService.updateProject(id, {
       title,
-      statuses,
       icon,
     });
 

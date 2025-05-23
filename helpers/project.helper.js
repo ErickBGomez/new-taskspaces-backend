@@ -11,3 +11,15 @@ export const findWorkspaceIdByProjectId = async (projectId) => {
 
   return project.workspace;
 };
+
+export const parseProjectData = (project) => {
+  if (!project) return null;
+
+  const { created_at, updated_at, ...projectData } = project;
+
+  return {
+    ...projectData,
+    createdAt: created_at,
+    updatedAt: updated_at,
+  };
+};
