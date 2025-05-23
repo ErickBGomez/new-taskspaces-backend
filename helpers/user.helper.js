@@ -3,7 +3,6 @@ import {
   findUserByEmail,
   findUserByUsername,
 } from '../repositories/user.repository.js';
-import { ROLE_INT_TO_STRING } from '../utils/user.utils.js';
 
 export const checkUserExists = async (username, email) => {
   const userByUsername = await findUserByUsername(username);
@@ -38,10 +37,8 @@ export const parseUserData = (user) => {
 
   const { role, ...userData } = user;
 
-  const parsedRole = ROLE_INT_TO_STRING[role.value] || 'USER'; // Convert back to string
-
   return {
     ...userData,
-    role: parsedRole,
+    role: role?.value || 'USER',
   };
 };
