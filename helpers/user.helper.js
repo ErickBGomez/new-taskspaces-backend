@@ -35,10 +35,12 @@ export const comparePassword = async (plainPassword, hashedPassword) => {
 export const parseUserData = (user) => {
   if (!user) return null;
 
-  const { role, ...userData } = user;
+  const { role, created_at, updated_at, ...userData } = user;
 
   return {
     ...userData,
-    role: role?.value || 'USER',
+    role: role?.value, // If role is not provided, it will be null
+    createdAt: created_at,
+    updatedAt: updated_at,
   };
 };
