@@ -6,6 +6,7 @@ import { TaskNotFoundError } from '../errors/task.errors.js';
 import { ProjectNotFoundError } from '../errors/project.errors.js';
 import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
 
+// TODO: remove this function
 export const findProjectIdByTaskId = async (taskId) => {
   const task = await findTaskById(taskId);
 

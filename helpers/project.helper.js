@@ -5,6 +5,7 @@ import {
 import { ProjectNotFoundError } from '../errors/project.errors.js';
 import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
 
+// TODO: Remove this function
 export const findWorkspaceIdByProjectId = async (projectId) => {
   const project = await findProjectById(projectId);
 

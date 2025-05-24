@@ -1,6 +1,5 @@
 import * as taskRepository from '../repositories/task.repository.js';
 import * as projectRepository from '../repositories/project.repository.js';
-import * as projectHelper from '../helpers/project.helper.js';
 import * as workspaceRepository from '../repositories/workspace.repository.js';
 import { TaskNotFoundError } from '../errors/task.errors.js';
 import { ProjectNotFoundError } from '../errors/project.errors.js';
