@@ -5,14 +5,33 @@ import {
 import prisma from '../utils/prisma.js';
 import { MEMBER_ROLE_STRING_TO_INT } from '../utils/workspace.utils.js';
 
-export const findAllWorkspaces = async () => {
-  const workspaces = await prisma.workspace.findMany({
+const selectWorkspace = {
+  id: true,
+  title: true,
+  created_at: true,
+  updated_at: true,
+};
+
+const selectWorkspaceMember = {
+  user_app: {
     select: {
       id: true,
-      title: true,
-      created_at: true,
-      updated_at: true,
+      fullname: true,
+      username: true,
+      avatar: true,
+      email: true,
     },
+  },
+  member_role: {
+    select: {
+      value: true,
+    },
+  },
+};
+
+export const findAllWorkspaces = async () => {
+  const workspaces = await prisma.workspace.findMany({
+    select: { ...selectWorkspace },
   });
 
   return workspaces.map((workspace) => parseWorkspaceData(workspace));
@@ -23,12 +42,7 @@ export const findWorkspaceById = async (id) => {
     where: {
       id: parseInt(id),
     },
-    select: {
-      id: true,
-      title: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectWorkspace },
   });
 
   return parseWorkspaceData(workspace);
@@ -40,12 +54,7 @@ export const findWorkspaceByTitleAndOwnerId = async (title, userId) => {
       title,
       owner_id: parseInt(userId),
     },
-    select: {
-      id: true,
-      title: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectWorkspace },
   });
 
   return parseWorkspaceData(workspace);
@@ -56,12 +65,7 @@ export const findWorkspacesByOwnerId = async (ownerId) => {
     where: {
       owner_id: parseInt(ownerId),
     },
-    select: {
-      id: true,
-      title: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectWorkspace },
   });
 
   return workspaces.map((workspace) => parseWorkspaceData(workspace));
@@ -73,12 +77,7 @@ export const createWorkspace = async (workspace) => {
       title: workspace.title,
       owner_id: parseInt(workspace.ownerId),
     },
-    select: {
-      id: true,
-      title: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectWorkspace },
   });
 
   return parseWorkspaceData(createdWorkspace);
@@ -92,12 +91,7 @@ export const updateWorkspace = async (id, workspace) => {
     data: {
       title: workspace.title,
     },
-    select: {
-      id: true,
-      title: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectWorkspace },
   });
 
   return parseWorkspaceData(updatedWorkspace);
@@ -108,12 +102,7 @@ export const deleteWorkspace = async (id) => {
     where: {
       id: parseInt(id),
     },
-    select: {
-      id: true,
-      title: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectWorkspace },
   });
 
   return parseWorkspaceData(deletedWorkspace);
@@ -125,22 +114,7 @@ export const findMembers = async (workspaceId) => {
     where: {
       workspace_id: parseInt(workspaceId),
     },
-    select: {
-      user_app: {
-        select: {
-          id: true,
-          fullname: true,
-          username: true,
-          avatar: true,
-          email: true,
-        },
-      },
-      member_role: {
-        select: {
-          value: true,
-        },
-      },
-    },
+    select: { ...selectWorkspaceMember },
   });
 
   return members.map((member) => parseWorkspaceMember(member));
@@ -152,22 +126,7 @@ export const findMember = async (workspaceId, memberId) => {
       workspace_id: parseInt(workspaceId),
       user_id: parseInt(memberId),
     },
-    select: {
-      user_app: {
-        select: {
-          id: true,
-          fullname: true,
-          username: true,
-          avatar: true,
-          email: true,
-        },
-      },
-      member_role: {
-        select: {
-          value: true,
-        },
-      },
-    },
+    select: { ...selectWorkspaceMember },
   });
 
   return parseWorkspaceMember(member);
@@ -180,22 +139,7 @@ export const inviteMember = async (workspaceId, memberId, memberRole) => {
       user_id: parseInt(memberId),
       member_role_id: MEMBER_ROLE_STRING_TO_INT[memberRole] || 1, // Default to READER if role is not recognized
     },
-    select: {
-      user_app: {
-        select: {
-          id: true,
-          fullname: true,
-          username: true,
-          avatar: true,
-          email: true,
-        },
-      },
-      member_role: {
-        select: {
-          value: true,
-        },
-      },
-    },
+    select: { ...selectWorkspaceMember },
   });
 
   return parseWorkspaceMember(invitedMember);
@@ -212,22 +156,7 @@ export const updateMember = async (workspaceId, memberId, memberRole) => {
     data: {
       member_role_id: MEMBER_ROLE_STRING_TO_INT[memberRole] || 1, // Default to READER if role is not recognized
     },
-    select: {
-      user_app: {
-        select: {
-          id: true,
-          fullname: true,
-          username: true,
-          avatar: true,
-          email: true,
-        },
-      },
-      member_role: {
-        select: {
-          value: true,
-        },
-      },
-    },
+    select: { ...selectWorkspaceMember },
   });
 
   return parseWorkspaceMember(updatedMember);
@@ -241,22 +170,7 @@ export const removeMember = async (workspaceId, memberId) => {
         user_id: parseInt(memberId),
       },
     },
-    select: {
-      user_app: {
-        select: {
-          id: true,
-          fullname: true,
-          username: true,
-          avatar: true,
-          email: true,
-        },
-      },
-      member_role: {
-        select: {
-          value: true,
-        },
-      },
-    },
+    select: { ...selectWorkspaceMember },
   });
 
   return parseWorkspaceMember(removedMember);
