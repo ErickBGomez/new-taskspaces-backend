@@ -141,3 +141,18 @@ export const deleteProject = async (id) => {
 
   return parseProjectData(deletedProject);
 };
+
+export const findWorkspaceIdByProjectId = async (projectId) => {
+  const projectFound = await prisma.project.findFirst({
+    where: {
+      id: parseInt(projectId),
+    },
+    select: {
+      workspace_id: true,
+    },
+  });
+
+  if (!projectFound) return null;
+
+  return projectFound.workspace_id;
+};

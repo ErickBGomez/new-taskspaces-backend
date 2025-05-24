@@ -150,9 +150,9 @@ export const assignMemberToTask = async (taskId, memberId) => {
 export const unassignMemberToTask = async (taskId, memberId) => {
   const unassignedMemberToTask = await prisma.task_assigned.delete({
     where: {
-      task_id_user_id: {
-        task_id: parseInt(taskId),
+      user_id_task_id: {
         user_id: parseInt(memberId),
+        task_id: parseInt(taskId),
       },
     },
     select: {
@@ -163,4 +163,26 @@ export const unassignMemberToTask = async (taskId, memberId) => {
   });
 
   return parseTaskData(unassignedMemberToTask.task);
+};
+
+// Helpers (not to consume in the API)
+export const findWorkspaceIdByTask = async (taskId) => {
+  const taskFound = await prisma.task.findFirst({
+    where: {
+      id: parseInt(taskId),
+    },
+    select: {
+      project: {
+        select: {
+          workspace_id: true,
+        },
+      },
+    },
+  });
+
+  if (!taskFound) {
+    return null;
+  }
+
+  return taskFound.project.workspace_id;
 };

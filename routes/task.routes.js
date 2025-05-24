@@ -64,14 +64,14 @@ router.delete(
   taskController.deleteTask
 );
 router.post(
-  '/:id/p/:projectId/member/:memberId',
+  '/:id/member/:memberId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
   taskController.assignMemberToTask
 );
 router.delete(
-  '/:id/p/:projectId/member/:memberId',
+  '/:id/member/:memberId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),

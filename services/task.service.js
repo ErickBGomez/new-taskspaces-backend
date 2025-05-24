@@ -6,6 +6,7 @@ import { TaskNotFoundError } from '../errors/task.errors.js';
 import { ProjectNotFoundError } from '../errors/project.errors.js';
 import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
 import { UserNotFoundError } from '../errors/user.errors.js';
+import { findWorkspaceIdFromTask } from '../helpers/task.helper.js';
 
 export const findAllTasks = async () => {
   return await taskRepository.findAllTasks();
@@ -79,16 +80,11 @@ export const deleteTask = async (id) => {
   return await taskRepository.deleteTask(id);
 };
 
-export const assignMemberToTask = async (id, projectId, memberId) => {
+export const assignMemberToTask = async (id, memberId) => {
   const taskExists = await taskRepository.findTaskById(id);
   if (!taskExists) throw new TaskNotFoundError();
 
-  const projectExists = await projectRepository.findProjectById(projectId);
-  if (!projectExists) throw new ProjectNotFoundError();
-
-  const workspaceId = (
-    await projectHelper.findWorkspaceIdByProjectId(projectId)
-  ).toString();
+  const workspaceId = await findWorkspaceIdFromTask(id);
   if (!workspaceId) throw new WorkspaceNotFoundError();
 
   const memberExists = await workspaceRepository.findMember(
@@ -100,16 +96,11 @@ export const assignMemberToTask = async (id, projectId, memberId) => {
   return await taskRepository.assignMemberToTask(id, memberId);
 };
 
-export const unassignMemberToTask = async (id, projectId, memberId) => {
+export const unassignMemberToTask = async (id, memberId) => {
   const taskExists = await taskRepository.findTaskById(id);
   if (!taskExists) throw new TaskNotFoundError();
 
-  const projectExists = await projectRepository.findProjectById(projectId);
-  if (!projectExists) throw new ProjectNotFoundError();
-
-  const workspaceId = (
-    await projectHelper.findWorkspaceIdByProjectId(projectId)
-  ).toString();
+  const workspaceId = await findWorkspaceIdFromTask(id);
   if (!workspaceId) throw new WorkspaceNotFoundError();
 
   const memberExists = await workspaceRepository.findMember(
