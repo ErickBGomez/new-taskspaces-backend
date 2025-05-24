@@ -288,9 +288,9 @@ export const deleteTask = async (req, res) => {
 
 export const assignMemberToTask = async (req, res) => {
   try {
-    const { id, projectId, memberId } = req.params;
+    const { id, memberId } = req.params;
 
-    const task = await taskService.assignMemberToTask(id, projectId, memberId);
+    const task = await taskService.assignMemberToTask(id, memberId);
 
     res
       .status(200)
@@ -360,13 +360,9 @@ export const assignMemberToTask = async (req, res) => {
 
 export const unassignMemberToTask = async (req, res) => {
   try {
-    const { id, projectId, memberId } = req.params;
+    const { id, memberId } = req.params;
 
-    const task = await taskService.unassignMemberToTask(
-      id,
-      projectId,
-      memberId
-    );
+    const task = await taskService.unassignMemberToTask(id, memberId);
 
     res
       .status(200)
