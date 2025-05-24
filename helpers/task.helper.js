@@ -1,6 +1,10 @@
-import { findTaskById } from '../repositories/task.repository.js';
+import {
+  findTaskById,
+  findWorkspaceIdByTask,
+} from '../repositories/task.repository.js';
 import { TaskNotFoundError } from '../errors/task.errors.js';
 import { ProjectNotFoundError } from '../errors/project.errors.js';
+import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
 
 export const findProjectIdByTaskId = async (taskId) => {
   const task = await findTaskById(taskId);
@@ -10,6 +14,14 @@ export const findProjectIdByTaskId = async (taskId) => {
   if (!task.project) throw new ProjectNotFoundError();
 
   return task.project;
+};
+
+export const findWorkspaceIdFromTask = async (taskId) => {
+  const workspaceId = await findWorkspaceIdByTask(taskId);
+
+  if (!workspaceId) throw new WorkspaceNotFoundError();
+
+  return workspaceId;
 };
 
 export const parseTaskData = (task) => {
