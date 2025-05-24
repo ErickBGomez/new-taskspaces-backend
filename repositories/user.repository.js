@@ -2,17 +2,19 @@ import { parseUserData } from '../helpers/user.helper.js';
 import prisma from '../utils/prisma.js';
 import { ROLE_STRING_TO_INT } from '../utils/user.utils.js';
 
+const selectUser = {
+  id: true,
+  fullname: true,
+  username: true,
+  avatar: true,
+  email: true,
+  created_at: true,
+  updated_at: true,
+};
+
 export const findAllUsers = async () => {
   const users = await prisma.user_app.findMany({
-    select: {
-      id: true,
-      fullname: true,
-      username: true,
-      avatar: true,
-      email: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectUser },
   });
 
   return users.map((user) => parseUserData(user));
@@ -23,15 +25,7 @@ export const findUserById = async (id) => {
     where: {
       id: parseInt(id),
     },
-    select: {
-      id: true,
-      fullname: true,
-      username: true,
-      avatar: true,
-      email: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectUser },
   });
 
   return parseUserData(user);
@@ -44,14 +38,8 @@ export const findUserByEmail = async (email, exposeSensitive = false) => {
     user = await prisma.user_app.findFirst({
       where: { email },
       select: {
-        id: true,
-        fullname: true,
-        username: true,
-        avatar: true,
-        email: true,
+        ...selectUser,
         password: true,
-        created_at: true,
-        updated_at: true,
         role: { select: { value: true } },
       },
     });
@@ -59,13 +47,7 @@ export const findUserByEmail = async (email, exposeSensitive = false) => {
     user = await prisma.user_app.findFirst({
       where: { email },
       select: {
-        id: true,
-        fullname: true,
-        username: true,
-        avatar: true,
-        email: true,
-        created_at: true,
-        updated_at: true,
+        ...selectUser,
       },
     });
   }
@@ -76,48 +58,30 @@ export const findUserByEmail = async (email, exposeSensitive = false) => {
 export const findUserByUsername = async (username) => {
   const user = await prisma.user_app.findFirst({
     where: { username },
-    select: {
-      id: true,
-      fullname: true,
-      username: true,
-      avatar: true,
-      email: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectUser },
   });
 
   return parseUserData(user);
 };
 
-export const createUser = async (userData) => {
-  const { role, ...userFields } = userData;
-
-  const data = {
-    ...userFields,
-    role_id: ROLE_STRING_TO_INT[role] || 1, // Default to USER if role is not recognized,
-  };
+export const createUser = async (user) => {
+  const { role, ...userData } = user;
 
   const createdUser = await prisma.user_app.create({
-    data,
-    select: {
-      id: true,
-      fullname: true,
-      username: true,
-      avatar: true,
-      email: true,
-      created_at: true,
-      updated_at: true,
+    data: {
+      ...userData,
+      role_id: ROLE_STRING_TO_INT[role] || 1, // Default to USER if role is not recognized,
     },
+    select: { ...selectUser },
   });
 
   return parseUserData(createdUser);
 };
 
-export const updateUser = async (id, userData) => {
-  const { role, ...userFields } = userData;
+export const updateUser = async (id, user) => {
+  const { role, ...userData } = user;
 
-  let data = { ...userFields };
+  let data = { ...userData };
 
   // Convert role string to roleId if provided
   if (role) {
@@ -128,15 +92,8 @@ export const updateUser = async (id, userData) => {
     where: {
       id: parseInt(id),
     },
-    data,
-    select: {
-      id: true,
-      fullname: true,
-      username: true,
-      email: true,
-      created_at: true,
-      updated_at: true,
-    },
+    data: { ...userData },
+    select: { ...selectUser },
   });
 
   return parseUserData(updatedUser);
@@ -147,15 +104,7 @@ export const deleteUser = async (id) => {
     where: {
       id: parseInt(id),
     },
-    select: {
-      id: true,
-      fullname: true,
-      username: true,
-      avatar: true,
-      email: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectUser },
   });
 
   return parseUserData(deletedUser);
@@ -168,13 +117,7 @@ export const findUserWithPasswordById = async (id) => {
       id: parseInt(id),
     },
     select: {
-      id: true,
-      fullname: true,
-      username: true,
-      avatar: true,
-      email: true,
-      created_at: true,
-      updated_at: true,
+      ...selectUser,
       role: { select: { value: true } },
     },
   });
