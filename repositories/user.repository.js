@@ -79,14 +79,9 @@ export const createUser = async (user) => {
 };
 
 export const updateUser = async (id, user) => {
+  // Remove role is it was provided in the request
+  // eslint-disable-next-line no-unused-vars
   const { role, ...userData } = user;
-
-  let data = { ...userData };
-
-  // Convert role string to roleId if provided
-  if (role) {
-    data.role_id = ROLE_STRING_TO_INT[role] || 1; // Default to USER if role is not recognized
-  }
 
   const updatedUser = await prisma.user_app.update({
     where: {
