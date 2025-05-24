@@ -11,3 +11,31 @@ export const findProjectIdByTaskId = async (taskId) => {
 
   return task.project;
 };
+
+export const parseTaskData = (task) => {
+  if (!task) return null;
+
+  const {
+    timer,
+    task_status,
+    task_tag,
+    task_assigned,
+    created_at,
+    updated_at,
+    ...taskData
+  } = task;
+
+  return {
+    ...taskData,
+    timer: parseInt(timer),
+    status: task_status.value,
+    tags: task_tag.map((tag) => ({
+      ...tag,
+    })),
+    assignedMembers: task_assigned.map((assigned) => ({
+      ...assigned.user_app,
+    })),
+    createdAt: created_at,
+    updatedAt: updated_at,
+  };
+};

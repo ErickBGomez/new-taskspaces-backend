@@ -1,275 +1,166 @@
+import { parseTaskData } from '../helpers/task.helper.js';
 import prisma from '../utils/prisma.js';
+import { STATUS_STRING_TO_INT } from '../utils/task.utils.js';
 
-// Find all tasks
+const selectTask = {
+  id: true,
+  title: true,
+  description: true,
+  date: true,
+  timer: true,
+  task_status: {
+    select: {
+      value: true,
+    },
+  },
+  task_tag: {
+    select: {
+      tag: {
+        select: {
+          id: true,
+          title: true,
+          color: true,
+        },
+      },
+    },
+  },
+  task_assigned: {
+    select: {
+      user_app: {
+        select: {
+          id: true,
+          fullname: true,
+          username: true,
+          avatar: true,
+          email: true,
+        },
+      },
+    },
+  },
+  created_at: true,
+  updated_at: true,
+};
+
+// TODO: Document these lines
 export const findAllTasks = async () => {
-  return await prisma.task.findMany({
-    include: {
-      assignedUsers: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              fullname: true,
-              username: true,
-              email: true,
-            },
-          },
-        },
-      },
-      tags: {
-        include: {
-          tag: true,
-        },
-      },
-      status: true,
-      project: true,
-    },
+  const tasks = await prisma.task.findMany({
+    select: { ...selectTask },
   });
+
+  return tasks.map((task) => parseTaskData(task));
 };
 
-// Find tasks by project ID
 export const findTasksByProjectId = async (projectId) => {
-  return await prisma.task.findMany({
+  const tasks = await prisma.task.findMany({
     where: {
-      projectId: parseInt(projectId),
+      project_id: parseInt(projectId),
     },
-    include: {
-      assignedUsers: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              fullname: true,
-              username: true,
-              email: true,
-            },
-          },
-        },
-      },
-      tags: {
-        include: {
-          tag: true,
-        },
-      },
-      status: true,
-    },
+    select: { ...selectTask },
   });
+
+  return tasks.map((task) => parseTaskData(task));
 };
 
-// Find task by ID
 export const findTaskById = async (id) => {
-  return await prisma.task.findUnique({
+  const task = await prisma.task.findFirst({
     where: {
       id: parseInt(id),
     },
-    include: {
-      assignedUsers: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              fullname: true,
-              username: true,
-              email: true,
-            },
-          },
-        },
-      },
-      tags: {
-        include: {
-          tag: true,
-        },
-      },
-      status: true,
-      project: true,
-      comments: {
-        include: {
-          author: {
-            select: {
-              id: true,
-              fullname: true,
-              username: true,
-            },
-          },
-        },
-      },
-    },
+    select: { ...selectTask },
   });
+
+  return parseTaskData(task);
 };
 
-// Find task by ID and project ID
 export const findTaskByIdAndProjectId = async (id, projectId) => {
-  return await prisma.task.findFirst({
+  // return await Task.findOne({ _id: id, project: projectId }).populate(
+  //   'assignedMembers'
+  // );
+
+  const task = await prisma.task.findFirst({
     where: {
       id: parseInt(id),
-      projectId: parseInt(projectId),
+      project_id: parseInt(projectId),
     },
-    include: {
-      assignedUsers: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              fullname: true,
-              username: true,
-              email: true,
-            },
-          },
-        },
-      },
-      tags: {
-        include: {
-          tag: true,
-        },
-      },
-      status: true,
-    },
+    select: { ...selectTask },
   });
+
+  return parseTaskData(task);
 };
 
-// Create task
-export const createTask = async (taskData) => {
-  const { assignedMembers, tags, ...taskFields } = taskData;
+export const createTask = async (task) => {
+  const { status, projectId, ...taskData } = task;
 
-  return await prisma.task.create({
+  const createdTask = await prisma.task.create({
     data: {
-      ...taskFields,
-      projectId: parseInt(taskFields.projectId),
-      statusId: taskFields.statusId || 1, // Default to PENDING
-      // Handle assigned members
-      ...(assignedMembers &&
-        assignedMembers.length > 0 && {
-          assignedUsers: {
-            create: assignedMembers.map((userId) => ({
-              userId: parseInt(userId),
-            })),
-          },
-        }),
-      // Handle tags
-      ...(tags &&
-        tags.length > 0 && {
-          tags: {
-            create: tags.map((tagId) => ({
-              tagId: parseInt(tagId),
-            })),
-          },
-        }),
+      ...taskData,
+      status_id: STATUS_STRING_TO_INT[status] || 1, // Default to PENDING if status is not recognized
+      project_id: parseInt(projectId),
     },
-    include: {
-      assignedUsers: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              fullname: true,
-              username: true,
-              email: true,
-            },
-          },
-        },
-      },
-      tags: {
-        include: {
-          tag: true,
-        },
-      },
-      status: true,
-    },
+    select: { ...selectTask },
   });
+
+  return parseTaskData(createdTask);
 };
 
-// Update task
-export const updateTask = async (id, taskData) => {
-  const { assignedMembers, tags, ...taskFields } = taskData;
+export const updateTask = async (id, task) => {
+  const { status, ...taskData } = task;
 
-  return await prisma.task.update({
+  const updatedTask = await prisma.task.update({
     where: {
       id: parseInt(id),
     },
     data: {
-      ...taskFields,
-      ...(taskFields.projectId && {
-        projectId: parseInt(taskFields.projectId),
-      }),
-      ...(taskFields.statusId && { statusId: parseInt(taskFields.statusId) }),
+      ...taskData,
+      status_id: STATUS_STRING_TO_INT[status] || 1, // Default to PENDING if status is not recognized
     },
-    include: {
-      assignedUsers: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              fullname: true,
-              username: true,
-              email: true,
-            },
-          },
-        },
-      },
-      tags: {
-        include: {
-          tag: true,
-        },
-      },
-      status: true,
-    },
+    select: { ...selectTask },
   });
+
+  return parseTaskData(updatedTask);
 };
 
-// Delete task
 export const deleteTask = async (id) => {
-  return await prisma.task.delete({
+  const deletedTask = await prisma.task.delete({
     where: {
       id: parseInt(id),
     },
+    select: { ...selectTask },
   });
+
+  return parseTaskData(deletedTask);
 };
 
-// Assign member to task
 export const assignMemberToTask = async (taskId, memberId) => {
-  return await prisma.taskAssigned.create({
+  const assignedMemberToTask = await prisma.task_assigned.create({
     data: {
-      taskId: parseInt(taskId),
-      userId: parseInt(memberId),
+      task_id: parseInt(taskId),
+      user_id: parseInt(memberId),
+    },
+    select: {
+      task: {
+        select: { ...selectTask },
+      },
     },
   });
+
+  return parseTaskData(assignedMemberToTask.task);
 };
 
-// Unassign member from task
 export const unassignMemberToTask = async (taskId, memberId) => {
-  return await prisma.taskAssigned.delete({
+  const unassignedMemberToTask = await prisma.task_assigned.delete({
     where: {
-      userId_taskId: {
-        userId: parseInt(memberId),
-        taskId: parseInt(taskId),
+      task_id_user_id: {
+        task_id: parseInt(taskId),
+        user_id: parseInt(memberId),
+      },
+    },
+    select: {
+      task: {
+        select: { ...selectTask },
       },
     },
   });
-};
 
-// Add tag to task
-export const addTagToTask = async (taskId, tagId) => {
-  return await prisma.taskTag.create({
-    data: {
-      taskId: parseInt(taskId),
-      tagId: parseInt(tagId),
-    },
-  });
-};
-
-// Remove tag from task
-export const removeTagFromTask = async (taskId, tagId) => {
-  return await prisma.taskTag.delete({
-    where: {
-      taskId_tagId: {
-        taskId: parseInt(taskId),
-        tagId: parseInt(tagId),
-      },
-    },
-  });
-};
-
-// Close Prisma connection (call this when your app shuts down)
-export const closePrismaConnection = async () => {
-  await prisma.$disconnect();
+  return parseTaskData(unassignedMemberToTask.task);
 };
