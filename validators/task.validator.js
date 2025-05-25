@@ -1,5 +1,4 @@
 import { body } from 'express-validator';
-import mongoose from 'mongoose';
 
 export const createTaskValidator = [
   body('title')
@@ -17,12 +16,6 @@ export const createTaskValidator = [
     .withMessage('Status must be a string')
     .isIn(['PENDING', 'DOING', 'DONE'])
     .withMessage('Status must be one of the following: PENDING, DOING, DONE'),
-  body('tags')
-    .optional()
-    .isArray()
-    .withMessage('Tags must be an array of strings')
-    .custom((tags) => tags.every((tag) => typeof tag === 'string'))
-    .withMessage('Each tag must be valid'),
   body('date')
     .optional()
     .isISO8601()
@@ -31,14 +24,6 @@ export const createTaskValidator = [
     .optional()
     .isInt({ min: 0 })
     .withMessage('Timer must be a non-negative integer'),
-  body('assignedMembers')
-    .optional()
-    .isArray()
-    .withMessage('Members must be an array of ObjectIds')
-    .custom((members) =>
-      members.every((member) => mongoose.Types.ObjectId.isValid(member))
-    )
-    .withMessage('Each member must be a valid ObjectId'),
 ];
 
 export const updateTaskValidator = [
@@ -65,12 +50,4 @@ export const updateTaskValidator = [
     .optional()
     .isInt({ min: 0 })
     .withMessage('Timer must be a non-negative integer'),
-  body('assignedMembers')
-    .optional()
-    .isArray()
-    .withMessage('Members must be an array of ObjectIds')
-    .custom((members) =>
-      members.every((member) => mongoose.Types.ObjectId.isValid(member))
-    )
-    .withMessage('Each member must be a valid ObjectId'),
 ];
