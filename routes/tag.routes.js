@@ -29,10 +29,10 @@ router.get(
   tagController.getTagsByProjectId
 );
 router.get(
-  '/:id/p/:projectId',
+  '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.PROJECT),
+  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.TAG),
   tagController.getTagById
 );
 router.get(
@@ -52,26 +52,26 @@ router.post(
   tagController.createTag
 );
 router.put(
-  '/:id/p/:projectId',
+  '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.PROJECT),
+  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TAG),
   tagValidator,
   checkValidation,
   tagController.updateTag
 );
 router.delete(
-  '/:id/p/:projectId',
+  '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.PROJECT),
+  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TAG),
   tagController.deleteTag
 );
 router.post(
   '/:id/t/:taskId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
+  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TAG),
   // ?: Validate this?
   tagController.assignTagToTask
 );
@@ -79,7 +79,7 @@ router.delete(
   '/:id/t/:taskId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
+  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TAG),
   tagController.unassignTagFromTask
 );
 

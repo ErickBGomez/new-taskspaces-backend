@@ -37,11 +37,14 @@ export const findTagById = async (id) => {
   return parseTagData(tag);
 };
 
-// TODO: Check this
 export const findTagsByTaskId = async (taskId) => {
   const tags = await prisma.tag.findMany({
     where: {
-      task_id: parseInt(taskId),
+      task_tag: {
+        some: {
+          task_id: parseInt(taskId),
+        },
+      },
     },
     select: { ...selectTag },
   });

@@ -79,7 +79,7 @@ export const assignTagToTask = async (id, taskId) => {
   // because taskExists model may change, and the response may or not include
   // the tags populated
   const tagsFromTask = await tagRepository.findTagsByTaskId(taskId);
-  if (tagsFromTask?.some((tag) => tag._id.toString() === id))
+  if (tagsFromTask?.some((tag) => tag.id.toString() === id))
     throw new TagAlreadyAssigned();
 
   return await tagRepository.assignTagToTask(id, taskId);
