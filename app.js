@@ -6,6 +6,7 @@ import projectRoutes from './routes/project.routes.js';
 import workspaceRoutes from './routes/workspace.routes.js';
 import commentRoutes from './routes/comment.routes.js';
 import tagRoutes from './routes/tag.routes.js';
+import bookmarkRoutes from './routes/bookmark.routes.js';
 import authRoutes from './routes/auth.routes.js';
 
 const app = express();
@@ -26,6 +27,7 @@ app.use(`${apiPrefix}/projects`, projectRoutes);
 app.use(`${apiPrefix}/workspaces`, workspaceRoutes);
 app.use(`${apiPrefix}/comments`, commentRoutes);
 app.use(`${apiPrefix}/tags`, tagRoutes);
+app.use(`${apiPrefix}/bookmarks`, bookmarkRoutes);
 app.use(`${apiPrefix}/auth`, authRoutes);
 
 export default app;
