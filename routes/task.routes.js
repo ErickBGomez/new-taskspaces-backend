@@ -15,6 +15,7 @@ import {
 } from '../validators/task.validator.js';
 import checkValidation from '../middlewares/validator.middleware.js';
 import * as taskController from '../controllers/task.controller.js';
+import handleInternalServerErrorMiddleware from '../middlewares/internal-server-error.middleware.js';
 
 const router = Router();
 
@@ -22,21 +23,24 @@ router.get(
   '/',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.SYSADMIN),
-  taskController.getAllTasks
+  taskController.getAllTasks,
+  handleInternalServerErrorMiddleware
 );
 router.get(
   '/p/:projectId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.PROJECT),
-  taskController.getTasksByProjectId
+  taskController.getTasksByProjectId,
+  handleInternalServerErrorMiddleware
 );
 router.get(
   '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.TASK),
-  taskController.getTaskById
+  taskController.getTaskById,
+  handleInternalServerErrorMiddleware
 );
 router.post(
   '/p/:projectId',
@@ -45,7 +49,8 @@ router.post(
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.PROJECT),
   createTaskValidator,
   checkValidation,
-  taskController.createTask
+  taskController.createTask,
+  handleInternalServerErrorMiddleware
 );
 router.put(
   '/:id',
@@ -54,28 +59,32 @@ router.put(
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
   updateTaskValidator,
   checkValidation,
-  taskController.updateTask
+  taskController.updateTask,
+  handleInternalServerErrorMiddleware
 );
 router.delete(
   '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
-  taskController.deleteTask
+  taskController.deleteTask,
+  handleInternalServerErrorMiddleware
 );
 router.post(
   '/:id/member/:memberId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
-  taskController.assignMemberToTask
+  taskController.assignMemberToTask,
+  handleInternalServerErrorMiddleware
 );
 router.delete(
   '/:id/member/:memberId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
-  taskController.unassignMemberToTask
+  taskController.unassignMemberToTask,
+  handleInternalServerErrorMiddleware
 );
 
 export default router;

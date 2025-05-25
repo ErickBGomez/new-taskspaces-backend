@@ -4,9 +4,10 @@ import SuccessResponseBuilder from '../helpers/success-response-builder.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import { TaskNotFoundError } from '../errors/task.errors.js';
 
-export const getAllComments = async (req, res) => {
+export const getAllComments = async (req, res, next) => {
   try {
     const comments = await commentService.findAllComments();
+
     res
       .status(200)
       .json(
@@ -17,19 +18,11 @@ export const getAllComments = async (req, res) => {
           .build()
       );
   } catch (error) {
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const getCommentsByTaskId = async (req, res) => {
+export const getCommentsByTaskId = async (req, res, next) => {
   try {
     const { taskId } = req.params;
     const comments = await commentService.findCommentsByTaskId(taskId);
@@ -54,19 +47,11 @@ export const getCommentsByTaskId = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const getCommentById = async (req, res) => {
+export const getCommentById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -93,19 +78,11 @@ export const getCommentById = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const createComment = async (req, res) => {
+export const createComment = async (req, res, next) => {
   try {
     const { taskId } = req.params;
     const { content } = req.body;
@@ -138,19 +115,11 @@ export const createComment = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const updateComment = async (req, res) => {
+export const updateComment = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { content } = req.body;
@@ -178,19 +147,11 @@ export const updateComment = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const deleteComment = async (req, res) => {
+export const deleteComment = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -216,14 +177,6 @@ export const deleteComment = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };

@@ -5,7 +5,7 @@ import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import { ProjectNotFoundError } from '../errors/project.errors.js';
 import { TaskNotFoundError } from '../errors/task.errors.js';
 
-export const getAllTags = async (req, res) => {
+export const getAllTags = async (req, res, next) => {
   try {
     const tags = await tagService.findAllTags();
 
@@ -19,19 +19,11 @@ export const getAllTags = async (req, res) => {
           .build()
       );
   } catch (error) {
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const getTagsByProjectId = async (req, res) => {
+export const getTagsByProjectId = async (req, res, next) => {
   try {
     const { projectId } = req.params;
 
@@ -57,19 +49,11 @@ export const getTagsByProjectId = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const getTagById = async (req, res) => {
+export const getTagById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -96,19 +80,11 @@ export const getTagById = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const getTagsByTaskId = async (req, res) => {
+export const getTagsByTaskId = async (req, res, next) => {
   try {
     const { taskId } = req.params;
 
@@ -135,19 +111,11 @@ export const getTagsByTaskId = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const createTag = async (req, res) => {
+export const createTag = async (req, res, next) => {
   try {
     const { title, color } = req.body;
     const { projectId } = req.params;
@@ -181,19 +149,11 @@ export const createTag = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const updateTag = async (req, res) => {
+export const updateTag = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { title, color } = req.body;
@@ -221,19 +181,11 @@ export const updateTag = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const deleteTag = async (req, res) => {
+export const deleteTag = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -259,19 +211,11 @@ export const deleteTag = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const assignTagToTask = async (req, res) => {
+export const assignTagToTask = async (req, res, next) => {
   try {
     const { id, taskId } = req.params;
 
@@ -319,19 +263,11 @@ export const assignTagToTask = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const unassignTagFromTask = async (req, res) => {
+export const unassignTagFromTask = async (req, res, next) => {
   try {
     const { id, taskId } = req.params;
 
@@ -368,14 +304,6 @@ export const unassignTagFromTask = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };

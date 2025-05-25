@@ -12,7 +12,7 @@ import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import { UserNotFoundError } from '../errors/user.errors.js';
 import { ROLES } from '../middlewares/authorize-roles.middleware.js';
 
-export const getAllWorkspaces = async (req, res) => {
+export const getAllWorkspaces = async (req, res, next) => {
   try {
     const workspaces = await workspaceService.findAllWorkspaces();
 
@@ -26,19 +26,11 @@ export const getAllWorkspaces = async (req, res) => {
           .build()
       );
   } catch (error) {
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const getWorkspaceById = async (req, res) => {
+export const getWorkspaceById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -65,19 +57,11 @@ export const getWorkspaceById = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const getWorkspacesByOwnerId = async (req, res) => {
+export const getWorkspacesByOwnerId = async (req, res, next) => {
   try {
     const { role, id } = req.user;
     const { userId } = req.params;
@@ -111,19 +95,11 @@ export const getWorkspacesByOwnerId = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const checkWorkspaceAvailability = async (req, res) => {
+export const checkWorkspaceAvailability = async (req, res, next) => {
   try {
     const { title } = req.query;
     const { id: userId } = req.user;
@@ -143,19 +119,11 @@ export const checkWorkspaceAvailability = async (req, res) => {
           .build()
       );
   } catch (error) {
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const createWorkspace = async (req, res) => {
+export const createWorkspace = async (req, res, next) => {
   try {
     const { title } = req.body;
     const { id: ownerId, username } = req.user;
@@ -189,19 +157,11 @@ export const createWorkspace = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const updateWorkspace = async (req, res) => {
+export const updateWorkspace = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { title } = req.body;
@@ -229,19 +189,11 @@ export const updateWorkspace = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const deleteWorkspace = async (req, res) => {
+export const deleteWorkspace = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -267,20 +219,12 @@ export const deleteWorkspace = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
 // Members
-export const getMembers = async (req, res) => {
+export const getMembers = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -307,19 +251,11 @@ export const getMembers = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const getMemberRole = async (req, res) => {
+export const getMemberRole = async (req, res, next) => {
   try {
     const { id: workspaceId, memberId } = req.params;
 
@@ -371,19 +307,11 @@ export const getMemberRole = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const inviteMember = async (req, res) => {
+export const inviteMember = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { username, memberRole } = req.body;
@@ -449,19 +377,11 @@ export const inviteMember = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const updateMember = async (req, res) => {
+export const updateMember = async (req, res, next) => {
   try {
     const { id, memberId } = req.params;
     const { id: actionUserId } = req.user;
@@ -528,19 +448,11 @@ export const updateMember = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const removeMember = async (req, res) => {
+export const removeMember = async (req, res, next) => {
   try {
     const { id, memberId } = req.params;
     const { id: actionUserId } = req.user;
@@ -594,14 +506,6 @@ export const removeMember = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };

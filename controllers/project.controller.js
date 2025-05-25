@@ -7,7 +7,7 @@ import SuccessResponseBuilder from '../helpers/success-response-builder.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
 
-export const getAllProjects = async (req, res) => {
+export const getAllProjects = async (req, res, next) => {
   try {
     const projects = await projectService.findAllProjects();
 
@@ -21,19 +21,11 @@ export const getAllProjects = async (req, res) => {
           .build()
       );
   } catch (error) {
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const getProjectsByWorkspaceId = async (req, res) => {
+export const getProjectsByWorkspaceId = async (req, res, next) => {
   try {
     const { workspaceId } = req.params;
 
@@ -61,19 +53,11 @@ export const getProjectsByWorkspaceId = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const getProjectById = async (req, res) => {
+export const getProjectById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -100,19 +84,11 @@ export const getProjectById = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const createProject = async (req, res) => {
+export const createProject = async (req, res, next) => {
   try {
     // In the case of create project, it's necessary to retrieve the workspaceId
     // because its part of the project schema to have the reference to the workspace
@@ -159,19 +135,11 @@ export const createProject = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const updateProject = async (req, res) => {
+export const updateProject = async (req, res, next) => {
   try {
     // In the case of update project, it's not necessary to retrieve the workspaceId
     // because workspaceId cannot be updated, and the member role has been checked before
@@ -205,19 +173,11 @@ export const updateProject = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const deleteProject = async (req, res) => {
+export const deleteProject = async (req, res, next) => {
   try {
     // In the case of delete project, it's the same case as update project
     // the workspaceId is not necessary to retrieve
@@ -245,14 +205,6 @@ export const deleteProject = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };

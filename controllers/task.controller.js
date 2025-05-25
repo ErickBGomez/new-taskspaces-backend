@@ -6,9 +6,10 @@ import { ProjectNotFoundError } from '../errors/project.errors.js';
 import { UserNotFoundError } from '../errors/user.errors.js';
 import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
 
-export const getAllTasks = async (req, res) => {
+export const getAllTasks = async (req, res, next) => {
   try {
     const tasks = await taskService.findAllTasks();
+
     res
       .status(200)
       .json(
@@ -19,19 +20,11 @@ export const getAllTasks = async (req, res) => {
           .build()
       );
   } catch (error) {
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const getTasksByProjectId = async (req, res) => {
+export const getTasksByProjectId = async (req, res, next) => {
   try {
     const { projectId } = req.params;
 
@@ -57,19 +50,11 @@ export const getTasksByProjectId = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const getTaskById = async (req, res) => {
+export const getTaskById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -96,19 +81,11 @@ export const getTaskById = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const createTask = async (req, res) => {
+export const createTask = async (req, res, next) => {
   try {
     // In the case of create task, it's necessary to retrieve the projectId
     // because its part of the task schema to have the reference to the project
@@ -148,19 +125,11 @@ export const createTask = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const updateTask = async (req, res) => {
+export const updateTask = async (req, res, next) => {
   try {
     // In the case of update task, it's not necessary to retrieve the projectId
     // because projectId cannot be updated, and the member role has been checked before
@@ -200,19 +169,11 @@ export const updateTask = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const deleteTask = async (req, res) => {
+export const deleteTask = async (req, res, next) => {
   try {
     const { id, projectId } = req.params;
 
@@ -238,19 +199,11 @@ export const deleteTask = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const assignMemberToTask = async (req, res) => {
+export const assignMemberToTask = async (req, res, next) => {
   try {
     const { id, memberId } = req.params;
 
@@ -310,19 +263,11 @@ export const assignMemberToTask = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const unassignMemberToTask = async (req, res) => {
+export const unassignMemberToTask = async (req, res, next) => {
   try {
     const { id, memberId } = req.params;
 
@@ -382,14 +327,6 @@ export const unassignMemberToTask = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };

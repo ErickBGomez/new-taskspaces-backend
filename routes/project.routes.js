@@ -15,6 +15,7 @@ import {
 } from '../validators/project.validator.js';
 import checkValidation from '../middlewares/validator.middleware.js';
 import * as projectController from '../controllers/project.controller.js';
+import handleInternalServerErrorMiddleware from '../middlewares/internal-server-error.middleware.js';
 
 const router = Router();
 
@@ -22,21 +23,24 @@ router.get(
   '/',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.SYSADMIN),
-  projectController.getAllProjects
+  projectController.getAllProjects,
+  handleInternalServerErrorMiddleware
 );
 router.get(
   '/w/:workspaceId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.WORKSPACE),
-  projectController.getProjectsByWorkspaceId
+  projectController.getProjectsByWorkspaceId,
+  handleInternalServerErrorMiddleware
 );
 router.get(
   '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.PROJECT),
-  projectController.getProjectById
+  projectController.getProjectById,
+  handleInternalServerErrorMiddleware
 );
 router.post(
   '/w/:workspaceId',
@@ -45,7 +49,8 @@ router.post(
   checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, DEPTH.WORKSPACE),
   createProjectValidator,
   checkValidation,
-  projectController.createProject
+  projectController.createProject,
+  handleInternalServerErrorMiddleware
 );
 router.put(
   '/:id',
@@ -54,14 +59,16 @@ router.put(
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.PROJECT),
   updateProjectValidator,
   checkValidation,
-  projectController.updateProject
+  projectController.updateProject,
+  handleInternalServerErrorMiddleware
 );
 router.delete(
   '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, DEPTH.PROJECT),
-  projectController.deleteProject
+  projectController.deleteProject,
+  handleInternalServerErrorMiddleware
 );
 
 export default router;

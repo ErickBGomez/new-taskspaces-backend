@@ -16,6 +16,7 @@ import {
 } from '../validators/workspace.validator.js';
 import checkValidation from '../middlewares/validator.middleware.js';
 import * as workspaceController from '../controllers/workspace.controller.js';
+import handleInternalServerErrorMiddleware from '../middlewares/internal-server-error.middleware.js';
 
 const router = Router();
 
@@ -23,20 +24,23 @@ router.get(
   '/check',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  workspaceController.checkWorkspaceAvailability
+  workspaceController.checkWorkspaceAvailability,
+  handleInternalServerErrorMiddleware
 );
 router.get(
   '/',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.SYSADMIN),
-  workspaceController.getAllWorkspaces
+  workspaceController.getAllWorkspaces,
+  handleInternalServerErrorMiddleware
 );
 router.get(
   '/:id/',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.WORKSPACE),
-  workspaceController.getWorkspaceById
+  workspaceController.getWorkspaceById,
+  handleInternalServerErrorMiddleware
 );
 // This route cannot be checked by the middleware checkMemberRoleMiddleware,
 // because there is no way to obtain the id of a specific workspace
@@ -44,7 +48,8 @@ router.get(
   '/u/:userId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  workspaceController.getWorkspacesByOwnerId
+  workspaceController.getWorkspacesByOwnerId,
+  handleInternalServerErrorMiddleware
 );
 // TODO: Define create workspace to another user (admin)
 router.post(
@@ -53,7 +58,8 @@ router.post(
   authorizeRolesMiddleware(ROLES.USER),
   workspaceValidator,
   checkValidation,
-  workspaceController.createWorkspace
+  workspaceController.createWorkspace,
+  handleInternalServerErrorMiddleware
 );
 router.put(
   '/:id',
@@ -62,14 +68,16 @@ router.put(
   checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, DEPTH.WORKSPACE),
   workspaceValidator,
   checkValidation,
-  workspaceController.updateWorkspace
+  workspaceController.updateWorkspace,
+  handleInternalServerErrorMiddleware
 );
 router.delete(
   '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, DEPTH.WORKSPACE),
-  workspaceController.deleteWorkspace
+  workspaceController.deleteWorkspace,
+  handleInternalServerErrorMiddleware
 );
 
 // Members
@@ -78,7 +86,8 @@ router.get(
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.WORKSPACE),
-  workspaceController.getMembers
+  workspaceController.getMembers,
+  handleInternalServerErrorMiddleware
 );
 // Gets just member role, not the whole user information
 router.get(
@@ -86,7 +95,8 @@ router.get(
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.WORKSPACE),
-  workspaceController.getMemberRole
+  workspaceController.getMemberRole,
+  handleInternalServerErrorMiddleware
 );
 router.post(
   '/:id/members',
@@ -95,7 +105,8 @@ router.post(
   checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, DEPTH.WORKSPACE),
   inviteValidator,
   checkValidation,
-  workspaceController.inviteMember
+  workspaceController.inviteMember,
+  handleInternalServerErrorMiddleware
 );
 router.put(
   '/:id/members/:memberId',
@@ -104,14 +115,16 @@ router.put(
   checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, DEPTH.WORKSPACE),
   updateMemberValidator,
   checkValidation,
-  workspaceController.updateMember
+  workspaceController.updateMember,
+  handleInternalServerErrorMiddleware
 );
 router.delete(
   '/:id/members/:memberId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, DEPTH.WORKSPACE),
-  workspaceController.removeMember
+  workspaceController.removeMember,
+  handleInternalServerErrorMiddleware
 );
 
 export default router;

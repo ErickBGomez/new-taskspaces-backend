@@ -12,6 +12,7 @@ import {
 import tagValidator from '../validators/tag.validator.js';
 import checkValidation from '../middlewares/validator.middleware.js';
 import * as tagController from '../controllers/tag.controller.js';
+import handleInternalServerErrorMiddleware from '../middlewares/internal-server-error.middleware.js';
 
 const router = Router();
 
@@ -19,28 +20,32 @@ router.get(
   '/',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.SYSADMIN),
-  tagController.getAllTags
+  tagController.getAllTags,
+  handleInternalServerErrorMiddleware
 );
 router.get(
   '/p/:projectId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.PROJECT),
-  tagController.getTagsByProjectId
+  tagController.getTagsByProjectId,
+  handleInternalServerErrorMiddleware
 );
 router.get(
   '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.TAG),
-  tagController.getTagById
+  tagController.getTagById,
+  handleInternalServerErrorMiddleware
 );
 router.get(
   '/t/:taskId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.TASK),
-  tagController.getTagsByTaskId
+  tagController.getTagsByTaskId,
+  handleInternalServerErrorMiddleware
 );
 router.post(
   '/p/:projectId',
@@ -49,7 +54,8 @@ router.post(
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.PROJECT),
   tagValidator,
   checkValidation,
-  tagController.createTag
+  tagController.createTag,
+  handleInternalServerErrorMiddleware
 );
 router.put(
   '/:id',
@@ -58,14 +64,16 @@ router.put(
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TAG),
   tagValidator,
   checkValidation,
-  tagController.updateTag
+  tagController.updateTag,
+  handleInternalServerErrorMiddleware
 );
 router.delete(
   '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TAG),
-  tagController.deleteTag
+  tagController.deleteTag,
+  handleInternalServerErrorMiddleware
 );
 router.post(
   '/:id/t/:taskId',
@@ -73,7 +81,8 @@ router.post(
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TAG),
   // ?: Validate this?
-  tagController.assignTagToTask
+  tagController.assignTagToTask,
+  handleInternalServerErrorMiddleware
 );
 router.delete(
   '/:id/t/:taskId',
