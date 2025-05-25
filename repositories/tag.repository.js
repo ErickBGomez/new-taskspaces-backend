@@ -113,10 +113,14 @@ export const unassignTagFromTask = async (id, taskId) => {
         tag_id: parseInt(id),
       },
     },
-    select: { ...selectTag },
+    select: {
+      tag: {
+        select: { ...selectTag },
+      },
+    },
   });
 
-  return parseTagData(unassignedTagFromTask);
+  return parseTagData(unassignedTagFromTask.tag);
 };
 
 export const findWorkspaceIdByTag = async (tagId) => {
