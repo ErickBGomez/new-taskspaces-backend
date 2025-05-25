@@ -1,32 +1,90 @@
-import Comment from '../models/comment.model.js';
+import { parseCommentData } from '../helpers/comment.helper.js';
+import prisma from '../utils/prisma.js';
+
+const selectComment = {
+  id: true,
+  content: true,
+  created_at: true,
+  updated_at: true,
+  user_app: {
+    select: {
+      fullname: true,
+      username: true,
+      avatar: true,
+      email: true,
+    },
+  },
+};
 
 export const findAllComments = async () => {
-  return await Comment.find().populate('author', 'username avatar');
+  const comments = await prisma.comment.findMany({
+    select: { ...selectComment },
+  });
+
+  return comments.map((comment) => parseCommentData(comment));
 };
 
 export const findCommentsByTaskId = async (taskId) => {
-  return await Comment.find({ task: taskId }).populate(
-    'author',
-    'username avatar'
-  );
+  const comments = await prisma.comment.findMany({
+    where: {
+      task_id: parseInt(taskId),
+    },
+    select: { ...selectComment },
+  });
+
+  return comments.map((comment) => parseCommentData(comment));
 };
 
 export const findCommentById = async (id) => {
-  return await Comment.findById(id);
+  const comment = await prisma.comment.findFirst({
+    where: {
+      id: parseInt(id),
+    },
+    select: { ...selectComment },
+  });
+
+  return parseCommentData(comment);
 };
 
+// TODO: refactor how payload data and ids are being passed
+// Request body should be in the first argument (like content)
+// The rest of arguments should be ids (like authorId, taskId)
 export const createComment = async (comment) => {
-  return await Comment.create(comment).then((newComment) =>
-    newComment.populate('author', 'username avatar')
-  );
+  const { authorId, taskId, ...commentData } = comment;
+
+  const createdComment = await prisma.comment.create({
+    data: {
+      ...commentData,
+      author_id: parseInt(authorId),
+      task_id: parseInt(taskId),
+    },
+    select: { ...selectComment },
+  });
+
+  return parseCommentData(createdComment);
 };
 
 export const updateComment = async (id, comment) => {
-  return await Comment.findByIdAndUpdate(id, comment, {
-    new: true,
+  const updatedComment = await prisma.comment.update({
+    where: {
+      id: parseInt(id),
+    },
+    data: {
+      ...comment,
+    },
+    select: { ...selectComment },
   });
+
+  return parseCommentData(updatedComment);
 };
 
 export const deleteComment = async (id) => {
-  return await Comment.findByIdAndDelete(id);
+  const deletedComment = await prisma.comment.delete({
+    where: {
+      id: parseInt(id),
+    },
+    select: { ...selectComment },
+  });
+
+  return parseCommentData(deletedComment);
 };

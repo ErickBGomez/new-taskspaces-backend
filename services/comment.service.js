@@ -23,28 +23,25 @@ export const findCommentById = async (id) => {
   return comment;
 };
 
-export const createComment = async (taskId, { author, content, mentions }) => {
+export const createComment = async (taskId, { authorId, content }) => {
   const taskExists = await taskRepository.findTaskById(taskId);
 
   if (!taskExists) throw new TaskNotFoundError();
 
   return await commentRepository.createComment({
-    author,
+    authorId,
     content,
-    mentions,
-    task: taskId,
+    taskId,
   });
 };
 
-export const updateComment = async (id, { author, content, mentions }) => {
+export const updateComment = async (id, { content }) => {
   const commentExists = await commentRepository.findCommentById(id);
 
   if (!commentExists) throw new CommentNotFoundError();
 
   return await commentRepository.updateComment(id, {
-    author,
     content,
-    mentions,
   });
 };
 
