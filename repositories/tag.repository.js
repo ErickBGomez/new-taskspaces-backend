@@ -115,3 +115,22 @@ export const unassignTagFromTask = async (id, taskId) => {
 
   return parseTagData(unassignedTagFromTask);
 };
+
+export const findWorkspaceIdByTag = async (tagId) => {
+  const tagFound = await prisma.tag.findFirst({
+    where: {
+      id: parseInt(tagId),
+    },
+    select: {
+      project: {
+        select: {
+          workspace_id: true,
+        },
+      },
+    },
+  });
+
+  if (!tagFound) return null;
+
+  return tagFound.project.workspace_id;
+};

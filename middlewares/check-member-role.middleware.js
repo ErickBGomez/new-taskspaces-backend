@@ -15,6 +15,7 @@ import { ProjectNotFoundError } from '../errors/project.errors.js';
 import { TaskNotFoundError } from '../errors/task.errors.js';
 import { InvalidDepthError } from '../errors/common.errors.js';
 import { ROLES } from './authorize-roles.middleware.js';
+import { findWorkspaceIdFromTag } from '../helpers/tag.helper.js';
 
 export const MEMBER_ROLES = {
   READER: 'READER',
@@ -29,9 +30,10 @@ const MEMBER_ROLES_HIERARCHY = {
 };
 
 export const DEPTH = {
-  TASK: 'task',
-  PROJECT: 'project',
   WORKSPACE: 'workspace',
+  PROJECT: 'project',
+  TASK: 'task',
+  TAG: 'tag',
 };
 
 export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
@@ -45,26 +47,24 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
       // checked by their member roles)
       if (ROLES[role] === ROLES.SYSADMIN) return next();
 
-      let memberRole;
+      let workspaceId;
 
       // TODO: Refactor these lines
       switch (depth) {
         case DEPTH.WORKSPACE: {
           // Obtain either workspaceId or id from path parameters
-          const { workspaceId, id } = req.params;
-          const resolvedWorkspaceId = workspaceId ?? id;
+          const { workspaceId: workspaceIdParams, id } = req.params;
+          const resolvedWorkspaceId = workspaceIdParams ?? id;
 
-          memberRole = await findMemberRole(resolvedWorkspaceId, userId);
+          workspaceId = resolvedWorkspaceId;
+
           break;
         }
         case DEPTH.PROJECT: {
           const { projectId, id } = req.params;
           const resolvedProjectId = projectId ?? id;
 
-          const workspaceId =
-            await findWorkspaceIdFromProject(resolvedProjectId);
-
-          memberRole = await findMemberRole(workspaceId, userId);
+          workspaceId = await findWorkspaceIdFromProject(resolvedProjectId);
 
           break;
         }
@@ -72,15 +72,24 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
           const { taskId, id } = req.params;
           const resolvedTaskId = taskId ?? id;
 
-          const workspaceId = await findWorkspaceIdFromTask(resolvedTaskId);
-
-          memberRole = await findMemberRole(workspaceId, userId);
+          workspaceId = await findWorkspaceIdFromTask(resolvedTaskId);
 
           break;
         }
+        case DEPTH.TAG: {
+          const { tagId, id } = req.params;
+          const resolvedTagId = tagId ?? id;
+
+          workspaceId = await findWorkspaceIdFromTag(resolvedTagId);
+
+          break;
+        }
+
         default:
           throw new InvalidDepthError();
       }
+
+      const memberRole = await findMemberRole(workspaceId, userId);
 
       console.log(memberRole);
 
