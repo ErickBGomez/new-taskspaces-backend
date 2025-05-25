@@ -1,7 +1,7 @@
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
-import * as workspaceService from '../services/workspace.service.js';
-import * as projectHelper from '../helpers/project.helper.js';
-import * as taskHelper from '../helpers/task.helper.js';
+import { findMemberRole } from '../services/workspace.service.js';
+import { findWorkspaceIdFromProject } from '../helpers/project.helper.js';
+import { findWorkspaceIdFromTask } from '../helpers/task.helper.js';
 import {
   InsufficientPrivilegesError,
   UnauthorizedError,
@@ -54,10 +54,7 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
           const { workspaceId, id } = req.params;
           const resolvedWorkspaceId = workspaceId ?? id;
 
-          memberRole = await workspaceService.findMemberRole(
-            resolvedWorkspaceId,
-            userId
-          );
+          memberRole = await findMemberRole(resolvedWorkspaceId, userId);
           break;
         }
         case DEPTH.PROJECT: {
@@ -65,12 +62,9 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
           const resolvedProjectId = projectId ?? id;
 
           const workspaceId =
-            await projectHelper.findWorkspaceIdByProjectId(resolvedProjectId);
+            await findWorkspaceIdFromProject(resolvedProjectId);
 
-          memberRole = await workspaceService.findMemberRole(
-            workspaceId,
-            userId
-          );
+          memberRole = await findMemberRole(workspaceId, userId);
 
           break;
         }
@@ -78,22 +72,17 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
           const { taskId, id } = req.params;
           const resolvedTaskId = taskId ?? id;
 
-          const projectId =
-            await taskHelper.findProjectIdByTaskId(resolvedTaskId);
+          const workspaceId = await findWorkspaceIdFromTask(resolvedTaskId);
 
-          const workspaceId =
-            await projectHelper.findWorkspaceIdByProjectId(projectId);
-
-          memberRole = await workspaceService.findMemberRole(
-            workspaceId,
-            userId
-          );
+          memberRole = await findMemberRole(workspaceId, userId);
 
           break;
         }
         default:
           throw new InvalidDepthError();
       }
+
+      console.log(memberRole);
 
       if (!MEMBER_ROLES[memberRole]) throw new InvalidMemberRoleError();
 

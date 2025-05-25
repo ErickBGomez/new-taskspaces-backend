@@ -1,23 +1,8 @@
-import {
-  findProjectById,
-  findWorkspaceIdByProjectId as test,
-} from '../repositories/project.repository.js';
-import { ProjectNotFoundError } from '../errors/project.errors.js';
+import { findWorkspaceIdByProjectId } from '../repositories/project.repository.js';
 import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
 
-// TODO: Remove this function
-export const findWorkspaceIdByProjectId = async (projectId) => {
-  const project = await findProjectById(projectId);
-
-  if (!project) throw new ProjectNotFoundError();
-
-  if (!project.workspace) throw new WorkspaceNotFoundError();
-
-  return project.workspace;
-};
-
 export const findWorkspaceIdFromProject = async (projectId) => {
-  const workspaceId = await test(projectId);
+  const workspaceId = await findWorkspaceIdByProjectId(projectId);
 
   if (!workspaceId) throw new WorkspaceNotFoundError();
 
