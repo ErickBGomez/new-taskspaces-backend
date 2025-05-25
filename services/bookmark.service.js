@@ -25,15 +25,7 @@ export const findBookmarksByTaskId = async (taskId) => {
 
   if (!taskExists) throw new TaskNotFoundError();
 
-  return await bookmarkRepository.findBookmarkByTaskId(taskId);
-};
-
-export const findBookmarkById = async (id) => {
-  const bookmark = await bookmarkRepository.findBookmarkById(id);
-
-  if (!bookmark) throw new BookmarkNotFoundError();
-
-  return bookmark;
+  return await bookmarkRepository.findBookmarksByTaskId(taskId);
 };
 
 export const findBookmarkByUserIdAndTaskId = async (userId, taskId) => {
@@ -68,10 +60,13 @@ export const createBookmark = async (userId, taskId) => {
   return await bookmarkRepository.createBookmark(userId, taskId);
 };
 
-export const deleteBookmark = async (id) => {
-  const bookmark = await bookmarkRepository.findBookmarkById(id);
+export const deleteBookmark = async (userId, taskId) => {
+  const bookmark = await bookmarkRepository.findBookmarkByUserIdAndTaskId(
+    userId,
+    taskId
+  );
 
   if (!bookmark) throw new BookmarkNotFoundError();
 
-  return await bookmarkRepository.deleteBookmark(id);
+  return await bookmarkRepository.deleteBookmark(userId, taskId);
 };

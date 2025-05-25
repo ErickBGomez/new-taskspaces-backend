@@ -39,17 +39,6 @@ export const findBookmarksByTaskId = async (taskId) => {
   return bookmarks.map((bookmark) => parseBookmarkData(bookmark));
 };
 
-export const findBookmarkById = async (id) => {
-  const bookmark = await prisma.bookmark.findFirst({
-    where: {
-      id: parseInt(id),
-    },
-    select: { ...selectBookmark },
-  });
-
-  return parseBookmarkData(bookmark);
-};
-
 export const findBookmarkByUserIdAndTaskId = async (userId, taskId) => {
   const bookmark = await prisma.bookmark.findFirst({
     where: {
@@ -74,10 +63,13 @@ export const createBookmark = async (userId, taskId) => {
   return parseBookmarkData(bookmark);
 };
 
-export const deleteBookmark = async (id) => {
+export const deleteBookmark = async (userId, taskId) => {
   const bookmark = await prisma.bookmark.delete({
     where: {
-      id: parseInt(id),
+      user_id_task_id: {
+        user_id: parseInt(userId),
+        task_id: parseInt(taskId),
+      },
     },
     select: { ...selectBookmark },
   });

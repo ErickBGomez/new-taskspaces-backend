@@ -26,9 +26,9 @@ export const getAllBookmarks = async (req, res, next) => {
   }
 };
 
-export const getBookmarksByUserId = async (req, res, next) => {
+export const getUserBookmarks = async (req, res, next) => {
   try {
-    const { userId } = req.params;
+    const { id: userId } = req.user;
 
     const bookmarks = await bookmarkService.findBookmarksByUserId(userId);
 
@@ -88,11 +88,15 @@ export const getBookmarksByTaskId = async (req, res, next) => {
   }
 };
 
-export const getBookmarkById = async (req, res, next) => {
+export const getBookmarkByTaskId = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { taskId } = req.params;
+    const { id: userId } = req.user;
 
-    const bookmark = await bookmarkService.findBookmarkById(id);
+    const bookmark = await bookmarkService.findBookmarkByUserIdAndTaskId(
+      userId,
+      taskId
+    );
 
     res
       .status(200)
@@ -119,54 +123,10 @@ export const getBookmarkById = async (req, res, next) => {
   }
 };
 
-export const getBookmarkByUserIdAndTaskId = async (req, res, next) => {
-  try {
-    const { userId, taskId } = req.params;
-
-    const bookmark = await bookmarkService.findBookmarkByUserIdAndTaskId(
-      userId,
-      taskId
-    );
-
-    res
-      .status(200)
-      .json(
-        new SuccessResponseBuilder()
-          .setStatus(200)
-          .setMessage('Bookmark found')
-          .setContent(bookmark)
-          .build()
-      );
-  } catch (error) {
-    if (error instanceof UserNotFoundError)
-      return res
-        .status(404)
-        .json(
-          new ErrorResponseBuilder()
-            .setStatus(404)
-            .setMessage('User not found')
-            .setError(error.message)
-            .build()
-        );
-
-    if (error instanceof TaskNotFoundError)
-      return res
-        .status(404)
-        .json(
-          new ErrorResponseBuilder()
-            .setStatus(404)
-            .setMessage('Task not found')
-            .setError(error.message)
-            .build()
-        );
-
-    next(error);
-  }
-};
-
 export const createBookmark = async (req, res, next) => {
   try {
-    const { userId, taskId } = req.params;
+    const { taskId } = req.params;
+    const { id: userId } = req.user;
 
     const bookmark = await bookmarkService.createBookmark(userId, taskId);
 
@@ -219,9 +179,10 @@ export const createBookmark = async (req, res, next) => {
 
 export const deleteBookmark = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { taskId } = req.params;
+    const { id: userId } = req.user;
 
-    await bookmarkService.deleteBookmark(id);
+    await bookmarkService.deleteBookmark(userId, taskId);
 
     res
       .status(200)

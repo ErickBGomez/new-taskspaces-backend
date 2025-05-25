@@ -17,40 +17,33 @@ const router = Router();
 router.get(
   '/',
   authMiddleware,
+  authorizeRolesMiddleware(ROLES.USER),
+  bookmarkController.getUserBookmarks,
+  handleInternalServerErrorMiddleware
+);
+router.get(
+  '/all',
+  authMiddleware,
   authorizeRolesMiddleware(ROLES.SYSADMIN),
   bookmarkController.getAllBookmarks,
   handleInternalServerErrorMiddleware
 );
 router.get(
-  '/u/:userId',
+  '/all/t/:taskId',
   authMiddleware,
-  authorizeRolesMiddleware(ROLES.USER),
-  bookmarkController.getBookmarksByUserId,
+  authorizeRolesMiddleware(ROLES.SYSADMIN),
+  bookmarkController.getBookmarksByTaskId,
   handleInternalServerErrorMiddleware
 );
 router.get(
   '/t/:taskId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  bookmarkController.getBookmarksByTaskId,
-  handleInternalServerErrorMiddleware
-);
-router.get(
-  '/:id',
-  authMiddleware,
-  authorizeRolesMiddleware(ROLES.USER),
-  bookmarkController.getBookmarkById,
-  handleInternalServerErrorMiddleware
-);
-router.get(
-  '/u/:userId/t/:taskId',
-  authMiddleware,
-  authorizeRolesMiddleware(ROLES.USER),
-  bookmarkController.getBookmarkByUserIdAndTaskId,
+  bookmarkController.getBookmarkByTaskId,
   handleInternalServerErrorMiddleware
 );
 router.post(
-  '/u/:userId/t/:taskId',
+  '/t/:taskId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
@@ -58,7 +51,7 @@ router.post(
   handleInternalServerErrorMiddleware
 );
 router.delete(
-  '/:id',
+  '/t/:taskId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   bookmarkController.deleteBookmark,
