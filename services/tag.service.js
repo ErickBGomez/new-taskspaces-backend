@@ -33,16 +33,18 @@ export const findTagsByTaskId = async (taskId) => {
   return await tagRepository.findTagsByTaskId(taskId);
 };
 
-export const createTag = async (projectId, { title, color }) => {
+export const createTag = async ({ title, color }, projectId) => {
   const projectExists = await projectRepository.findProjectById(projectId);
 
   if (!projectExists) throw new ProjectNotFoundError();
 
-  return await tagRepository.createTag({
-    title,
-    color,
-    project: projectId,
-  });
+  return await tagRepository.createTag(
+    {
+      title,
+      color,
+    },
+    projectId
+  );
 };
 
 export const updateTag = async (id, { title, color }) => {

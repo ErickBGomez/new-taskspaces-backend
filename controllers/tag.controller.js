@@ -152,10 +152,13 @@ export const createTag = async (req, res) => {
     const { title, color } = req.body;
     const { projectId } = req.params;
 
-    const tag = await tagService.createTag(projectId, {
-      title,
-      color,
-    });
+    const tag = await tagService.createTag(
+      {
+        title,
+        color,
+      },
+      projectId
+    );
 
     res
       .status(201)

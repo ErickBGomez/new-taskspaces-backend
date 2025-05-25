@@ -1,51 +1,117 @@
-import Tag from '../models/tag.model.js';
-import Task from '../models/task.model.js';
+import { parseTagData } from '../helpers/tag.helper.js';
+import prisma from '../utils/prisma.js';
+
+const selectTag = {
+  id: true,
+  title: true,
+  color: true,
+  created_at: true,
+  updated_at: true,
+};
 
 export const findAllTags = async () => {
-  return await Tag.find();
+  const tags = await prisma.tag.findMany({ select: { ...selectTag } });
+
+  return tags.map((tag) => parseTagData(tag));
 };
 
 export const findTagsByProjectId = async (projectId) => {
-  return await Tag.find({ project: projectId });
+  const tags = await prisma.tag.findMany({
+    where: {
+      project_id: parseInt(projectId),
+    },
+    select: { ...selectTag },
+  });
+
+  return tags.map((tag) => parseTagData(tag));
 };
 
 export const findTagById = async (id) => {
-  return await Tag.findById(id);
+  const tag = await prisma.tag.findFirst({
+    where: {
+      id: parseInt(id),
+    },
+    select: { ...selectTag },
+  });
+
+  return parseTagData(tag);
 };
 
+// TODO: Check this
 export const findTagsByTaskId = async (taskId) => {
-  const task = await Task.findById(taskId).populate('tags');
-  return task?.tags;
+  const tags = await prisma.tag.findMany({
+    where: {
+      task_id: parseInt(taskId),
+    },
+    select: { ...selectTag },
+  });
+
+  return tags.map((tag) => parseTagData(tag));
 };
 
-export const createTag = async (tag) => {
-  return await Tag.create(tag);
+export const createTag = async (tag, projectId) => {
+  const createdTag = await prisma.tag.create({
+    data: {
+      ...tag,
+      project_id: parseInt(projectId),
+    },
+    select: { ...selectTag },
+  });
+
+  return parseTagData(createdTag);
 };
 
 export const updateTag = async (id, tag) => {
-  return await Tag.findByIdAndUpdate(id, tag, {
-    new: true,
+  const updatedTag = await prisma.tag.update({
+    where: {
+      id: parseInt(id),
+    },
+    data: {
+      ...tag,
+    },
+    select: { ...selectTag },
   });
+
+  return parseTagData(updatedTag);
 };
 
 export const deleteTag = async (id) => {
-  // Also delete the tag from all tasks
-  await Task.updateMany({ tags: id }, { $pull: { tags: id } });
-  return await Tag.findByIdAndDelete(id);
+  const deletedTag = await prisma.tag.delete({
+    where: {
+      id: parseInt(id),
+    },
+    select: { ...selectTag },
+  });
+
+  return parseTagData(deletedTag);
 };
 
 export const assignTagToTask = async (id, taskId) => {
-  return await Task.findByIdAndUpdate(
-    taskId,
-    { $push: { tags: id } },
-    { new: true }
-  );
+  const assignedTagToTask = await prisma.task_tag.create({
+    data: {
+      task_id: parseInt(taskId),
+      tag_id: parseInt(id),
+    },
+    select: {
+      tag: {
+        select: { ...selectTag },
+      },
+    },
+  });
+
+  return parseTagData(assignedTagToTask.tag);
 };
 
 export const unassignTagFromTask = async (id, taskId) => {
-  return await Task.findByIdAndUpdate(
-    taskId,
-    { $pull: { tags: id } },
-    { new: true }
-  );
+  const unassignedTagFromTask = await prisma.task_tag.delete({
+    where: {
+      task_id_tag_id: {
+        task_id: parseInt(taskId),
+        tag_id: parseInt(id),
+      },
+    },
+    select: { ...selectTag },
+  });
+
+  return parseTagData(unassignedTagFromTask);
 };
