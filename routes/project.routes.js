@@ -32,10 +32,10 @@ router.get(
   projectController.getProjectsByWorkspaceId
 );
 router.get(
-  '/:id/w/:workspaceId',
+  '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.WORKSPACE),
+  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.PROJECT),
   projectController.getProjectById
 );
 router.post(
@@ -48,19 +48,19 @@ router.post(
   projectController.createProject
 );
 router.put(
-  '/:id/w/:workspaceId',
+  '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.WORKSPACE),
+  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.PROJECT),
   updateProjectValidator,
   checkValidation,
   projectController.updateProject
 );
 router.delete(
-  '/:id/w/:workspaceId',
+  '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, DEPTH.WORKSPACE),
+  checkMemberRoleMiddleware(MEMBER_ROLES.ADMIN, DEPTH.PROJECT),
   projectController.deleteProject
 );
 

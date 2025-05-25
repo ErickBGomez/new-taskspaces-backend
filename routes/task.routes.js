@@ -32,10 +32,10 @@ router.get(
   taskController.getTasksByProjectId
 );
 router.get(
-  '/:id/p/:projectId',
+  '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.PROJECT),
+  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.TASK),
   taskController.getTaskById
 );
 router.post(
@@ -48,7 +48,7 @@ router.post(
   taskController.createTask
 );
 router.put(
-  '/:id/p/:projectId',
+  '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
@@ -57,7 +57,7 @@ router.put(
   taskController.updateTask
 );
 router.delete(
-  '/:id/p/:projectId',
+  '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
