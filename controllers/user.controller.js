@@ -9,7 +9,7 @@ import SuccessResponseBuilder from '../helpers/success-response-builder.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import { ROLES } from '../middlewares/authorize-roles.middleware.js';
 
-export const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res, next) => {
   try {
     const users = await userService.findAllUsers();
 
@@ -23,20 +23,11 @@ export const getAllUsers = async (req, res) => {
           .build()
       );
   } catch (error) {
-    // TODO: Create handle internal server error middleware, instead of repeating this code
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const getUserById = async (req, res) => {
+export const getUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -63,19 +54,11 @@ export const getUserById = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const registerUser = async (req, res) => {
+export const registerUser = async (req, res, next) => {
   try {
     const { fullname, username, avatar, email, password, confirmPassword } =
       req.body;
@@ -118,19 +101,11 @@ export const registerUser = async (req, res) => {
           .build()
       );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const loginUser = async (req, res) => {
+export const loginUser = async (req, res, next) => {
   try {
     // TODO: Login with email OR username
     const { email, password } = req.body;
@@ -158,19 +133,11 @@ export const loginUser = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const forgotPassword = async (req, res) => {
+export const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
 
@@ -196,19 +163,11 @@ export const forgotPassword = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const updateUser = async (req, res) => {
+export const updateUser = async (req, res, next) => {
   try {
     const { id: userId, role } = req.user;
     const { id } = req.params;
@@ -245,19 +204,11 @@ export const updateUser = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const updatePassword = async (req, res) => {
+export const updatePassword = async (req, res, next) => {
   try {
     const { id: userId, role } = req.user;
     const { id } = req.params;
@@ -288,19 +239,11 @@ export const updatePassword = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };
 
-export const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res, next) => {
   try {
     const { id: userId, role } = req.user;
     const { id } = req.params;
@@ -330,14 +273,6 @@ export const deleteUser = async (req, res) => {
             .build()
         );
 
-    res
-      .status(500)
-      .json(
-        new ErrorResponseBuilder()
-          .setStatus(500)
-          .setMessage('Internal server error')
-          .setError(error.message)
-          .build()
-      );
+    next(error);
   }
 };

@@ -7,6 +7,7 @@ import {
 import { registerUserValidator } from '../validators/user.validator.js';
 import checkValidation from '../middlewares/validator.middleware.js';
 import * as userController from '../controllers/user.controller.js';
+import handleInternalServerErrorMiddleware from '../middlewares/internal-server-error.middleware.js';
 
 /*
   I've considered separating the actions into an admin-only method and a user-only method
@@ -21,39 +22,53 @@ router.get(
   '/',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.SYSADMIN),
-  userController.getAllUsers
+  userController.getAllUsers,
+  handleInternalServerErrorMiddleware
 );
 router.get(
   '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  userController.getUserById
+  userController.getUserById,
+  handleInternalServerErrorMiddleware
 );
 router.post(
   '/register',
   registerUserValidator,
   checkValidation,
-  userController.registerUser
+  userController.registerUser,
+  handleInternalServerErrorMiddleware
 );
-router.post('/login', userController.loginUser);
-router.post('/forgot-password', userController.forgotPassword);
+router.post(
+  '/login',
+  userController.loginUser,
+  handleInternalServerErrorMiddleware
+);
+router.post(
+  '/forgot-password',
+  userController.forgotPassword,
+  handleInternalServerErrorMiddleware
+);
 router.put(
   '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  userController.updateUser
+  userController.updateUser,
+  handleInternalServerErrorMiddleware
 );
 router.put(
   '/:id/password',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  userController.updatePassword
+  userController.updatePassword,
+  handleInternalServerErrorMiddleware
 );
 router.delete(
   '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  userController.deleteUser
+  userController.deleteUser,
+  handleInternalServerErrorMiddleware
 );
 
 export default router;

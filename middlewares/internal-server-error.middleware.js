@@ -1,6 +1,6 @@
-import ErrorResponseBuilder from '../helpers/error-response-builder';
+import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 
-export const handleInternalServerError = (err, req, res, next) => {
+const handleInternalServerErrorMiddleware = (err, req, res, next) => {
   res
     .status(500)
     .json(
@@ -13,3 +13,5 @@ export const handleInternalServerError = (err, req, res, next) => {
 
   next(err);
 };
+
+export default handleInternalServerErrorMiddleware;
