@@ -1,4 +1,4 @@
-import { parseTaskData } from './task.helper';
+import { parseTaskData } from './task.helper.js';
 
 export const parseBookmarkData = (bookmark) => {
   if (!bookmark) return null;

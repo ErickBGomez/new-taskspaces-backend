@@ -1,11 +1,11 @@
 import {
   BookmarkAlreadyExists,
   BookmarkNotFoundError,
-} from '../errors/bookmark.errors';
-import { TaskNotFoundError } from '../errors/task.errors';
-import { UserNotFoundError } from '../errors/user.errors';
-import ErrorResponseBuilder from '../helpers/error-response-builder';
-import SuccessResponseBuilder from '../helpers/success-response-builder';
+} from '../errors/bookmark.errors.js';
+import { TaskNotFoundError } from '../errors/task.errors.js';
+import { UserNotFoundError } from '../errors/user.errors.js';
+import ErrorResponseBuilder from '../helpers/error-response-builder.js';
+import SuccessResponseBuilder from '../helpers/success-response-builder.js';
 import * as bookmarkService from '../services/bookmark.service.js';
 
 export const getAllBookmarks = async (req, res, next) => {

@@ -2,7 +2,7 @@ import {
   BookmarkAlreadyExists,
   BookmarkNotFoundError,
 } from '../errors/bookmark.errors.js';
-import { UserNotFoundError } from '../errors/user.errors';
+import { UserNotFoundError } from '../errors/user.errors.js';
 import * as bookmarkRepository from '../repositories/bookmark.repository.js';
 import * as userRepository from '../repositories/user.repository.js';
 import * as taskRepository from '../repositories/task.repository.js';

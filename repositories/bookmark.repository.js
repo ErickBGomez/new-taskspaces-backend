@@ -1,6 +1,6 @@
 import prisma from '../utils/prisma.js';
-import { parseBookmarkData } from '../helpers/bookmark.helper';
-import { selectTask } from './task.repository';
+import { parseBookmarkData } from '../helpers/bookmark.helper.js';
+import { selectTask } from './task.repository.js';
 
 const selectBookmark = {
   created_at: true,
