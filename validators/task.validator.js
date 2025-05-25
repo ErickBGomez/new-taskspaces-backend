@@ -15,8 +15,8 @@ export const createTaskValidator = [
     .optional()
     .isString()
     .withMessage('Status must be a string')
-    .isIn(['pending', 'doing', 'done'])
-    .withMessage('Status must be one of the following: pending, doing, done'),
+    .isIn(['PENDING', 'DOING', 'DONE'])
+    .withMessage('Status must be one of the following: PENDING, DOING, DONE'),
   body('tags')
     .optional()
     .isArray()
@@ -55,8 +55,8 @@ export const updateTaskValidator = [
     .optional()
     .isString()
     .withMessage('Status must be a string')
-    .isIn(['pending', 'doing', 'done'])
-    .withMessage('Status must be one of the following: pending, doing, done'),
+    .isIn(['PENDING', 'DOING', 'DONE'])
+    .withMessage('Status must be one of the following: PENDING, DOING, DONE'),
   body('date')
     .optional()
     .isISO8601()
