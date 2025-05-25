@@ -85,12 +85,10 @@ export const findProjectByTitle = async (title, workspaceId) => {
   return parseProjectData(project);
 };
 
-export const createProject = async (project) => {
-  const { workspaceId, ...projectData } = project;
-
+export const createProject = async (project, workspaceId) => {
   const createdProject = await prisma.project.create({
     data: {
-      ...projectData,
+      ...project,
       workspace_id: parseInt(workspaceId),
     },
     select: {

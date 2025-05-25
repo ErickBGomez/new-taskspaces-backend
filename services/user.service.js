@@ -89,10 +89,7 @@ export const loginUser = async ({ email, password }) => {
   };
 };
 
-export const updateUser = async (
-  id,
-  { fullname, username, avatar, email, description }
-) => {
+export const updateUser = async (id, { fullname, username, avatar, email }) => {
   const userExists = await userRepository.findUserById(id);
 
   if (!userExists) throw new UserNotFoundError();
@@ -102,7 +99,6 @@ export const updateUser = async (
     username,
     avatar,
     email,
-    description,
   });
 };
 

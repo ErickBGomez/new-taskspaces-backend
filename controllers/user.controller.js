@@ -212,7 +212,7 @@ export const updateUser = async (req, res) => {
   try {
     const { id: userId, role } = req.user;
     const { id } = req.params;
-    const { fullname, username, avatar, email, description } = req.body;
+    const { fullname, username, avatar, email } = req.body;
 
     // User role can update only their own data. Sysadmin can update any user
     if (role !== ROLES.SYSADMIN && userId !== id) throw new UserNotFoundError();
@@ -222,7 +222,6 @@ export const updateUser = async (req, res) => {
       username,
       avatar,
       email,
-      description,
     });
 
     res

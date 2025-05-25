@@ -23,16 +23,12 @@ export const findCommentById = async (id) => {
   return comment;
 };
 
-export const createComment = async (taskId, { authorId, content }) => {
+export const createComment = async ({ content }, authorId, taskId) => {
   const taskExists = await taskRepository.findTaskById(taskId);
 
   if (!taskExists) throw new TaskNotFoundError();
 
-  return await commentRepository.createComment({
-    authorId,
-    content,
-    taskId,
-  });
+  return await commentRepository.createComment({ content }, authorId, taskId);
 };
 
 export const updateComment = async (id, { content }) => {
@@ -40,9 +36,7 @@ export const updateComment = async (id, { content }) => {
 
   if (!commentExists) throw new CommentNotFoundError();
 
-  return await commentRepository.updateComment(id, {
-    content,
-  });
+  return await commentRepository.updateComment(id, { content });
 };
 
 export const deleteComment = async (id) => {

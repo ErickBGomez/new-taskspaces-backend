@@ -158,12 +158,12 @@ export const checkWorkspaceAvailability = async (req, res) => {
 export const createWorkspace = async (req, res) => {
   try {
     const { title } = req.body;
-    const { id: userId, username } = req.user;
+    const { id: ownerId, username } = req.user;
 
-    const workspace = await workspaceService.createWorkspace({
-      title,
-      ownerId: userId,
-    });
+    const workspace = await workspaceService.createWorkspace(
+      { title },
+      ownerId
+    );
 
     // Self invite the owner as admin
     await workspaceService.inviteMember(workspace.id, username, 'ADMIN');

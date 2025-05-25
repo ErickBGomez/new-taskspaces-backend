@@ -88,8 +88,8 @@ export const findTaskByIdAndProjectId = async (id, projectId) => {
   return parseTaskData(task);
 };
 
-export const createTask = async (task) => {
-  const { status, projectId, ...taskData } = task;
+export const createTask = async (task, projectId) => {
+  const { status, ...taskData } = task;
 
   const createdTask = await prisma.task.create({
     data: {

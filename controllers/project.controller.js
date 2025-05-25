@@ -119,10 +119,13 @@ export const createProject = async (req, res) => {
     const { workspaceId } = req.params;
     const { title, icon } = req.body;
 
-    const project = await projectService.createProject(workspaceId, {
-      title,
-      icon,
-    });
+    const project = await projectService.createProject(
+      {
+        title,
+        icon,
+      },
+      workspaceId
+    );
 
     res
       .status(201)

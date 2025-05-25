@@ -49,12 +49,10 @@ export const findCommentById = async (id) => {
 // TODO: refactor how payload data and ids are being passed
 // Request body should be in the first argument (like content)
 // The rest of arguments should be ids (like authorId, taskId)
-export const createComment = async (comment) => {
-  const { authorId, taskId, ...commentData } = comment;
-
+export const createComment = async (comment, authorId, taskId) => {
   const createdComment = await prisma.comment.create({
     data: {
-      ...commentData,
+      ...comment,
       author_id: parseInt(authorId),
       task_id: parseInt(taskId),
     },

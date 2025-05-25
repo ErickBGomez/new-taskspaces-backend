@@ -111,10 +111,11 @@ export const createComment = async (req, res) => {
     const { content } = req.body;
     const authorId = req.user.id;
 
-    const comment = await commentService.createComment(taskId, {
+    const comment = await commentService.createComment(
+      { content },
       authorId,
-      content,
-    });
+      taskId
+    );
 
     res
       .status(201)
@@ -154,9 +155,7 @@ export const updateComment = async (req, res) => {
     const { id } = req.params;
     const { content } = req.body;
 
-    const comment = await commentService.updateComment(id, {
-      content,
-    });
+    const comment = await commentService.updateComment(id, { content });
 
     res
       .status(200)

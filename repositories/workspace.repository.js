@@ -71,11 +71,11 @@ export const findWorkspacesByOwnerId = async (ownerId) => {
   return workspaces.map((workspace) => parseWorkspaceData(workspace));
 };
 
-export const createWorkspace = async (workspace) => {
+export const createWorkspace = async (workspace, ownerId) => {
   const createdWorkspace = await prisma.workspace.create({
     data: {
-      title: workspace.title,
-      owner_id: parseInt(workspace.ownerId),
+      ...workspace,
+      owner_id: parseInt(ownerId),
     },
     select: { ...selectWorkspace },
   });
@@ -88,9 +88,7 @@ export const updateWorkspace = async (id, workspace) => {
     where: {
       id: parseInt(id),
     },
-    data: {
-      title: workspace.title,
-    },
+    data: { ...workspace },
     select: { ...selectWorkspace },
   });
 

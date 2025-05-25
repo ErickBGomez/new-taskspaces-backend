@@ -116,13 +116,16 @@ export const createTask = async (req, res) => {
     const { projectId } = req.params;
     const { title, description, status, date, timer } = req.body;
 
-    const task = await taskService.createTask(projectId, {
-      title,
-      description,
-      status,
-      date,
-      timer,
-    });
+    const task = await taskService.createTask(
+      {
+        title,
+        description,
+        status,
+        date,
+        timer,
+      },
+      projectId
+    );
 
     res
       .status(201)
