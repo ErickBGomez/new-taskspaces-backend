@@ -2,7 +2,7 @@ import { parseTaskData } from '../helpers/task.helper.js';
 import prisma from '../utils/prisma.js';
 import { STATUS_STRING_TO_INT } from '../utils/task.utils.js';
 
-const selectTask = {
+export const selectTask = {
   id: true,
   title: true,
   description: true,
