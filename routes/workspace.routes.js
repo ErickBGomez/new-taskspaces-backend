@@ -28,6 +28,13 @@ router.get(
   handleInternalServerErrorMiddleware
 );
 router.get(
+  '/shared',
+  authMiddleware,
+  authorizeRolesMiddleware(ROLES.USER),
+  workspaceController.getSharedWorkspaces,
+  handleInternalServerErrorMiddleware
+);
+router.get(
   '/',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.SYSADMIN),
