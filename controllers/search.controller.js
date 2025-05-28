@@ -7,7 +7,7 @@ export const searchAll = async (req, res, next) => {
     const { query, model } = req.query;
     const { role, id: userId } = req.user;
 
-    const isAdmin = role === ROLES[role];
+    const isAdmin = ROLES[role] === ROLES.SYSADMIN;
 
     let results;
 
