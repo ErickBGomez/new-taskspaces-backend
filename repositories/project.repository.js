@@ -1,7 +1,7 @@
 import { parseProjectData } from '../helpers/project.helper.js';
 import prisma from '../utils/prisma.js';
 
-const selectProject = {
+export const selectProject = {
   id: true,
   title: true,
   icon: true,
