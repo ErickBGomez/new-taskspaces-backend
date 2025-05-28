@@ -52,8 +52,6 @@ export const createWorkspace = async ({ title }, ownerId) => {
   const workspaceExists =
     await workspaceRepository.findWorkspaceByTitleAndOwnerId(title, ownerId);
 
-  console.log(workspaceExists);
-
   if (workspaceExists) throw new WorkspaceAlreadyExistsError();
 
   return await workspaceRepository.createWorkspace({ title }, ownerId);
