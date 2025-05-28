@@ -1,15 +1,17 @@
 import { parseProjectData } from '../helpers/project.helper.js';
 import prisma from '../utils/prisma.js';
 
+const selectProject = {
+  id: true,
+  title: true,
+  icon: true,
+  created_at: true,
+  updated_at: true,
+};
+
 export const findAllProjects = async () => {
   const projects = await prisma.project.findMany({
-    select: {
-      id: true,
-      title: true,
-      icon: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectProject },
   });
 
   return projects.map((project) => parseProjectData(project));
@@ -20,13 +22,7 @@ export const findProjectsByWorkspaceId = async (workspaceId) => {
     where: {
       workspace_id: parseInt(workspaceId),
     },
-    select: {
-      id: true,
-      title: true,
-      icon: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectProject },
   });
 
   return projects.map((project) => parseProjectData(project));
@@ -37,13 +33,7 @@ export const findProjectById = async (id) => {
     where: {
       id: parseInt(id),
     },
-    select: {
-      id: true,
-      title: true,
-      icon: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectProject },
   });
 
   return parseProjectData(project);
@@ -55,13 +45,7 @@ export const findProjectByIdAndWorkspaceId = async (id, workspaceId) => {
       id: parseInt(id),
       workspace_id: parseInt(workspaceId),
     },
-    select: {
-      id: true,
-      title: true,
-      icon: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectProject },
   });
 
   return parseProjectData(project);
@@ -73,13 +57,7 @@ export const findProjectByTitle = async (title, workspaceId) => {
       title,
       workspace_id: parseInt(workspaceId),
     },
-    select: {
-      id: true,
-      title: true,
-      icon: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectProject },
   });
 
   return parseProjectData(project);
@@ -91,13 +69,7 @@ export const createProject = async (project, workspaceId) => {
       ...project,
       workspace_id: parseInt(workspaceId),
     },
-    select: {
-      id: true,
-      title: true,
-      icon: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectProject },
   });
 
   return parseProjectData(createdProject);
@@ -111,13 +83,7 @@ export const updateProject = async (id, project) => {
     data: {
       ...project,
     },
-    select: {
-      id: true,
-      title: true,
-      icon: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectProject },
   });
 
   return parseProjectData(updatedProject);
@@ -128,13 +94,7 @@ export const deleteProject = async (id) => {
     where: {
       id: parseInt(id),
     },
-    select: {
-      id: true,
-      title: true,
-      icon: true,
-      created_at: true,
-      updated_at: true,
-    },
+    select: { ...selectProject },
   });
 
   return parseProjectData(deletedProject);
