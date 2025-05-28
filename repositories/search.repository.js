@@ -8,79 +8,50 @@ import { parseProjectData } from '../helpers/project.helper.js';
 import { parseTaskData } from '../helpers/task.helper.js';
 import { parseUserData } from '../helpers/user.helper.js';
 
-export const searchAllAdmin = async (query) => {
+// TODO: Include shared workspaces in search results
+export const searchWorkspaces = async (query, admin = false, userId = null) => {
+  const condition = { title: { contains: query, mode: 'insensitive' } };
+
+  // Search workspaces owned by the user only when user is not an admin
+  if (!admin) condition.owner_id = parseInt(userId);
+
   const workspaces = await prisma.workspace.findMany({
-    where: {
-      title: { contains: query, mode: 'insensitive' },
-    },
+    where: { ...condition },
     select: { ...selectWorkspace },
   });
 
-  const projects = await prisma.project.findMany({
-    where: {
-      title: { contains: query, mode: 'insensitive' },
-    },
-    select: { ...selectProject },
-  });
-
-  const tasks = await prisma.task.findMany({
-    where: {
-      title: { contains: query, mode: 'insensitive' },
-    },
-    select: { ...selectTask },
-  });
-
-  const users = await prisma.user_app.findMany({
-    where: {
-      OR: [
-        { fullname: { contains: query, mode: 'insensitive' } },
-        { username: { contains: query, mode: 'insensitive' } },
-        { email: { contains: query, mode: 'insensitive' } },
-      ],
-    },
-    select: { ...selectUser },
-  });
-
-  return {
-    workspaces: workspaces.map((workspace) => parseWorkspaceData(workspace)),
-    projects: projects.map((project) => parseProjectData(project)),
-    tasks: tasks.map((task) => parseTaskData(task)),
-    users: users.map((user) => parseUserData(user)),
-  };
+  return workspaces.map((workspace) => parseWorkspaceData(workspace));
 };
 
-// Add shared workspaces
-export const searchAll = async (query, userId) => {
-  const workspaces = await prisma.workspace.findMany({
-    where: {
-      title: { contains: query, mode: 'insensitive' },
-      owner_id: parseInt(userId),
-    },
-    select: { ...selectWorkspace },
-  });
+export const searchProjects = async (query, admin = false, userId = null) => {
+  const condition = { title: { contains: query, mode: 'insensitive' } };
+
+  // Search projects what are owned by the user only when user is not an admin
+  if (!admin) condition.workspace = { owner_id: parseInt(userId) };
 
   const projects = await prisma.project.findMany({
-    where: {
-      title: { contains: query, mode: 'insensitive' },
-      workspace: {
-        owner_id: parseInt(userId),
-      },
-    },
+    where: { ...condition },
     select: { ...selectProject },
   });
 
+  return projects.map((project) => parseProjectData(project));
+};
+
+export const searchTasks = async (query, admin = false, userId = null) => {
+  const condition = { title: { contains: query, mode: 'insensitive' } };
+
+  // Search tasks what are owned by the user only when user is not an admin
+  if (!admin) condition.project = { workspace: { owner_id: parseInt(userId) } };
+
   const tasks = await prisma.task.findMany({
-    where: {
-      title: { contains: query, mode: 'insensitive' },
-      project: {
-        workspace: {
-          owner_id: parseInt(userId),
-        },
-      },
-    },
+    where: { ...condition },
     select: { ...selectTask },
   });
 
+  return tasks.map((task) => parseTaskData(task));
+};
+
+export const searchUsers = async (query) => {
   const users = await prisma.user_app.findMany({
     where: {
       OR: [
@@ -92,10 +63,22 @@ export const searchAll = async (query, userId) => {
     select: { ...selectUser },
   });
 
+  return users.map((user) => parseUserData(user));
+};
+
+export const searchAll = async (query, admin, userId) => {
+  const workspaces = await searchWorkspaces(query, admin, userId);
+
+  const projects = await searchProjects(query, admin, userId);
+
+  const tasks = await searchTasks(query, admin, userId);
+
+  const users = await searchUsers(query);
+
   return {
-    workspaces: workspaces.map((workspace) => parseWorkspaceData(workspace)),
-    projects: projects.map((project) => parseProjectData(project)),
-    tasks: tasks.map((task) => parseTaskData(task)),
-    users: users.map((user) => parseUserData(user)),
+    workspaces,
+    projects,
+    tasks,
+    users,
   };
 };
