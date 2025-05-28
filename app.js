@@ -7,6 +7,7 @@ import workspaceRoutes from './routes/workspace.routes.js';
 import commentRoutes from './routes/comment.routes.js';
 import tagRoutes from './routes/tag.routes.js';
 import bookmarkRoutes from './routes/bookmark.routes.js';
+import searchRoutes from './routes/search.routes.js';
 import authRoutes from './routes/auth.routes.js';
 
 const app = express();
@@ -28,6 +29,7 @@ app.use(`${apiPrefix}/workspaces`, workspaceRoutes);
 app.use(`${apiPrefix}/comments`, commentRoutes);
 app.use(`${apiPrefix}/tags`, tagRoutes);
 app.use(`${apiPrefix}/bookmarks`, bookmarkRoutes);
+app.use(`${apiPrefix}/search`, searchRoutes);
 app.use(`${apiPrefix}/auth`, authRoutes);
 
 export default app;
