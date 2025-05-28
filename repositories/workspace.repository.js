@@ -71,6 +71,23 @@ export const findWorkspacesByOwnerId = async (ownerId) => {
   return workspaces.map((workspace) => parseWorkspaceData(workspace));
 };
 
+export const findSharedWorkspacesByUserId = async (userId) => {
+  const sharedWorkspaces = await prisma.workspace_member.findMany({
+    where: {
+      user_id: parseInt(userId),
+    },
+    select: {
+      workspace: {
+        select: { ...selectWorkspace },
+      },
+    },
+  });
+
+  return sharedWorkspaces.map((workspace) =>
+    parseWorkspaceData(workspace.workspace)
+  );
+};
+
 export const createWorkspace = async (workspace, ownerId) => {
   const createdWorkspace = await prisma.workspace.create({
     data: {

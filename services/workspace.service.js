@@ -40,6 +40,14 @@ export const checkWorkspaceAvailability = async (title, userId) => {
   return { available: Boolean(!workspace) };
 };
 
+export const findSharedWorkspacesByUserId = async (userId) => {
+  const userExists = await userRepository.findUserById(userId);
+
+  if (!userExists) throw new UserNotFoundError();
+
+  return await workspaceRepository.findSharedWorkspacesByUserId(userId);
+};
+
 export const createWorkspace = async ({ title }, ownerId) => {
   const workspaceExists =
     await workspaceRepository.findWorkspaceByTitleAndOwnerId(title, ownerId);

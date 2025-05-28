@@ -123,6 +123,38 @@ export const checkWorkspaceAvailability = async (req, res, next) => {
   }
 };
 
+export const getSharedWorkspaces = async (req, res, next) => {
+  try {
+    const { id: userId } = req.user;
+
+    const workspaces =
+      await workspaceService.findSharedWorkspacesByUserId(userId);
+
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Shared workspaces found')
+          .setContent(workspaces)
+          .build()
+      );
+  } catch (error) {
+    if (error instanceof UserNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('User not found')
+            .setError(error.message)
+            .build()
+        );
+
+    next(error);
+  }
+};
+
 export const createWorkspace = async (req, res, next) => {
   try {
     const { title } = req.body;
