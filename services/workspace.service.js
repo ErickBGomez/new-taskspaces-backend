@@ -42,17 +42,13 @@ export const checkWorkspaceAvailability = async (title, userId) => {
 
 export const createWorkspace = async ({ title }, ownerId) => {
   const workspaceExists =
-    await workspaceRepository.findWorkspaceByTitleAndOwnerId(
-      { title },
-      ownerId
-    );
+    await workspaceRepository.findWorkspaceByTitleAndOwnerId(title, ownerId);
+
+  console.log(workspaceExists);
 
   if (workspaceExists) throw new WorkspaceAlreadyExistsError();
 
-  return await workspaceRepository.createWorkspace({
-    title,
-    ownerId,
-  });
+  return await workspaceRepository.createWorkspace({ title }, ownerId);
 };
 
 export const updateWorkspace = async (id, { title }) => {
