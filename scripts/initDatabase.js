@@ -8,13 +8,13 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-function askQuestion(query) {
+const askQuestion = (query) => {
   return new Promise((resolve) =>
     rl.question(chalk.yellow(query), (ans) => resolve(ans.trim().toLowerCase()))
   );
-}
+};
 
-function runCommand(command) {
+const runCommand = (command) => {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
       if (error) {
@@ -24,7 +24,7 @@ function runCommand(command) {
       }
     });
   });
-}
+};
 
 async function checkAndPopulateTable(tableName, valuesArray) {
   console.log(chalk.gray(`  - Populating table: ${tableName}...`));
