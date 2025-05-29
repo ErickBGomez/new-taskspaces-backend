@@ -18,6 +18,7 @@ const parseDatabaseUrl = (databaseUrl) => {
       password: url.password,
       database: url.pathname.slice(1), // Remove leading '/'
     };
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
     throw new Error('Invalid DATABASE_URL format');
   }

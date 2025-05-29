@@ -24,6 +24,7 @@ const displayHeader = () => {
       console.log(chalk.gray(`  Port: ${url.port || 5432}`));
       console.log(chalk.gray(`  Database: ${url.pathname.slice(1)}`));
       console.log(chalk.gray(`  User: ${url.username}\n`));
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
       console.log(
         chalk.yellow('⚠ DATABASE_URL found but format appears invalid\n')
