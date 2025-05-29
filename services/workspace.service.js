@@ -40,19 +40,21 @@ export const checkWorkspaceAvailability = async (title, userId) => {
   return { available: Boolean(!workspace) };
 };
 
+export const findSharedWorkspacesByUserId = async (userId) => {
+  const userExists = await userRepository.findUserById(userId);
+
+  if (!userExists) throw new UserNotFoundError();
+
+  return await workspaceRepository.findSharedWorkspacesByUserId(userId);
+};
+
 export const createWorkspace = async ({ title }, ownerId) => {
   const workspaceExists =
-    await workspaceRepository.findWorkspaceByTitleAndOwnerId(
-      { title },
-      ownerId
-    );
+    await workspaceRepository.findWorkspaceByTitleAndOwnerId(title, ownerId);
 
   if (workspaceExists) throw new WorkspaceAlreadyExistsError();
 
-  return await workspaceRepository.createWorkspace({
-    title,
-    ownerId,
-  });
+  return await workspaceRepository.createWorkspace({ title }, ownerId);
 };
 
 export const updateWorkspace = async (id, { title }) => {

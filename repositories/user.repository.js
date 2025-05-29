@@ -2,7 +2,7 @@ import { parseUserData } from '../helpers/user.helper.js';
 import prisma from '../utils/prisma.js';
 import { ROLE_STRING_TO_INT } from '../utils/user.utils.js';
 
-const selectUser = {
+export const selectUser = {
   id: true,
   fullname: true,
   username: true,

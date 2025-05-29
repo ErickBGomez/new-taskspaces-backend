@@ -5,7 +5,7 @@ import {
 import prisma from '../utils/prisma.js';
 import { MEMBER_ROLE_STRING_TO_INT } from '../utils/workspace.utils.js';
 
-const selectWorkspace = {
+export const selectWorkspace = {
   id: true,
   title: true,
   created_at: true,
@@ -69,6 +69,29 @@ export const findWorkspacesByOwnerId = async (ownerId) => {
   });
 
   return workspaces.map((workspace) => parseWorkspaceData(workspace));
+};
+
+export const findSharedWorkspacesByUserId = async (userId) => {
+  const workspaces = await prisma.workspace_member.findMany({
+    where: {
+      user_id: parseInt(userId),
+    },
+    select: {
+      workspace: {
+        select: { ...selectWorkspace, owner_id: true },
+      },
+    },
+  });
+
+  // Filter workspaces by only shared ones
+  // Do not include workspaces owned by the user
+  const sharedWorkspaces = workspaces.filter(
+    (workspace) => workspace.workspace.owner_id !== parseInt(userId)
+  );
+
+  return sharedWorkspaces.map((workspace) =>
+    parseWorkspaceData(workspace.workspace)
+  );
 };
 
 export const createWorkspace = async (workspace, ownerId) => {
