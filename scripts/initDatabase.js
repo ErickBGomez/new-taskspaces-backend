@@ -1,38 +1,10 @@
-import readline from 'readline';
-import { exec } from 'child_process';
 import chalk from 'chalk';
 import dotenv from 'dotenv';
+import { askQuestion, runCommand, rl } from './script-functions.js';
 import prisma from '../utils/prisma.js';
 
 // Load environment variables
 dotenv.config();
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-// Enhanced question function with colored prompts
-const askQuestion = (query, options = {}) => {
-  const { color = 'cyan', bold = false } = options;
-  const styledQuery = bold ? chalk[color].bold(query) : chalk[color](query);
-
-  return new Promise((resolve) =>
-    rl.question(styledQuery, (ans) => resolve(ans.trim().toLowerCase()))
-  );
-};
-
-const runCommand = (command) => {
-  return new Promise((resolve, reject) => {
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        reject(stderr || error.message);
-      } else {
-        resolve(stdout);
-      }
-    });
-  });
-};
 
 const displayHeader = () => {
   console.log(chalk.blue.bold('🚀 DATABASE SETUP SCRIPT 🚀'));

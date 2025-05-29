@@ -1,38 +1,11 @@
 import readline from 'readline';
-import { exec } from 'child_process';
 import chalk from 'chalk';
 import { Client } from 'pg';
 import dotenv from 'dotenv';
+import { askQuestion, runCommand, rl } from './script-functions.js';
 
 // Load environment variables
 dotenv.config();
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-// Enhanced question function with colored prompts
-const askQuestion = (query, options = {}) => {
-  const { color = 'yellow', critical = false } = options;
-  const styledQuery = critical ? chalk.red.bold(query) : chalk[color](query);
-
-  return new Promise((resolve) =>
-    rl.question(styledQuery, (ans) => resolve(ans.trim().toLowerCase()))
-  );
-};
-
-const runCommand = (command) => {
-  return new Promise((resolve, reject) => {
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        reject(stderr || error.message);
-      } else {
-        resolve(stdout);
-      }
-    });
-  });
-};
 
 // Parse DATABASE_URL to extract connection details
 const parseDatabaseUrl = (databaseUrl) => {
