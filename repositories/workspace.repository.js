@@ -5,7 +5,7 @@ import {
 import prisma from '../utils/prisma.js';
 import { MEMBER_ROLE_STRING_TO_INT } from '../utils/workspace.utils.js';
 
-const selectWorkspace = {
+export const selectWorkspace = {
   id: true,
   title: true,
   created_at: true,
