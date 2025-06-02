@@ -28,6 +28,14 @@ export const findUserById = async (id) => {
   return user;
 };
 
+export const findUserByUsername = async (username) => {
+  const user = await userRepository.findUserByUsername(username);
+
+  if (!user) throw new UserNotFoundError();
+
+  return user;
+};
+
 export const registerUser = async ({
   fullname,
   username,
