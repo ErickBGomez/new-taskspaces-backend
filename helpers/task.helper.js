@@ -27,7 +27,7 @@ export const parseTaskData = (task) => {
     timer: parseInt(timer),
     status: task_status.value,
     tags: task_tag.map((tag) => ({
-      ...tag,
+      ...tag.tag, // Avoid repeated tag field
     })),
     assignedMembers: task_assigned.map((assigned) => ({
       ...assigned.user_app,

@@ -26,6 +26,13 @@ router.get(
   handleInternalServerErrorMiddleware
 );
 router.get(
+  '/u/:username',
+  authMiddleware,
+  authorizeRolesMiddleware(ROLES.USER),
+  userController.getUserByUsername,
+  handleInternalServerErrorMiddleware
+);
+router.get(
   '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
