@@ -17,6 +17,7 @@ const envSchema = Joi.object({
   MAIL_FROM_NAME: Joi.string().required(),
   MAIL_FROM_EMAIL: Joi.string().email().required(),
   FRONTEND_URL: Joi.string().uri().required(),
+  BUCKET_NAME: Joi.string().required(),
 })
   .unknown()
   .required();
@@ -39,6 +40,7 @@ const config = {
   MAIL_FROM_NAME: envVars.MAIL_FROM_NAME,
   MAIL_FROM_EMAIL: envVars.MAIL_FROM_EMAIL,
   FRONTEND_URL: envVars.FRONTEND_URL,
+  BUCKET_NAME: envVars.BUCKET_NAME,
 };
 
 export default config;

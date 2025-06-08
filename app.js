@@ -9,6 +9,7 @@ import tagRoutes from './routes/tag.routes.js';
 import bookmarkRoutes from './routes/bookmark.routes.js';
 import searchRoutes from './routes/search.routes.js';
 import authRoutes from './routes/auth.routes.js';
+import mediaRouters from './routes/media.routes.js';
 
 const app = express();
 const apiPrefix = '/api';
@@ -33,6 +34,7 @@ app.use(`${apiPrefix}/workspaces`, workspaceRoutes);
 app.use(`${apiPrefix}/comments`, commentRoutes);
 app.use(`${apiPrefix}/tags`, tagRoutes);
 app.use(`${apiPrefix}/bookmarks`, bookmarkRoutes);
+app.use(`${apiPrefix}/media`, mediaRouters);
 app.use(`${apiPrefix}/search`, searchRoutes);
 app.use(`${apiPrefix}/auth`, authRoutes);
 
