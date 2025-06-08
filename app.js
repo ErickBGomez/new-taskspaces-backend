@@ -13,6 +13,7 @@ import authRoutes from './routes/auth.routes.js';
 const app = express();
 const apiPrefix = '/api';
 
+// CORS configuration
 app.use(
   cors({
     origin: '*', // Allow all origins
@@ -20,7 +21,10 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
+
+// Middleware to parse JSON bodies
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(`${apiPrefix}/users`, userRoutes);
 app.use(`${apiPrefix}/tasks`, taskRoutes);
