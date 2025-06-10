@@ -1,12 +1,19 @@
-import AWS from 'aws-sdk';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
-// AWS Configuration
-AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION || 'us-east-1',
-});
+// Use local credentials
+const s3 = new S3Client({});
 
-const s3 = new AWS.S3();
+export const uploadFile = async (uploadInfo) => {
+  const { Bucket, Key, Body, ContentType, ACL, Metadata } = uploadInfo;
 
-export default s3;
+  return await s3.send(
+    new PutObjectCommand({
+      Bucket,
+      Key,
+      Body,
+      ContentType,
+      ACL,
+      Metadata,
+    })
+  );
+};

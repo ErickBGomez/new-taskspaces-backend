@@ -1,5 +1,5 @@
 import config from '../config/config.js';
-import s3 from '../helpers/aws.helper.js';
+import { uploadFile } from '../helpers/aws.helper.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import { generateFileName } from '../helpers/media.helper.js';
 import SuccessResponseBuilder from '../helpers/success-response-builder.js';
@@ -8,8 +8,6 @@ const { BUCKET_NAME } = config;
 
 export const uploadMedia = async (req, res, next) => {
   try {
-    console.log(req.file);
-
     if (!req.file) {
       return res
         .status(400)
@@ -35,7 +33,7 @@ export const uploadMedia = async (req, res, next) => {
       },
     };
 
-    const result = await s3.upload(uploadParams).promise();
+    const result = await uploadFile(uploadParams);
 
     res.status(201).json(
       new SuccessResponseBuilder()
