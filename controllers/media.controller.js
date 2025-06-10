@@ -1,5 +1,4 @@
 import config from '../config/config.js';
-import { uploadFile } from '../helpers/aws.helper.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import { generateFileName } from '../helpers/media.helper.js';
 import SuccessResponseBuilder from '../helpers/success-response-builder.js';
@@ -21,19 +20,19 @@ export const uploadMedia = async (req, res, next) => {
 
     const fileName = generateFileName(req.file.originalname);
 
-    const uploadParams = {
-      Bucket: BUCKET_NAME,
-      Key: `images/${fileName}`,
-      Body: req.file.buffer,
-      ContentType: req.file.mimetype,
-      ACL: 'public-read', // Make image publicly accessible
-      Metadata: {
-        'original-name': req.file.originalname,
-        'upload-date': new Date().toISOString(),
-      },
-    };
+    // const uploadParams = {
+    //   Bucket: BUCKET_NAME,
+    //   Key: `images/${fileName}`,
+    //   Body: req.file.buffer,
+    //   ContentType: req.file.mimetype,
+    //   ACL: 'public-read', // Make image publicly accessible
+    //   Metadata: {
+    //     'original-name': req.file.originalname,
+    //     'upload-date': new Date().toISOString(),
+    //   },
+    // };
 
-    const result = await uploadFile(uploadParams);
+    // const result = await uploadFile(uploadParams);
 
     res.status(201).json(
       new SuccessResponseBuilder()
