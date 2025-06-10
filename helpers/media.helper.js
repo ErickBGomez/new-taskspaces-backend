@@ -11,15 +11,3 @@ export const parseMediaData = (media) => {
     updatedAt: updated_at,
   };
 };
-
-// Helper function to get file extension from mimetype
-export const getFileExtension = (mimetype) => {
-  const extensions = {
-    'image/jpeg': '.jpg',
-    'image/jpg': '.jpg',
-    'image/png': '.png',
-    'image/gif': '.gif',
-    'image/webp': '.webp',
-  };
-  return extensions[mimetype] || '.jpg';
-};

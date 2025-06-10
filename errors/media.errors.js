@@ -4,3 +4,10 @@ export class NoMediaUploadedError extends Error {
     this.name = 'NoMediaUploadedError';
   }
 }
+
+export class FileNotSupportedError extends Error {
+  constructor(message = 'File type not supported.') {
+    super(message);
+    this.name = 'FileNotSupportedError';
+  }
+}

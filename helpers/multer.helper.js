@@ -1,5 +1,6 @@
 import multer from 'multer';
 import path from 'path';
+import { FileNotSupportedError } from '../errors/media.errors.js';
 
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -16,14 +17,15 @@ var storage = multer.diskStorage({
 export const upload = multer({
   storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 50 * 1024 * 1024, // 50MB limit
   },
   fileFilter: (req, file, cb) => {
-    // Accept only image files
-    if (file.mimetype.startsWith('image/')) {
+    const allowedMimetypes = /^(image|video|audio|text)\//;
+
+    if (allowedMimetypes.test(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Only image files are allowed!'), false);
+      cb(new FileNotSupportedError(), false);
     }
   },
 });
