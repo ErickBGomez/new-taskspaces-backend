@@ -134,3 +134,4 @@ generated/prisma
 
 # Others (remove lated)
 test.js
+public/

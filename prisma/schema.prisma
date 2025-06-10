@@ -89,6 +89,7 @@ model task {
   updated_at    DateTime?       @default(now()) @db.Timestamp(6)
   bookmark      bookmark[]
   comment       comment[]
+  media         media[]
   project       project         @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   task_status   task_status     @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   task_assigned task_assigned[]
@@ -143,6 +144,7 @@ model user_app {
   updated_at       DateTime?          @default(now()) @db.Timestamp(6)
   bookmark         bookmark[]
   comment          comment[]
+  media            media[]
   task_assigned    task_assigned[]
   role             role               @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   workspace        workspace[]
@@ -180,4 +182,22 @@ model workspace_member {
   @@index([member_role_id], map: "idx_workspace_member_role")
   @@index([user_id], map: "idx_workspace_member_user")
   @@index([workspace_id], map: "idx_workspace_member_workspace")
+}
+
+model media {
+  id         Int       @id @default(autoincrement())
+  filename   String
+  type       String    
+  url        String
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  author_id  Int
+  task_id    Int
+  user_app   user_app  @relation(fields: [author_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  task       task      @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([author_id], map: "idx_media_author_id")
+  @@index([created_at], map: "idx_media_created_at")
+  @@index([task_id], map: "idx_media_task_id")
+  @@index([type], map: "idx_media_type")
 }
