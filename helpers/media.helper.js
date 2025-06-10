@@ -6,7 +6,7 @@ export const parseMediaData = (media) => {
   return {
     ...mediaData,
     authorId: parseInt(author_id),
-    task_id: parseInt(task_id),
+    taskId: parseInt(task_id),
     createdAt: created_at,
     updatedAt: updated_at,
   };

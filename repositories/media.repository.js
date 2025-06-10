@@ -4,7 +4,10 @@ import { parseMediaData } from '../helpers/media.helper.js';
 const selectMedia = {
   id: true,
   filename: true,
+  type: true,
   url: true,
+  author_id: true,
+  task_id: true,
   created_at: true,
   updated_at: true,
 };
