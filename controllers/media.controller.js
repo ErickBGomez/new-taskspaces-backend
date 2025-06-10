@@ -18,7 +18,7 @@ export const uploadMedia = async (req, res, next) => {
         );
     }
 
-    const fileName = generateFileName(req.file.originalname);
+    // const fileName = generateFileName(req.file.originalname);
 
     // const uploadParams = {
     //   Bucket: BUCKET_NAME,
@@ -38,13 +38,8 @@ export const uploadMedia = async (req, res, next) => {
       new SuccessResponseBuilder()
         .setStatus(201)
         .setMessage('File uploaded successfully')
-        .setContent({
-          key: fileName,
-          url: result.Location,
-          bucket: BUCKET_NAME,
-          size: req.file.size,
-          mimetype: req.file.mimetype,
-        })
+        // TODO: Set content here
+        .setContent({})
     );
   } catch (error) {
     next(error);
