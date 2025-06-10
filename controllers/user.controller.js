@@ -58,6 +58,37 @@ export const getUserById = async (req, res, next) => {
   }
 };
 
+export const getUserByUsername = async (req, res, next) => {
+  try {
+    const { username } = req.params;
+
+    const resultUser = await userService.findUserByUsername(username);
+
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('User retrieved')
+          .setContent(resultUser)
+          .build()
+      );
+  } catch (error) {
+    if (error instanceof UserNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('User not found')
+            .setError(new UserNotFoundError().message)
+            .build()
+        );
+
+    next(error);
+  }
+};
+
 export const registerUser = async (req, res, next) => {
   try {
     const { fullname, username, avatar, email, password, confirmPassword } =

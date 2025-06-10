@@ -1,7 +1,13 @@
 import * as searchRepository from '../repositories/search.repository.js';
 
 export const searchAll = async (query, isAdmin, userId) => {
-  if (!query) return [];
+  if (!query)
+    return {
+      workspaces: [],
+      projects: [],
+      tasks: [],
+      users: [],
+    };
 
   return await searchRepository.searchAll(query, isAdmin, userId);
 };
