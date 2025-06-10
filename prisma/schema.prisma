@@ -187,7 +187,7 @@ model workspace_member {
 model media {
   id         Int       @id @default(autoincrement())
   filename   String
-  type       String    @db.VarChar(8)
+  type       String    
   url        String
   created_at DateTime? @default(now()) @db.Timestamp(6)
   updated_at DateTime? @default(now()) @db.Timestamp(6)

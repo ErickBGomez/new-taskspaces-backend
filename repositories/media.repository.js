@@ -35,10 +35,11 @@ export const findMediaByTaskId = async (taskId) => {
   return media.map((medium) => parseMediaData(medium));
 };
 
-export const uploadMedia = async (media, taskId) => {
+export const uploadMedia = async (media, authorId, taskId) => {
   const uploadedMedia = await prisma.media.create({
     data: {
       ...media,
+      author_id: parseInt(authorId),
       task_id: parseInt(taskId),
     },
     select: { ...selectMedia },
