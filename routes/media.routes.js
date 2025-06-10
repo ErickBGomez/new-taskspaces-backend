@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { upload } from '../helpers/multer.helper.js';
-import { uploadMedia } from '../repositories/media.repository.js';
+import { uploadMedia } from '../controllers/media.controller.js';
+import uploadImageMiddleware from '../middlewares/upload-image.middleware.js';
 
 const router = Router();
 
-router.post('/upload', upload.single('image'), uploadMedia);
+router.post('/upload', uploadImageMiddleware, uploadMedia);
 
 export default router;
