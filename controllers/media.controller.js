@@ -1,9 +1,5 @@
-import config from '../config/config.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
-import { generateFileName } from '../helpers/media.helper.js';
 import SuccessResponseBuilder from '../helpers/success-response-builder.js';
-
-const { BUCKET_NAME } = config;
 
 export const uploadMedia = async (req, res, next) => {
   try {
@@ -18,28 +14,19 @@ export const uploadMedia = async (req, res, next) => {
         );
     }
 
-    // const fileName = generateFileName(req.file.originalname);
-
-    // const uploadParams = {
-    //   Bucket: BUCKET_NAME,
-    //   Key: `images/${fileName}`,
-    //   Body: req.file.buffer,
-    //   ContentType: req.file.mimetype,
-    //   ACL: 'public-read', // Make image publicly accessible
-    //   Metadata: {
-    //     'original-name': req.file.originalname,
-    //     'upload-date': new Date().toISOString(),
-    //   },
-    // };
-
-    // const result = await uploadFile(uploadParams);
+    // Get uploaded file name
+    const filename = req.file.filename;
 
     res.status(201).json(
       new SuccessResponseBuilder()
         .setStatus(201)
         .setMessage('File uploaded successfully')
         // TODO: Set content here
-        .setContent({})
+        .setContent({
+          file: filename,
+          // Get URL based on current protocol and host
+          url: `${req.protocol}://${req.get('host')}/media/${filename}`,
+        })
     );
   } catch (error) {
     next(error);

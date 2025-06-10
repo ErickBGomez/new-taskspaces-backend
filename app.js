@@ -27,6 +27,9 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve public files and uploads in the 'public' directory
+app.use(express.static('public'));
+
 app.use(`${apiPrefix}/users`, userRoutes);
 app.use(`${apiPrefix}/tasks`, taskRoutes);
 app.use(`${apiPrefix}/projects`, projectRoutes);
