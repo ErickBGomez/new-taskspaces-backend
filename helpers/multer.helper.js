@@ -9,7 +9,10 @@ var storage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(
       null,
-      file.fieldname + '-' + Date.now() + path.extname(file.originalname)
+      file.mimetype.split('/')[0] +
+        '-' +
+        Date.now() +
+        path.extname(file.originalname)
     );
   },
 });

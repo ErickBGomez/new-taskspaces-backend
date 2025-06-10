@@ -2,7 +2,7 @@ import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import { upload } from '../helpers/multer.helper.js';
 
 const uploadImageMiddleware = (req, res, next) => {
-  const uploadImage = upload.single('image');
+  const uploadImage = upload.single('media');
 
   uploadImage(req, res, (err) => {
     if (err) {
