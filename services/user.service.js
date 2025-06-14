@@ -81,9 +81,8 @@ export const loginUser = async ({ email, password }) => {
   const { id, fullname, username, avatar, role } = user;
 
   // Create JWT token
-  const token = jwt.sign({ id, username, role }, config.JWT_SECRET, {
-    expiresIn: '1h',
-  });
+  // TODO: Temporarily disable token expiration for testing purposes
+  const token = jwt.sign({ id, username, role }, config.JWT_SECRET);
 
   return {
     user: {
