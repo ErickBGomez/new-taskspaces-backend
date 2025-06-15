@@ -229,7 +229,7 @@ export const deleteWorkspace = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    await workspaceService.deleteWorkspace(id);
+    const workspace = await workspaceService.deleteWorkspace(id);
 
     res
       .status(200)
@@ -237,6 +237,7 @@ export const deleteWorkspace = async (req, res, next) => {
         new SuccessResponseBuilder()
           .setStatus(200)
           .setMessage('Workspace deleted')
+          .setContent(workspace)
           .build()
       );
   } catch (error) {
