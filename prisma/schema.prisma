@@ -79,9 +79,10 @@ model tag {
 
 model task {
   id            Int             @id @default(autoincrement())
+  breadcrumb    String          @db.VarChar(255) @default("/")
   title         String          @default("New task") @db.VarChar(100)
   description   String?
-  date          DateTime?       @db.Date
+  deadline      DateTime?       @db.Date
   timer         Decimal?        @default(0) @db.Decimal
   status_id     Int             @default(1)
   project_id    Int
@@ -95,7 +96,7 @@ model task {
   task_assigned task_assigned[]
   task_tag      task_tag[]
 
-  @@index([date], map: "idx_task_date")
+  @@index([deadline], map: "idx_task_deadline")
   @@index([project_id], map: "idx_task_project")
   @@index([status_id], map: "idx_task_status")
 }
