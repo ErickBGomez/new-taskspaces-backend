@@ -1,6 +1,8 @@
 import { parseTaskData } from '../helpers/task.helper.js';
 import prisma from '../utils/prisma.js';
 import { STATUS_STRING_TO_INT } from '../utils/task.utils.js';
+import { selectTag } from './tag.repository.js';
+import { selectUser } from './user.repository.js';
 
 export const selectTask = {
   id: true,
@@ -8,6 +10,7 @@ export const selectTask = {
   description: true,
   date: true,
   timer: true,
+  project_id: true,
   task_status: {
     select: {
       value: true,
@@ -16,24 +19,14 @@ export const selectTask = {
   task_tag: {
     select: {
       tag: {
-        select: {
-          id: true,
-          title: true,
-          color: true,
-        },
+        select: { ...selectTag },
       },
     },
   },
   task_assigned: {
     select: {
       user_app: {
-        select: {
-          id: true,
-          fullname: true,
-          username: true,
-          avatar: true,
-          email: true,
-        },
+        select: { ...selectUser },
       },
     },
   },

@@ -1,7 +1,7 @@
 import { parseTagData } from '../helpers/tag.helper.js';
 import prisma from '../utils/prisma.js';
 
-const selectTag = {
+export const selectTag = {
   id: true,
   title: true,
   color: true,

@@ -15,6 +15,7 @@ export const parseTaskData = (task) => {
   const {
     timer,
     task_status,
+    project_id,
     task_tag,
     task_assigned,
     created_at,
@@ -26,6 +27,7 @@ export const parseTaskData = (task) => {
     ...taskData,
     timer: parseInt(timer),
     status: task_status.value,
+    projectId: parseInt(project_id),
     tags: task_tag.map((tag) => ({
       ...tag.tag, // Avoid repeated tag field
     })),
