@@ -183,7 +183,7 @@ export const deleteProject = async (req, res, next) => {
     // the workspaceId is not necessary to retrieve
     const { id } = req.params;
 
-    await projectService.deleteProject(id);
+    const project = await projectService.deleteProject(id);
 
     res
       .status(200)
@@ -191,6 +191,7 @@ export const deleteProject = async (req, res, next) => {
         new SuccessResponseBuilder()
           .setStatus(200)
           .setMessage('Project deleted')
+          .setContent(project)
           .build()
       );
   } catch (error) {

@@ -5,6 +5,7 @@ export const selectProject = {
   id: true,
   title: true,
   icon: true,
+  workspace_id: true,
   created_at: true,
   updated_at: true,
 };

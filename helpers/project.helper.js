@@ -12,10 +12,11 @@ export const findWorkspaceIdFromProject = async (projectId) => {
 export const parseProjectData = (project) => {
   if (!project) return null;
 
-  const { created_at, updated_at, ...projectData } = project;
+  const { workspace_id, created_at, updated_at, ...projectData } = project;
 
   return {
     ...projectData,
+    workspaceId: parseInt(workspace_id),
     createdAt: created_at,
     updatedAt: updated_at,
   };
