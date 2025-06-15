@@ -8,6 +8,7 @@ import { MEMBER_ROLE_STRING_TO_INT } from '../utils/workspace.utils.js';
 export const selectWorkspace = {
   id: true,
   title: true,
+  owner_id: true,
   created_at: true,
   updated_at: true,
 };

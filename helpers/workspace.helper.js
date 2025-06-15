@@ -1,10 +1,11 @@
 export const parseWorkspaceData = (workspace) => {
   if (!workspace) return null;
 
-  const { created_at, updated_at, ...workspaceData } = workspace;
+  const { owner_id, created_at, updated_at, ...workspaceData } = workspace;
 
   return {
     ...workspaceData,
+    ownerId: parseInt(owner_id),
     createdAt: created_at,
     updatedAt: updated_at,
   };
