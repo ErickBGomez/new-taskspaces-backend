@@ -6,9 +6,10 @@ import { selectUser } from './user.repository.js';
 
 export const selectTask = {
   id: true,
+  breadcrumb: true,
   title: true,
   description: true,
-  date: true,
+  deadline: true,
   timer: true,
   project_id: true,
   task_status: {

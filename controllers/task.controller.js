@@ -91,14 +91,14 @@ export const createTask = async (req, res, next) => {
     // because its part of the task schema to have the reference to the project
 
     const { projectId } = req.params;
-    const { title, description, status, date, timer } = req.body;
+    const { title, description, status, deadline, timer } = req.body;
 
     const task = await taskService.createTask(
       {
         title,
         description,
         status,
-        date,
+        deadline,
         timer,
       },
       projectId
@@ -138,13 +138,13 @@ export const updateTask = async (req, res, next) => {
     // Tags should NOT be included in the update task request
     // This action is being handled from another route (assignTagToTask and unassignTagToTask from Tag module)
     const { id } = req.params;
-    const { title, description, status, date, timer } = req.body;
+    const { title, description, status, deadline, timer } = req.body;
 
     const task = await taskService.updateTask(id, {
       title,
       description,
       status,
-      date,
+      deadline,
       timer,
     });
 

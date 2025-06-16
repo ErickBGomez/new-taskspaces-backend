@@ -37,7 +37,7 @@ export const findTaskById = async (id) => {
   - MM-DD-YYYY HH:mm:ss
 */
 export const createTask = async (
-  { title, description, status, date, timer },
+  { title, description, status, deadline, timer },
   projectId
 ) => {
   const projectExists = await projectRepository.findProjectById(projectId);
@@ -49,7 +49,7 @@ export const createTask = async (
       title,
       description,
       status,
-      date: new Date(date),
+      deadline,
       timer,
     },
     projectId
@@ -58,7 +58,7 @@ export const createTask = async (
 
 export const updateTask = async (
   id,
-  { title, description, status, date, timer }
+  { title, description, status, deadline, timer }
 ) => {
   const taskExists = await taskRepository.findTaskById(id);
 
@@ -68,7 +68,7 @@ export const updateTask = async (
     title,
     description,
     status,
-    date,
+    deadline,
     timer,
   });
 };
