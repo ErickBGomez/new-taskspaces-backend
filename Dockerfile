@@ -13,6 +13,9 @@ RUN npm install
 # Copy the rest of the project files
 COPY . .
 
+# Run generate prisma client
+RUN npx prisma generate
+
 # Run the database initialization command
 RUN npm run db:init
 
