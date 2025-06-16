@@ -10,7 +10,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "db:init": "node ./scripts/init-db.js",
+    "db:init:interactive": "node ./scripts/init-db-interactive.js",
+    "db:init": "node ./scripts/init-db-no-interactive.js",
     "db:drop": "node ./scripts/drop-db.js"
   },
   "keywords": [],

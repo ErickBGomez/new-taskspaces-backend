@@ -1,38 +1,23 @@
-# Etapa base para instalación de dependencias
-FROM node:18-alpine AS base
+# Base image
+FROM node:20
 
-# Define el directorio de trabajo
-WORKDIR /src
+# Set working directory
+WORKDIR /app
 
-# Copia los archivos necesarios para instalar dependencias
+# Copy package files first for better caching
 COPY package*.json ./
 
-# Instala las dependencias
+# Install dependencies
 RUN npm install
 
-# Etapa para desarrollo
-FROM base AS development
-
-# Instala nodemon globalmente
-RUN npm install -g nodemon
-
-# Copia el resto del código al contenedor
+# Copy the rest of the project files
 COPY . .
 
-# Expone el puerto del backend
+# Run the database initialization command
+RUN npm run db:init
+
+# Expose the port the app runs on (adjust if needed)
 EXPOSE 3000
 
-# Comando para iniciar en modo desarrollo
-CMD ["npm", "run", "dev"]
-
-# Etapa para producción
-FROM base AS production
-
-# Copia el resto del código
-COPY . .
-
-# Expone el puerto del backend
-EXPOSE 3000
-
-# Comando para iniciar en modo producción
+# Start the app
 CMD ["npm", "start"]
