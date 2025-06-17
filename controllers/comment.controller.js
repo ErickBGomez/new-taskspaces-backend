@@ -155,7 +155,7 @@ export const deleteComment = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    await commentService.deleteComment(id);
+    const comment = await commentService.deleteComment(id);
 
     res
       .status(200)
@@ -163,6 +163,7 @@ export const deleteComment = async (req, res, next) => {
         new SuccessResponseBuilder()
           .setStatus(200)
           .setMessage('Comment deleted')
+          .setContent(comment)
           .build()
       );
   } catch (error) {

@@ -177,7 +177,7 @@ export const deleteTask = async (req, res, next) => {
   try {
     const { id, projectId } = req.params;
 
-    await taskService.deleteTask(id, projectId);
+    const task = await taskService.deleteTask(id, projectId);
 
     res
       .status(200)
@@ -185,6 +185,7 @@ export const deleteTask = async (req, res, next) => {
         new SuccessResponseBuilder()
           .setStatus(200)
           .setMessage('Task deleted')
+          .setContent(task)
           .build()
       );
   } catch (error) {

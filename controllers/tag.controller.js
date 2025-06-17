@@ -189,7 +189,7 @@ export const deleteTag = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    await tagService.deleteTag(id);
+    const tag = await tagService.deleteTag(id);
 
     res
       .status(200)
@@ -197,6 +197,7 @@ export const deleteTag = async (req, res, next) => {
         new SuccessResponseBuilder()
           .setStatus(200)
           .setMessage('Tag deleted')
+          .setContent(tag)
           .build()
       );
   } catch (error) {

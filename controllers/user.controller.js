@@ -282,7 +282,7 @@ export const deleteUser = async (req, res, next) => {
     // User role can delete only their own data. Sysadmin can delete any user
     if (role !== ROLES.SYSADMIN && userId !== id) throw new UserNotFoundError();
 
-    await userService.deleteUser(id);
+    const user = await userService.deleteUser(id);
 
     res
       .status(200)
@@ -290,6 +290,7 @@ export const deleteUser = async (req, res, next) => {
         new SuccessResponseBuilder()
           .setStatus(200)
           .setMessage('User deleted')
+          .setContent(user)
           .build()
       );
   } catch (error) {
