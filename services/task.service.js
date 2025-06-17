@@ -40,12 +40,20 @@ export const createTask = async (
   { title, description, status, deadline, timer },
   projectId
 ) => {
-  const projectExists = await projectRepository.findProjectById(projectId);
+  const project = await projectRepository.findProjectById(projectId);
 
-  if (!projectExists) throw new ProjectNotFoundError();
+  if (!project) throw new ProjectNotFoundError();
+
+  const { workspaceId } = project;
+  const workspace = await workspaceRepository.findWorkspaceById(workspaceId);
+
+  if (!workspace) throw new WorkspaceNotFoundError();
+
+  const breadcrumb = `${workspace.title.trim()} / ${project.title.trim()}`;
 
   return await taskRepository.createTask(
     {
+      breadcrumb,
       title,
       description,
       status,
