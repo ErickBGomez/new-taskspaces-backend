@@ -16,9 +16,6 @@ COPY . .
 # Run generate prisma client
 RUN npx prisma generate
 
-# Run the database initialization command
-RUN npm run db:init
-
 # Expose the port the app runs on (adjust if needed)
 EXPOSE 3000
 
