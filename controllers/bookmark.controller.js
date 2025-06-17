@@ -182,7 +182,7 @@ export const deleteBookmark = async (req, res, next) => {
     const { taskId } = req.params;
     const { id: userId } = req.user;
 
-    await bookmarkService.deleteBookmark(userId, taskId);
+    const bookmark = await bookmarkService.deleteBookmark(userId, taskId);
 
     res
       .status(200)
@@ -190,6 +190,7 @@ export const deleteBookmark = async (req, res, next) => {
         new SuccessResponseBuilder()
           .setStatus(200)
           .setMessage('Bookmark deleted')
+          .setContent(bookmark)
           .build()
       );
   } catch (error) {

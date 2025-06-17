@@ -3,10 +3,12 @@ import { parseBookmarkData } from '../helpers/bookmark.helper.js';
 import { selectTask } from './task.repository.js';
 
 const selectBookmark = {
-  created_at: true,
+  user_id: true,
+  task_id: true,
   task: {
     select: { ...selectTask },
   },
+  created_at: true,
 };
 
 export const findAllBookmarks = async () => {
