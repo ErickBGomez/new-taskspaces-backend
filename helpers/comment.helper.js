@@ -1,11 +1,20 @@
 export const parseCommentData = (comment) => {
   if (!comment) return null;
 
-  // eslint-disable-next-line no-unused-vars
-  const { user_app, created_at, updated_at, ...commentData } = comment;
+  const {
+    author_id,
+    task_id,
+    // eslint-disable-next-line no-unused-vars
+    user_app,
+    created_at,
+    updated_at,
+    ...commentData
+  } = comment;
 
   return {
     ...commentData,
+    authorId: parseInt(author_id),
+    taskId: parseInt(task_id),
     createdAt: created_at,
     updatedAt: updated_at,
     author: {

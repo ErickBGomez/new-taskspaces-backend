@@ -5,6 +5,7 @@ export const selectTag = {
   id: true,
   title: true,
   color: true,
+  project_id: true,
   created_at: true,
   updated_at: true,
 };

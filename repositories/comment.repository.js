@@ -4,6 +4,8 @@ import prisma from '../utils/prisma.js';
 const selectComment = {
   id: true,
   content: true,
+  author_id: true,
+  task_id: true,
   created_at: true,
   updated_at: true,
   user_app: {
