@@ -308,3 +308,18 @@ export const deleteUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteUserTest = async (req, res, next) => {
+  try {
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('User deletion request received')
+          .build()
+      );
+  } catch (error) {
+    next(error);
+  }
+};

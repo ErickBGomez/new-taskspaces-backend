@@ -25,6 +25,12 @@ router.get(
   userController.getAllUsers,
   handleInternalServerErrorMiddleware
 );
+// Test deletion user
+router.get(
+  '/delete',
+  userController.deleteUserTest,
+  handleInternalServerErrorMiddleware
+);
 router.get(
   '/u/:username',
   authMiddleware,
