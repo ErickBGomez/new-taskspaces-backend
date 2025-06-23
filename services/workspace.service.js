@@ -74,12 +74,12 @@ export const deleteWorkspace = async (id) => {
 };
 
 // Members
-export const findMembers = async (workspaceId) => {
+export const findMembers = async (workspaceId, requestUserId) => {
   const workspace = await workspaceRepository.findWorkspaceById(workspaceId);
 
   if (!workspace) throw new WorkspaceNotFoundError();
 
-  return await workspaceRepository.findMembers(workspaceId);
+  return await workspaceRepository.findMembers(workspaceId, requestUserId);
 };
 
 export const findMemberRole = async (workspaceId, memberId) => {
@@ -97,7 +97,12 @@ export const findMemberRole = async (workspaceId, memberId) => {
   return member.memberRole;
 };
 
-export const inviteMember = async (workspaceId, username, memberRole) => {
+export const inviteMember = async (
+  workspaceId,
+  username,
+  memberRole,
+  requestUserId
+) => {
   const workspace = await workspaceRepository.findWorkspaceById(workspaceId);
 
   if (!workspace) throw new WorkspaceNotFoundError();
@@ -110,7 +115,10 @@ export const inviteMember = async (workspaceId, username, memberRole) => {
   if (!MEMBER_ROLES[memberRole]) throw new InvalidMemberRoleError();
 
   // Check if the user is already a member of the workspace
-  const existingMembers = await workspaceRepository.findMembers(workspaceId);
+  const existingMembers = await workspaceRepository.findMembers(
+    workspaceId,
+    requestUserId
+  );
   if (existingMembers?.some((member) => member.user.username === username))
     throw new UserAlreadyInvitedError();
 
@@ -124,25 +132,28 @@ export const inviteMember = async (workspaceId, username, memberRole) => {
   );
 };
 
-export const updateMember = async (id, actionUserId, memberId, memberRole) => {
+export const updateMember = async (id, memberId, memberRole, requestUserId) => {
   const workspace = await workspaceRepository.findWorkspaceById(id);
 
   if (!workspace) throw new WorkspaceNotFoundError();
 
   // Check if actions user and member exists
-  const actionUserExists = await userRepository.findUserById(actionUserId);
+  const actionUserExists = await userRepository.findUserById(requestUserId);
   if (!actionUserExists) throw new UserNotFoundError();
 
   const memberExists = await userRepository.findUserById(memberId);
   if (!memberExists) throw new UserNotFoundError();
 
   // Avoid the user to update their own member role
-  if (actionUserId === memberId) throw new MemberRoleSelfModifiedError();
+  if (requestUserId === memberId) throw new MemberRoleSelfModifiedError();
 
   if (!MEMBER_ROLES[memberRole]) throw new InvalidMemberRoleError();
 
   // Check if the user is NOT a member of the workspace
-  const existingMembers = await workspaceRepository.findMembers(id);
+  const existingMembers = await workspaceRepository.findMembers(
+    id,
+    requestUserId
+  );
   if (
     !existingMembers?.some((member) => member.user.id.toString() === memberId)
   )
@@ -152,22 +163,25 @@ export const updateMember = async (id, actionUserId, memberId, memberRole) => {
 };
 
 // TODO: Define a way to assign a new owner to the workspace when the current owner is removed
-export const removeMember = async (id, actionUserId, memberId) => {
+export const removeMember = async (id, memberId, requestUserId) => {
   const workspace = await workspaceRepository.findWorkspaceById(id);
 
   if (!workspace) throw new WorkspaceNotFoundError();
 
-  const actionUserExists = await userRepository.findUserById(actionUserId);
+  const actionUserExists = await userRepository.findUserById(requestUserId);
   if (!actionUserExists) throw new UserNotFoundError();
 
   const memberExists = await userRepository.findUserById(memberId);
   if (!memberExists) throw new UserNotFoundError();
 
   // Avoid the user to update their own member role
-  if (actionUserId === memberId) throw new MemberSelfRemovedError();
+  if (requestUserId === memberId) throw new MemberSelfRemovedError();
 
   // Check if the user is NOT a member of the workspace
-  const existingMembers = await workspaceRepository.findMembers(id);
+  const existingMembers = await workspaceRepository.findMembers(
+    id,
+    requestUserId
+  );
   if (
     !existingMembers?.some((member) => member.user.id.toString() === memberId)
   )

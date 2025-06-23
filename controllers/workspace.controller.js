@@ -260,8 +260,9 @@ export const deleteWorkspace = async (req, res, next) => {
 export const getMembers = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const { id: userId } = req.user;
 
-    const members = await workspaceService.findMembers(id);
+    const members = await workspaceService.findMembers(id, userId);
 
     res
       .status(200)
@@ -348,12 +349,14 @@ export const inviteMember = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { username, memberRole } = req.body;
+    const { id: userId } = req.user;
 
     // TODO: Invite by email
     const workspace = await workspaceService.inviteMember(
       id,
       username,
-      memberRole
+      memberRole,
+      userId
     );
 
     res
@@ -417,14 +420,14 @@ export const inviteMember = async (req, res, next) => {
 export const updateMember = async (req, res, next) => {
   try {
     const { id, memberId } = req.params;
-    const { id: actionUserId } = req.user;
+    const { id: userId } = req.user;
     const { memberRole } = req.body;
 
     const workspace = await workspaceService.updateMember(
       id,
-      actionUserId,
       memberId,
-      memberRole
+      memberRole,
+      userId
     );
 
     res
@@ -488,13 +491,9 @@ export const updateMember = async (req, res, next) => {
 export const removeMember = async (req, res, next) => {
   try {
     const { id, memberId } = req.params;
-    const { id: actionUserId } = req.user;
+    const { id: userId } = req.user;
 
-    const workspace = await workspaceService.removeMember(
-      id,
-      actionUserId,
-      memberId
-    );
+    const workspace = await workspaceService.removeMember(id, memberId, userId);
 
     res
       .status(200)

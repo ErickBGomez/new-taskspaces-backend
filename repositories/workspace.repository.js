@@ -131,10 +131,13 @@ export const deleteWorkspace = async (id) => {
 };
 
 // Members
-export const findMembers = async (workspaceId) => {
+export const findMembers = async (workspaceId, requestUserId) => {
   const members = await prisma.workspace_member.findMany({
     where: {
       workspace_id: parseInt(workspaceId),
+      user_id: {
+        not: parseInt(requestUserId), // Exclude the requesting user from the list
+      },
     },
     select: { ...selectWorkspaceMember },
   });
