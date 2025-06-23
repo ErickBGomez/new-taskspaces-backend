@@ -132,13 +132,19 @@ export const deleteWorkspace = async (id) => {
 
 // Members
 export const findMembers = async (workspaceId, requestUserId) => {
+  // Fetch all members of the workspace excluding the requesting user
+  const condition = {
+    workspace_id: parseInt(workspaceId),
+  };
+
+  if (requestUserId) {
+    condition.user_id = {
+      not: parseInt(requestUserId), // Exclude the requesting user from the list
+    };
+  }
+
   const members = await prisma.workspace_member.findMany({
-    where: {
-      workspace_id: parseInt(workspaceId),
-      user_id: {
-        not: parseInt(requestUserId), // Exclude the requesting user from the list
-      },
-    },
+    where: { ...condition },
     select: { ...selectWorkspaceMember },
   });
 
