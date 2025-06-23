@@ -70,7 +70,8 @@ export const getWorkspacesByOwnerId = async (req, res, next) => {
     // because there is no way to obtain the id of a specific workspace
 
     // Avoid obtaining workspaces from other users, only sysadmin can do that
-    if (role !== ROLES.SYSADMIN && id !== userId) throw new UserNotFoundError();
+    if (role !== ROLES.SYSADMIN && parseInt(id) !== parseInt(userId))
+      throw new UserNotFoundError();
 
     const workspaces = await workspaceService.findWorkspacesByOwnerId(userId);
 
