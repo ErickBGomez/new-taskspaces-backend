@@ -9,10 +9,7 @@ import {
   DEPTH,
   MEMBER_ROLES,
 } from '../middlewares/check-member-role.middleware.js';
-import {
-  createTaskValidator,
-  updateTaskValidator,
-} from '../validators/task.validator.js';
+import { taskValidator } from '../validators/task.validator.js';
 import checkValidation from '../middlewares/validator.middleware.js';
 import * as taskController from '../controllers/task.controller.js';
 import handleInternalServerErrorMiddleware from '../middlewares/internal-server-error.middleware.js';
@@ -47,7 +44,7 @@ router.post(
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.PROJECT),
-  createTaskValidator,
+  taskValidator,
   checkValidation,
   taskController.createTask,
   handleInternalServerErrorMiddleware
@@ -57,7 +54,7 @@ router.put(
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
-  updateTaskValidator,
+  taskValidator,
   checkValidation,
   taskController.updateTask,
   handleInternalServerErrorMiddleware
