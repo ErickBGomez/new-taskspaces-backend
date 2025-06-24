@@ -85,6 +85,11 @@ export const findTaskByIdAndProjectId = async (id, projectId) => {
 export const createTask = async (task, projectId) => {
   const { status, ...taskData } = task;
 
+  // Avoid setting deadline to an empty string
+  if (taskData.deadline === '') {
+    taskData.deadline = null;
+  }
+
   const createdTask = await prisma.task.create({
     data: {
       ...taskData,
@@ -99,6 +104,11 @@ export const createTask = async (task, projectId) => {
 
 export const updateTask = async (id, task) => {
   const { status, ...taskData } = task;
+
+  // Avoid setting deadline to an empty string
+  if (taskData.deadline === '') {
+    taskData.deadline = null;
+  }
 
   const updatedTask = await prisma.task.update({
     where: {
