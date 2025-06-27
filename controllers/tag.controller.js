@@ -220,7 +220,7 @@ export const assignTagToTask = async (req, res, next) => {
   try {
     const { id, taskId } = req.params;
 
-    await tagService.assignTagToTask(id, taskId);
+    const tag = await tagService.assignTagToTask(id, taskId);
 
     res
       .status(200)
@@ -228,6 +228,7 @@ export const assignTagToTask = async (req, res, next) => {
         new SuccessResponseBuilder()
           .setStatus(200)
           .setMessage('Tag assigned to task')
+          .setContent(tag)
           .build()
       );
   } catch (error) {
@@ -272,7 +273,7 @@ export const unassignTagFromTask = async (req, res, next) => {
   try {
     const { id, taskId } = req.params;
 
-    await tagService.unassignTagFromTask(id, taskId);
+    const tag = await tagService.unassignTagFromTask(id, taskId);
 
     res
       .status(200)
@@ -280,6 +281,7 @@ export const unassignTagFromTask = async (req, res, next) => {
         new SuccessResponseBuilder()
           .setStatus(200)
           .setMessage('Tag unassigned from task')
+          .setContent(tag)
           .build()
       );
   } catch (error) {
