@@ -20,15 +20,13 @@ export const getMemberRoleByWorkspaceId = async (req, res, next) => {
       userId
     );
 
-    res
-      .status(200)
-      .json(
-        new SuccessResponseBuilder()
-          .setStatus(200)
-          .setMessage('Member role found')
-          .setContent({ memberRole })
-          .build()
-      );
+    res.status(200).json(
+      new SuccessResponseBuilder()
+        .setStatus(200)
+        .setMessage('Member role found')
+        .setContent({ ...memberRole })
+        .build()
+    );
   } catch (error) {
     if (error instanceof WorkspaceNotFoundError)
       return res
@@ -88,15 +86,13 @@ export const getMemberRoleByProjectId = async (req, res, next) => {
       userId
     );
 
-    res
-      .status(200)
-      .json(
-        new SuccessResponseBuilder()
-          .setStatus(200)
-          .setMessage('Member role found')
-          .setContent({ memberRole })
-          .build()
-      );
+    res.status(200).json(
+      new SuccessResponseBuilder()
+        .setStatus(200)
+        .setMessage('Member role found')
+        .setContent({ ...memberRole })
+        .build()
+    );
   } catch (error) {
     if (error instanceof ProjectNotFoundError)
       return res
@@ -156,15 +152,13 @@ export const getMemberRoleByTaskId = async (req, res, next) => {
       userId
     );
 
-    res
-      .status(200)
-      .json(
-        new SuccessResponseBuilder()
-          .setStatus(200)
-          .setMessage('Member role found')
-          .setContent({ memberRole })
-          .build()
-      );
+    res.status(200).json(
+      new SuccessResponseBuilder()
+        .setStatus(200)
+        .setMessage('Member role found')
+        .setContent({ ...memberRole })
+        .build()
+    );
   } catch (error) {
     if (error instanceof TaskNotFoundError)
       return res
