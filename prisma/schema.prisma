@@ -82,7 +82,7 @@ model task {
   breadcrumb    String          @db.VarChar(255) @default("/")
   title         String          @default("New task") @db.VarChar(100)
   description   String?
-  deadline      DateTime?       @db.Date
+  deadline      DateTime?       @db.Timestamp(6)
   timer         Decimal?        @default(0) @db.Decimal
   status_id     Int             @default(1)
   project_id    Int

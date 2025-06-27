@@ -1,10 +1,14 @@
 import * as taskService from '../services/task.service.js';
-import { TaskNotFoundError } from '../errors/task.errors.js';
+import {
+  InvalidDateTimeFormatError,
+  TaskNotFoundError,
+} from '../errors/task.errors.js';
 import SuccessResponseBuilder from '../helpers/success-response-builder.js';
 import ErrorResponseBuilder from '../helpers/error-response-builder.js';
 import { ProjectNotFoundError } from '../errors/project.errors.js';
 import { UserNotFoundError } from '../errors/user.errors.js';
 import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
+import { normalizeDateTime } from '../helpers/datetime.helper.js';
 
 export const getAllTasks = async (req, res, next) => {
   try {
@@ -93,12 +97,14 @@ export const createTask = async (req, res, next) => {
     const { projectId } = req.params;
     const { title, description, status, deadline, timer } = req.body;
 
+    const parsedDeadline = normalizeDateTime(deadline);
+
     const task = await taskService.createTask(
       {
         title,
         description,
         status,
-        deadline,
+        deadline: parsedDeadline,
         timer,
       },
       projectId
@@ -114,6 +120,17 @@ export const createTask = async (req, res, next) => {
           .build()
       );
   } catch (error) {
+    if (error instanceof InvalidDateTimeFormatError)
+      return res
+        .status(400)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(400)
+            .setMessage('Invalid datetime format')
+            .setError(error.message)
+            .build()
+        );
+
     if (error instanceof ProjectNotFoundError)
       return res
         .status(404)
@@ -140,11 +157,13 @@ export const updateTask = async (req, res, next) => {
     const { id } = req.params;
     const { title, description, status, deadline, timer } = req.body;
 
+    const parsedDeadline = normalizeDateTime(deadline);
+
     const task = await taskService.updateTask(id, {
       title,
       description,
       status,
-      deadline,
+      deadline: parsedDeadline,
       timer,
     });
 
@@ -158,6 +177,17 @@ export const updateTask = async (req, res, next) => {
           .build()
       );
   } catch (error) {
+    if (error instanceof InvalidDateTimeFormatError)
+      return res
+        .status(400)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(400)
+            .setMessage('Invalid datetime format')
+            .setError(error.message)
+            .build()
+        );
+
     if (error instanceof TaskNotFoundError)
       return res
         .status(404)

@@ -1,11 +1,15 @@
 import * as taskRepository from '../repositories/task.repository.js';
 import * as projectRepository from '../repositories/project.repository.js';
 import * as workspaceRepository from '../repositories/workspace.repository.js';
-import { TaskNotFoundError } from '../errors/task.errors.js';
+import {
+  InvalidDateTimeFormatError,
+  TaskNotFoundError,
+} from '../errors/task.errors.js';
 import { ProjectNotFoundError } from '../errors/project.errors.js';
 import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
 import { UserNotFoundError } from '../errors/user.errors.js';
 import { findWorkspaceIdFromTask } from '../helpers/task.helper.js';
+import { isValidDateTime, toDateObject } from '../helpers/datetime.helper.js';
 
 export const findAllTasks = async () => {
   return await taskRepository.findAllTasks();
@@ -51,13 +55,17 @@ export const createTask = async (
 
   const breadcrumb = `${workspace.title.trim()} / ${project.title.trim()}`;
 
+  if (deadline) {
+    if (!isValidDateTime(deadline)) throw new InvalidDateTimeFormatError();
+  }
+
   return await taskRepository.createTask(
     {
       breadcrumb,
       title,
       description,
       status,
-      deadline,
+      deadline: toDateObject(deadline),
       timer,
     },
     projectId
@@ -72,11 +80,15 @@ export const updateTask = async (
 
   if (!taskExists) throw new TaskNotFoundError();
 
+  if (deadline) {
+    if (!isValidDateTime(deadline)) throw new InvalidDateTimeFormatError();
+  }
+
   return await taskRepository.updateTask(id, {
     title,
     description,
     status,
-    deadline,
+    deadline: toDateObject(deadline),
     timer,
   });
 };
