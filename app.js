@@ -10,6 +10,7 @@ import bookmarkRoutes from './routes/bookmark.routes.js';
 import searchRoutes from './routes/search.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import mediaRouters from './routes/media.routes.js';
+import memberRoutes from './routes/member.routes.js';
 
 const app = express();
 const apiPrefix = '/api';
@@ -40,5 +41,6 @@ app.use(`${apiPrefix}/bookmarks`, bookmarkRoutes);
 app.use(`${apiPrefix}/media`, mediaRouters);
 app.use(`${apiPrefix}/search`, searchRoutes);
 app.use(`${apiPrefix}/auth`, authRoutes);
+app.use(`${apiPrefix}/members`, memberRoutes);
 
 export default app;

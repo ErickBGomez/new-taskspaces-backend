@@ -290,62 +290,6 @@ export const getMembers = async (req, res, next) => {
   }
 };
 
-export const getMemberRole = async (req, res, next) => {
-  try {
-    const { id: workspaceId, memberId } = req.params;
-
-    const memberRole = await workspaceService.findMemberRole(
-      workspaceId,
-      memberId
-    );
-
-    res
-      .status(200)
-      .json(
-        new SuccessResponseBuilder()
-          .setStatus(200)
-          .setMessage('Member role found')
-          .setContent({ memberRole })
-          .build()
-      );
-  } catch (error) {
-    if (error instanceof WorkspaceNotFoundError)
-      return res
-        .status(404)
-        .json(
-          new ErrorResponseBuilder()
-            .setStatus(404)
-            .setMessage('Workspace not found')
-            .setError(error.message)
-            .build()
-        );
-
-    if (error instanceof UserNotFoundError)
-      return res
-        .status(404)
-        .json(
-          new ErrorResponseBuilder()
-            .setStatus(404)
-            .setMessage('User not found')
-            .setError(error.message)
-            .build()
-        );
-
-    if (error instanceof InvalidMemberRoleError)
-      return res
-        .status(400)
-        .json(
-          new ErrorResponseBuilder()
-            .setStatus(400)
-            .setMessage('Invalid member role')
-            .setError(error.message)
-            .build()
-        );
-
-    next(error);
-  }
-};
-
 export const inviteMember = async (req, res, next) => {
   try {
     const { id } = req.params;

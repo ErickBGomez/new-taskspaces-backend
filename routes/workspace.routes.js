@@ -96,15 +96,6 @@ router.get(
   workspaceController.getMembers,
   handleInternalServerErrorMiddleware
 );
-// Gets just member role, not the whole user information
-router.get(
-  '/:id/members/:memberId',
-  authMiddleware,
-  authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.WORKSPACE),
-  workspaceController.getMemberRole,
-  handleInternalServerErrorMiddleware
-);
 router.post(
   '/:id/members',
   authMiddleware,
