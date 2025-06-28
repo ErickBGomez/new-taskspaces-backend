@@ -108,6 +108,13 @@ export const findAssignedMembersByTaskId = async (id) => {
   return await taskRepository.findAssignedMembersByTaskId(id);
 };
 
+export const findWorkspaceMembersByTaskId = async (id) => {
+  const taskExists = await taskRepository.findTaskById(id);
+  if (!taskExists) throw new TaskNotFoundError();
+
+  return await taskRepository.findWorkspaceMembersByTaskId(id);
+};
+
 export const assignMemberToTask = async (id, memberId) => {
   const taskExists = await taskRepository.findTaskById(id);
   if (!taskExists) throw new TaskNotFoundError();

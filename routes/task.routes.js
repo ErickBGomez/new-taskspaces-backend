@@ -75,6 +75,14 @@ router.get(
   taskController.getAssignedMembersByTaskId,
   handleInternalServerErrorMiddleware
 );
+router.get(
+  '/:id/members/w/',
+  authMiddleware,
+  authorizeRolesMiddleware(ROLES.USER),
+  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
+  taskController.getWorkspaceMembersByTaskId,
+  handleInternalServerErrorMiddleware
+);
 router.post(
   '/:id/members/:memberId',
   authMiddleware,

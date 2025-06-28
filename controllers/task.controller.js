@@ -264,6 +264,36 @@ export const getAssignedMembersByTaskId = async (req, res, next) => {
   }
 };
 
+export const getWorkspaceMembersByTaskId = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const members = await taskService.findWorkspaceMembersByTaskId(id);
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Members found')
+          .setContent(members)
+          .build()
+      );
+  } catch (error) {
+    if (error instanceof TaskNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Task not found')
+            .setError(error.message)
+            .build()
+        );
+
+    next(error);
+  }
+};
+
 export const assignMemberToTask = async (req, res, next) => {
   try {
     const { id, memberId } = req.params;

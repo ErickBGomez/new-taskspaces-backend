@@ -151,6 +151,34 @@ export const findAssignedMembersByTaskId = async (taskId) => {
   return assignedMembers.map((member) => parseUserData(member.user_app));
 };
 
+export const findWorkspaceMembersByTaskId = async (taskId) => {
+  const task = await prisma.task.findFirst({
+    where: {
+      id: parseInt(taskId),
+    },
+    select: {
+      project: {
+        select: {
+          workspace_id: true,
+        },
+      },
+    },
+  });
+
+  const assignedMembers = await prisma.workspace_member.findMany({
+    where: {
+      workspace_id: parseInt(task.project.workspace_id),
+    },
+    select: {
+      user_app: {
+        select: { ...selectUser },
+      },
+    },
+  });
+
+  return assignedMembers.map((member) => parseUserData(member.user_app));
+};
+
 export const assignMemberToTask = async (taskId, memberId) => {
   const assignedMemberToTask = await prisma.task_assigned.create({
     data: {
