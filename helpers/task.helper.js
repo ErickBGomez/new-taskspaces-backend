@@ -1,5 +1,7 @@
 import { findWorkspaceIdByTask } from '../repositories/task.repository.js';
 import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
+import { parseTagData } from './tag.helper.js';
+import { parseUserData } from './user.helper.js';
 
 export const findWorkspaceIdFromTask = async (taskId) => {
   const workspaceId = await findWorkspaceIdByTask(taskId);
@@ -28,12 +30,10 @@ export const parseTaskData = (task) => {
     timer: parseInt(timer),
     status: task_status.value,
     projectId: parseInt(project_id),
-    tags: task_tag.map((tag) => ({
-      ...tag.tag, // Avoid repeated tag field
-    })),
-    assignedMembers: task_assigned.map((assigned) => ({
-      ...assigned.user_app,
-    })),
+    tags: task_tag.map((tag) => parseTagData(tag.tag)),
+    assignedMembers: task_assigned.map((assigned) =>
+      parseUserData(assigned.user_app)
+    ),
     createdAt: created_at,
     updatedAt: updated_at,
   };

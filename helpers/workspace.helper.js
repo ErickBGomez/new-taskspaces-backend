@@ -1,3 +1,5 @@
+import { parseUserData } from './user.helper.js';
+
 export const parseWorkspaceData = (workspace) => {
   if (!workspace) return null;
 
@@ -18,7 +20,7 @@ export const parseWorkspaceMember = (member) => {
 
   return {
     ...memberData,
-    user: user_app,
+    user: parseUserData(user_app),
     memberRole: member_role?.value,
   };
 };
