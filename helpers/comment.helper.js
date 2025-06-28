@@ -1,3 +1,14 @@
+import { WorkspaceNotFoundError } from '../errors/workspace.errors.js';
+import { findWorkspaceIdByComment } from '../repositories/comment.repository.js';
+
+export const findWorkspaceIdFromComment = async (taskId) => {
+  const workspaceId = await findWorkspaceIdByComment(taskId);
+
+  if (!workspaceId) throw new WorkspaceNotFoundError();
+
+  return workspaceId;
+};
+
 export const parseCommentData = (comment) => {
   if (!comment) return null;
 

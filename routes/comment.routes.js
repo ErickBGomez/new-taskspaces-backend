@@ -32,10 +32,10 @@ router.get(
   handleInternalServerErrorMiddleware
 );
 router.get(
-  '/:id/t/:taskId',
+  '/:id/',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.TASK),
+  checkMemberRoleMiddleware(MEMBER_ROLES.READER, DEPTH.COMMENT),
   commentController.getCommentById,
   handleInternalServerErrorMiddleware
 );
@@ -50,20 +50,20 @@ router.post(
   handleInternalServerErrorMiddleware
 );
 router.put(
-  '/:id/t/:taskId',
+  '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
+  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.COMMENT),
   commentValidator,
   checkValidation,
   commentController.updateComment,
   handleInternalServerErrorMiddleware
 );
 router.delete(
-  '/:id/t/:taskId',
+  '/:id',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
-  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
+  checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.COMMENT),
   commentController.deleteComment,
   handleInternalServerErrorMiddleware
 );

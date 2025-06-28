@@ -16,6 +16,7 @@ import { TaskNotFoundError } from '../errors/task.errors.js';
 import { InvalidDepthError } from '../errors/common.errors.js';
 import { ROLES } from './authorize-roles.middleware.js';
 import { findWorkspaceIdFromTag } from '../helpers/tag.helper.js';
+import { findWorkspaceIdFromComment } from '../helpers/comment.helper.js';
 
 export const MEMBER_ROLES = {
   READER: 'READER',
@@ -34,6 +35,7 @@ export const DEPTH = {
   PROJECT: 'project',
   TASK: 'task',
   TAG: 'tag',
+  COMMENT: 'comment',
 };
 
 export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
@@ -82,6 +84,14 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
 
           workspaceId = await findWorkspaceIdFromTag(resolvedTagId);
 
+          break;
+        }
+
+        case DEPTH.COMMENT: {
+          const { commentId, id } = req.params;
+          const resolvedCommentId = commentId ?? id;
+
+          workspaceId = await findWorkspaceIdFromComment(resolvedCommentId);
           break;
         }
 

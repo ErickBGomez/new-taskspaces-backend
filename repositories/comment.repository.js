@@ -6,6 +6,7 @@ const selectComment = {
   content: true,
   author_id: true,
   task_id: true,
+  edited: true,
   created_at: true,
   updated_at: true,
   user_app: {
@@ -71,6 +72,7 @@ export const updateComment = async (id, comment) => {
     },
     data: {
       ...comment,
+      edited: true,
     },
     select: { ...selectComment },
   });
@@ -87,4 +89,28 @@ export const deleteComment = async (id) => {
   });
 
   return parseCommentData(deletedComment);
+};
+
+// Helper
+export const findWorkspaceIdByComment = async (commentId) => {
+  const comment = await prisma.comment.findFirst({
+    where: {
+      id: parseInt(commentId),
+    },
+    select: {
+      task: {
+        select: {
+          project: {
+            select: {
+              workspace_id: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!comment) return null;
+
+  return comment.task.project.workspace_id;
 };
