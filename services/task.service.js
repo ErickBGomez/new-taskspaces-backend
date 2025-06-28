@@ -101,6 +101,13 @@ export const deleteTask = async (id) => {
   return await taskRepository.deleteTask(id);
 };
 
+export const findAssignedMembersByTaskId = async (id) => {
+  const taskExists = await taskRepository.findTaskById(id);
+  if (!taskExists) throw new TaskNotFoundError();
+
+  return await taskRepository.findAssignedMembersByTaskId(id);
+};
+
 export const assignMemberToTask = async (id, memberId) => {
   const taskExists = await taskRepository.findTaskById(id);
   if (!taskExists) throw new TaskNotFoundError();

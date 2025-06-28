@@ -234,6 +234,36 @@ export const deleteTask = async (req, res, next) => {
   }
 };
 
+export const getAssignedMembersByTaskId = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const assignedMembers = await taskService.findAssignedMembersByTaskId(id);
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Assigned members to task found')
+          .setContent(assignedMembers)
+          .build()
+      );
+  } catch (error) {
+    if (error instanceof TaskNotFoundError)
+      return res
+        .status(404)
+        .json(
+          new ErrorResponseBuilder()
+            .setStatus(404)
+            .setMessage('Task not found')
+            .setError(error.message)
+            .build()
+        );
+
+    next(error);
+  }
+};
+
 export const assignMemberToTask = async (req, res, next) => {
   try {
     const { id, memberId } = req.params;

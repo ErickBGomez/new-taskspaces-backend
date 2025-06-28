@@ -1,4 +1,5 @@
 import { parseTaskData } from '../helpers/task.helper.js';
+import { parseUserData } from '../helpers/user.helper.js';
 import prisma from '../utils/prisma.js';
 import { STATUS_STRING_TO_INT } from '../utils/task.utils.js';
 import { selectTag } from './tag.repository.js';
@@ -133,6 +134,21 @@ export const deleteTask = async (id) => {
   });
 
   return parseTaskData(deletedTask);
+};
+
+export const findAssignedMembersByTaskId = async (taskId) => {
+  const assignedMembers = await prisma.task_assigned.findMany({
+    where: {
+      task_id: parseInt(taskId),
+    },
+    select: {
+      user_app: {
+        select: { ...selectUser },
+      },
+    },
+  });
+
+  return assignedMembers.map((member) => parseUserData(member.user_app));
 };
 
 export const assignMemberToTask = async (taskId, memberId) => {

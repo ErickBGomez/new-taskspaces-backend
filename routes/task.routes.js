@@ -67,8 +67,16 @@ router.delete(
   taskController.deleteTask,
   handleInternalServerErrorMiddleware
 );
+// Task assigned members
+router.get(
+  '/:id/members',
+  authMiddleware,
+  authorizeRolesMiddleware(ROLES.USER),
+  taskController.getAssignedMembersByTaskId,
+  handleInternalServerErrorMiddleware
+);
 router.post(
-  '/:id/member/:memberId',
+  '/:id/members/:memberId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
@@ -76,7 +84,7 @@ router.post(
   handleInternalServerErrorMiddleware
 );
 router.delete(
-  '/:id/member/:memberId',
+  '/:id/members/:memberId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.TASK),
