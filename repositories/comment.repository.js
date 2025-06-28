@@ -1,5 +1,6 @@
 import { parseCommentData } from '../helpers/comment.helper.js';
 import prisma from '../utils/prisma.js';
+import { selectUser } from './user.repository.js';
 
 const selectComment = {
   id: true,
@@ -11,10 +12,7 @@ const selectComment = {
   updated_at: true,
   user_app: {
     select: {
-      fullname: true,
-      username: true,
-      avatar: true,
-      email: true,
+      ...selectUser,
     },
   },
 };
