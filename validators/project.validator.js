@@ -6,8 +6,8 @@ export const createProjectValidator = [
     .withMessage('Title is required')
     .isString()
     .withMessage('Title must be a string')
-    .isLength({ min: 3, max: 25 })
-    .withMessage('Title must be between 3 and 25 characters long'),
+    .isLength({ max: 25 })
+    .withMessage('Title must be less than 25 characters'),
   body('icon').optional().isString().withMessage('Icon must be a string'),
 ];
 
@@ -17,8 +17,8 @@ export const updateProjectValidator = [
     .withMessage('Title is required')
     .isString()
     .withMessage('Title must be a string')
-    .isLength({ min: 3, max: 25 })
-    .withMessage('Title must be between 3 and 25 characters long'),
+    .isLength({ max: 25 })
+    .withMessage('Title must be less than 25 characters'),
   body('statuses')
     .optional()
     .isArray()

@@ -14,6 +14,8 @@ const checkValidation = (req, res, next) => {
       return acc;
     }, []);
 
+    console.log(formattedErrors);
+
     return res
       .status(400)
       .json(
