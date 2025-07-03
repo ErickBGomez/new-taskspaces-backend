@@ -17,6 +17,7 @@ import { InvalidDepthError } from '../errors/common.errors.js';
 import { ROLES } from './authorize-roles.middleware.js';
 import { findWorkspaceIdFromTag } from '../helpers/tag.helper.js';
 import { findWorkspaceIdFromComment } from '../helpers/comment.helper.js';
+import { validateMemberRole } from '../helpers/member.helper.js';
 
 export const MEMBER_ROLES = {
   READER: 'READER',
@@ -24,7 +25,7 @@ export const MEMBER_ROLES = {
   ADMIN: 'ADMIN',
 };
 
-const MEMBER_ROLES_HIERARCHY = {
+export const MEMBER_ROLES_HIERARCHY = {
   READER: 0,
   COLLABORATOR: 1,
   ADMIN: 2,
@@ -49,68 +50,15 @@ export const checkMemberRoleMiddleware = (requiredMemberRole, depth) => {
       // checked by their member roles)
       if (ROLES[role] === ROLES.SYSADMIN) return next();
 
-      let workspaceId;
-
-      // TODO: Refactor these lines
-      switch (depth) {
-        case DEPTH.WORKSPACE: {
-          // Obtain either workspaceId or id from path parameters
-          const { workspaceId: workspaceIdParams, id } = req.params;
-          const resolvedWorkspaceId = workspaceIdParams ?? id;
-
-          workspaceId = resolvedWorkspaceId;
-
-          break;
-        }
-        case DEPTH.PROJECT: {
-          const { projectId, id } = req.params;
-          const resolvedProjectId = projectId ?? id;
-
-          workspaceId = await findWorkspaceIdFromProject(resolvedProjectId);
-
-          break;
-        }
-        case DEPTH.TASK: {
-          const { taskId, id } = req.params;
-          const resolvedTaskId = taskId ?? id;
-
-          workspaceId = await findWorkspaceIdFromTask(resolvedTaskId);
-
-          break;
-        }
-        case DEPTH.TAG: {
-          const { tagId, id } = req.params;
-          const resolvedTagId = tagId ?? id;
-
-          workspaceId = await findWorkspaceIdFromTag(resolvedTagId);
-
-          break;
-        }
-
-        case DEPTH.COMMENT: {
-          const { commentId, id } = req.params;
-          const resolvedCommentId = commentId ?? id;
-
-          workspaceId = await findWorkspaceIdFromComment(resolvedCommentId);
-          break;
-        }
-
-        default:
-          throw new InvalidDepthError();
-      }
-
-      const memberRole = await findMemberRole(workspaceId, userId);
-
-      if (!MEMBER_ROLES[memberRole]) throw new InvalidMemberRoleError();
-
-      if (
-        MEMBER_ROLES_HIERARCHY[memberRole] <
-        MEMBER_ROLES_HIERARCHY[requiredMemberRole]
-      )
-        throw new InsufficientPrivilegesError();
+      const validate = await validateMemberRole(
+        requiredMemberRole,
+        depth,
+        req.params,
+        userId
+      );
 
       // User has the required member role (ADMIN can bypass all member roles)
-      next();
+      if (validate) next();
     } catch (error) {
       if (error instanceof UnauthorizedError)
         return res

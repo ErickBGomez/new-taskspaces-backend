@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import config from '../config/config.js';
 import * as taskService from '../services/task.service.js';
+import { validateMemberRole } from '../helpers/member.helper.js';
+import { DEPTH, MEMBER_ROLES } from './check-member-role.middleware.js';
 
 const socketMiddleware = (io) => {
   io.use((socket, next) => {
@@ -35,10 +37,28 @@ const socketMiddleware = (io) => {
     });
 
     // Rooms
-    socket.on('project:join', (projectId) => {
-      socket.join(projectId);
-      console.log(`[${user.username}] Joined project: ${projectId}`);
-      socket.emit('project:joined', { projectId });
+    socket.on('project:join', async (projectId) => {
+      try {
+        const checkMemberRole = await validateMemberRole(
+          MEMBER_ROLES.READER,
+          DEPTH.PROJECT,
+          { projectId },
+          user.id
+        );
+
+        if (!checkMemberRole) return;
+        socket.join(projectId);
+        console.log(`[${user.username}] Joined project: ${projectId}`);
+        socket.emit('project:joined', { projectId });
+      } catch (e) {
+        console.error(
+          `[${user.username}] Failed to join project: ${projectId}.`
+        );
+        socket.emit('project:error', {
+          title: 'Project join failed',
+          message: e.message,
+        });
+      }
     });
 
     socket.on('project:leave', (projectId) => {
@@ -50,6 +70,15 @@ const socketMiddleware = (io) => {
     // Task events
     socket.on('task:fetchAll', async (projectId) => {
       try {
+        const checkMemberRole = await validateMemberRole(
+          MEMBER_ROLES.READER,
+          DEPTH.PROJECT,
+          { projectId },
+          user.id
+        );
+
+        if (!checkMemberRole) return;
+
         console.log(
           `[${user.username}] Fetching tasks... Project Id: ${projectId}`
         );
@@ -67,6 +96,15 @@ const socketMiddleware = (io) => {
 
     socket.on('task:fetch', async ({ id, projectId }) => {
       try {
+        const checkMemberRole = await validateMemberRole(
+          MEMBER_ROLES.READER,
+          DEPTH.PROJECT,
+          { projectId },
+          user.id
+        );
+
+        if (!checkMemberRole) return;
+
         console.log(
           `[${user.username}] Fetching task... Id: ${id}. Project Id: ${projectId}`
         );
@@ -83,6 +121,15 @@ const socketMiddleware = (io) => {
 
     socket.on('task:create', async ({ task, projectId }) => {
       try {
+        const checkMemberRole = await validateMemberRole(
+          MEMBER_ROLES.COLLABORATOR,
+          DEPTH.PROJECT,
+          { projectId },
+          user.id
+        );
+
+        if (!checkMemberRole) return;
+
         console.log(
           `[${user.username}] Creating new task... Project Id: ${projectId}`
         );
@@ -91,6 +138,8 @@ const socketMiddleware = (io) => {
         // Using io instead of socket to emit to all connected clients (see later to emit to a specific room)
         io.to(projectId).emit('task:created', { content: newTask });
       } catch (e) {
+        console.log(e.message);
+
         socket.emit('task:error', {
           title: 'Task creation failed',
           message: e.message,
@@ -100,6 +149,15 @@ const socketMiddleware = (io) => {
 
     socket.on('task:update', async ({ id, task, projectId }) => {
       try {
+        const checkMemberRole = await validateMemberRole(
+          MEMBER_ROLES.COLLABORATOR,
+          DEPTH.TASK,
+          { id },
+          user.id
+        );
+
+        if (!checkMemberRole) return;
+
         console.log(
           `[${user.username}] Updating new task... Id: ${id}. Project Id: ${projectId}`
         );
@@ -116,6 +174,15 @@ const socketMiddleware = (io) => {
 
     socket.on('task:delete', async ({ id, projectId }) => {
       try {
+        const checkMemberRole = await validateMemberRole(
+          MEMBER_ROLES.COLLABORATOR,
+          DEPTH.TASK,
+          { id },
+          user.id
+        );
+
+        if (!checkMemberRole) return;
+
         console.log(
           `[${user.username}] Deleting new task... Id: ${id}. Project Id: ${projectId}`
         );
