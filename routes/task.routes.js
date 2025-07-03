@@ -24,6 +24,13 @@ router.get(
   handleInternalServerErrorMiddleware
 );
 router.get(
+  '/assigned',
+  authMiddleware,
+  authorizeRolesMiddleware(ROLES.USER),
+  taskController.getAssignedTasks,
+  handleInternalServerErrorMiddleware
+);
+router.get(
   '/p/:projectId',
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),

@@ -28,6 +28,26 @@ export const getAllTasks = async (req, res, next) => {
   }
 };
 
+export const getAssignedTasks = async (req, res, next) => {
+  try {
+    const { id: userId } = req.user;
+
+    const tasks = await taskService.findAssignedTasks(userId);
+
+    res
+      .status(200)
+      .json(
+        new SuccessResponseBuilder()
+          .setStatus(200)
+          .setMessage('Assigned tasks found')
+          .setContent(tasks)
+          .build()
+      );
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getTasksByProjectId = async (req, res, next) => {
   try {
     const { projectId } = req.params;

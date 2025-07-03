@@ -1,3 +1,4 @@
+import { findUserById } from '../repositories/user.repository.js';
 import * as taskRepository from '../repositories/task.repository.js';
 import * as projectRepository from '../repositories/project.repository.js';
 import * as workspaceRepository from '../repositories/workspace.repository.js';
@@ -13,6 +14,13 @@ import { isValidDateTime, toDateObject } from '../helpers/datetime.helper.js';
 
 export const findAllTasks = async () => {
   return await taskRepository.findAllTasks();
+};
+
+export const findAssignedTasks = async (userId) => {
+  const userExists = await findUserById(userId);
+  if (!userExists) throw new UserNotFoundError();
+
+  return await taskRepository.findAssignedTasks(userId);
 };
 
 export const findTasksByProjectId = async (projectId) => {

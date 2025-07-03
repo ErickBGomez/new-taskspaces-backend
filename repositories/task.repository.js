@@ -45,6 +45,19 @@ export const findAllTasks = async () => {
   return tasks.map((task) => parseTaskData(task));
 };
 
+export const findAssignedTasks = async (userId) => {
+  const tasks = await prisma.task_assigned.findMany({
+    where: {
+      user_id: parseInt(userId),
+    },
+    select: { task: { select: { ...selectTask } } },
+  });
+
+  console.log(tasks);
+
+  return tasks.map((task) => parseTaskData(task.task));
+};
+
 export const findTasksByProjectId = async (projectId) => {
   const tasks = await prisma.task.findMany({
     where: {
