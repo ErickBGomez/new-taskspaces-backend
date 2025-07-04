@@ -77,8 +77,6 @@ export const validateMemberRole = async (
 
   const memberRole = await findMemberRole(workspaceId, userId);
 
-  console.log(memberRole);
-
   if (!MEMBER_ROLES[memberRole]) throw new InvalidMemberRoleError();
 
   if (

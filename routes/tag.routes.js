@@ -52,10 +52,6 @@ router.post(
   authMiddleware,
   authorizeRolesMiddleware(ROLES.USER),
   checkMemberRoleMiddleware(MEMBER_ROLES.COLLABORATOR, DEPTH.PROJECT),
-  (req, res, next) => {
-    console.log(req.body);
-    next();
-  },
   tagValidator,
   checkValidation,
   tagController.createTag,

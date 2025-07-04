@@ -53,8 +53,6 @@ export const findAssignedTasks = async (userId) => {
     select: { task: { select: { ...selectTask } } },
   });
 
-  console.log(tasks);
-
   return tasks.map((task) => parseTaskData(task.task));
 };
 
