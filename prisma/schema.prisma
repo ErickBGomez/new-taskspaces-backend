@@ -69,7 +69,7 @@ model role {
 model tag {
   id         Int        @id @default(autoincrement())
   title      String     @db.VarChar(25)
-  color      String     @default("#FFFFFF") @db.VarChar(7)
+  color      String     @default("#FFFFFF") @db.VarChar(9)
   project_id Int
   created_at DateTime?  @default(now()) @db.Timestamp(6)
   updated_at DateTime?  @default(now()) @db.Timestamp(6)

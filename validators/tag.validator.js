@@ -9,7 +9,7 @@ const tagValidator = [
   body('color')
     .isString()
     .withMessage('Color must be a string')
-    .isLength({ min: 7, max: 7 })
+    .isLength({ min: 7, max: 9 })
     .withMessage('Color must be a valid hex color'),
 ];
 
