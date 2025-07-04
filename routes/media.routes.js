@@ -1,5 +1,8 @@
 import { Router } from 'express';
-import { uploadMediaToTask } from '../controllers/media.controller.js';
+import {
+  uploadMediaToTask,
+  uploadMedia,
+} from '../controllers/media.controller.js';
 import uploadImageMiddleware from '../middlewares/upload-image.middleware.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
 
@@ -12,11 +15,6 @@ router.post(
   uploadMediaToTask
 );
 
-router.post(
-  '/upload/',
-  authMiddleware,
-  uploadImageMiddleware,
-  uploadMediaToTask
-);
+router.post('/upload/', authMiddleware, uploadImageMiddleware, uploadMedia);
 
 export default router;

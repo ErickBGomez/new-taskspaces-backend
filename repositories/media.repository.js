@@ -7,7 +7,6 @@ const selectMedia = {
   type: true,
   url: true,
   author_id: true,
-  task_id: true,
   created_at: true,
   updated_at: true,
 };
