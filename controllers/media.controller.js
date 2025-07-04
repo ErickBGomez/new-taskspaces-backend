@@ -40,6 +40,7 @@ export const uploadMediaToTask = async (req, res, next) => {
         .setMessage('File uploaded successfully')
         // TODO: Set content here
         .setContent({ ...mediaUploaded })
+        .build()
     );
   } catch (error) {
     next(error);
@@ -47,8 +48,6 @@ export const uploadMediaToTask = async (req, res, next) => {
 };
 
 export const uploadMedia = async (req, res, next) => {
-  const { id: authorId } = req.user;
-
   try {
     if (!req.file) {
       return res
@@ -67,14 +66,11 @@ export const uploadMedia = async (req, res, next) => {
     const url = `${req.protocol}://${req.get('host')}/media/${file}`;
 
     // Save file in database
-    const mediaUploaded = await mediaService.uploadMedia(
-      {
-        filename: file,
-        type: req.file.mimetype,
-        url: url,
-      },
-      authorId
-    );
+    const mediaUploaded = await mediaService.uploadMedia({
+      filename: file,
+      type: req.file.mimetype,
+      url: url,
+    });
 
     res.status(201).json(
       new SuccessResponseBuilder()
@@ -82,6 +78,7 @@ export const uploadMedia = async (req, res, next) => {
         .setMessage('File uploaded successfully')
         // TODO: Set content here
         .setContent({ ...mediaUploaded })
+        .build()
     );
   } catch (error) {
     next(error);

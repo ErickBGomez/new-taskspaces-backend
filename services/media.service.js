@@ -22,9 +22,6 @@ export const uploadMediaToTask = async (
   );
 };
 
-export const uploadMedia = async ({ filename, type, url }, authorId) => {
-  const userExists = await userRepository.findUserById(authorId);
-  if (!userExists) throw new UserNotFoundError();
-
-  return await mediaRepository.uploadMedia({ filename, type, url }, authorId);
+export const uploadMedia = async ({ filename, type, url }) => {
+  return await mediaRepository.uploadMedia({ filename, type, url });
 };

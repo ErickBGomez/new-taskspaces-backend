@@ -15,6 +15,6 @@ router.post(
   uploadMediaToTask
 );
 
-router.post('/upload/', authMiddleware, uploadImageMiddleware, uploadMedia);
+router.post('/upload/', uploadImageMiddleware, uploadMedia);
 
 export default router;

@@ -6,7 +6,6 @@ const selectMedia = {
   filename: true,
   type: true,
   url: true,
-  author_id: true,
   created_at: true,
   updated_at: true,
 };
@@ -56,11 +55,10 @@ export const uploadMediaToTask = async (media, authorId, taskId) => {
   return parseMediaData(uploadedMedia);
 };
 
-export const uploadMedia = async (media, authorId) => {
+export const uploadMedia = async (media) => {
   const uploadedMedia = await prisma.media.create({
     data: {
       ...media,
-      author_id: parseInt(authorId),
     },
     select: { ...selectMedia },
   });
