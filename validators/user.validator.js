@@ -21,12 +21,7 @@ export const registerUserValidator = [
     .withMessage(
       'Username must not contain special characters except for _ and .'
     ),
-  body('avatar')
-    .optional()
-    .isString()
-    .withMessage('Avatar must be a string')
-    .isURL()
-    .withMessage('Avatar must be a URL'),
+  body('avatar').optional().isString().withMessage('Avatar must be a string'),
   body('email')
     .notEmpty()
     .withMessage('Email is required')

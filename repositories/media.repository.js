@@ -30,20 +30,38 @@ export const findMediaById = async (id) => {
 };
 
 export const findMediaByTaskId = async (taskId) => {
-  const media = await prisma.media.findMany({
-    where: { taskId: parseInt(taskId) },
-    select: { ...selectMedia },
+  const media = await prisma.task_media.findMany({
+    where: { task_id: parseInt(taskId) },
+    select: { task: { select: { ...selectMedia } } },
   });
 
-  return media.map((medium) => parseMediaData(medium));
+  return media.map((task_media) => parseMediaData(task_media.task));
 };
 
-export const uploadMedia = async (media, authorId, taskId) => {
+export const uploadMediaToTask = async (media, authorId, taskId) => {
   const uploadedMedia = await prisma.media.create({
     data: {
       ...media,
       author_id: parseInt(authorId),
+    },
+    select: { ...selectMedia },
+  });
+
+  await prisma.task_media.create({
+    data: {
       task_id: parseInt(taskId),
+      media_id: uploadedMedia.id,
+    },
+  });
+
+  return parseMediaData(uploadedMedia);
+};
+
+export const uploadMedia = async (media, authorId) => {
+  const uploadedMedia = await prisma.media.create({
+    data: {
+      ...media,
+      author_id: parseInt(authorId),
     },
     select: { ...selectMedia },
   });
