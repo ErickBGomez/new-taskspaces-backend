@@ -1,5 +1,5 @@
 import prisma from '../utils/prisma.js';
-import { parseMediaData } from '../helpers/media.helper.js';
+import { parseMediaData, parseTaskMediaData } from '../helpers/media.helper.js';
 
 const selectMedia = {
   id: true,
@@ -8,6 +8,13 @@ const selectMedia = {
   url: true,
   created_at: true,
   updated_at: true,
+};
+
+const selectTaskMedia = {
+  task_id: true,
+  media: {
+    select: { ...selectMedia },
+  },
 };
 
 export const findAllMedia = async () => {
@@ -45,14 +52,15 @@ export const uploadMediaToTask = async (media, authorId, taskId) => {
     select: { ...selectMedia },
   });
 
-  await prisma.task_media.create({
+  const uploadedTaskMedia = await prisma.task_media.create({
     data: {
       task_id: parseInt(taskId),
       media_id: uploadedMedia.id,
     },
+    select: { ...selectTaskMedia },
   });
 
-  return parseMediaData(uploadedMedia);
+  return parseTaskMediaData(uploadedTaskMedia);
 };
 
 export const uploadMedia = async (media) => {

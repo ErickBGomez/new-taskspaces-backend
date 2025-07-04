@@ -10,3 +10,15 @@ export const parseMediaData = (media) => {
     updatedAt: updated_at,
   };
 };
+
+export const parseTaskMediaData = (taskMedia) => {
+  if (!taskMedia) return null;
+
+  const { task_id, created_at, ...taskMediaData } = taskMedia;
+
+  return {
+    taskId: parseInt(task_id),
+    createdAt: created_at,
+    ...taskMediaData,
+  };
+};
